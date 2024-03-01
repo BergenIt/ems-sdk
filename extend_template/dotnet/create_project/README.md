@@ -11,7 +11,30 @@
     * Services - папка для классов работающих с протофайлами
         * GreeterService.cs - класс, созданный автоматически (можно удалить за ненадобностью)
     * Program.cs - класс, с которого начинается запуск программы
-    
+3) Добавляем в папку Protos файл example.proto:
+```s
+syntax = "proto3";
+
+option csharp_namespace = "SnmpExample";
+
+package example;
+#Имя сервиса
+service ExampleService
+{
+#Название функции
+  rpc SendPing (PingRequest) returns (PingReply);
+}
+#Класс передаваемый сервису
+message PingRequest
+{
+  string someString = 1;
+}
+#Класс получаемый в ответ
+message PingReply
+{
+  string otherString = 1;
+}
+```
 
 ## Подключение протофайлов
 
