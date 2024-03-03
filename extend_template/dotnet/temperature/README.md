@@ -28,21 +28,21 @@
 
 Варианты `SystemMetric`:
 
-SYSTEM_METRIC_UNSPECIFIED = 0;
-SYSTEM_METRIC_POWER_STATE = 1;
-SYSTEM_METRIC_BOOT_GET = 2;
-SYSTEM_METRIC_MODEL = 3;
-SYSTEM_METRIC_VENDOR = 4;
-SYSTEM_METRIC_SERVER_LED = 5;
-SYSTEM_METRIC_POWER_USAGE = 6;
-SYSTEM_METRIC_FIRMWARE_BOOT_SOURCE_GET = 7;
-SYSTEM_METRIC_SERIAL_NUMBER = 8;
-SYSTEM_METRIC_BIOS_VERSION = 9;
-SYSTEM_METRIC_BMC_VERSION = 10;
-SYSTEM_METRIC_OPERATION_SYSTEM = 11;
-SYSTEM_METRIC_HOSTINFO = 12;
-SYSTEM_METRIC_PROCESSOR = 13;
-SYSTEM_METRIC_DEVICE_TEMPERATURE = 14;
+* SYSTEM_METRIC_UNSPECIFIED = 0;
+* SYSTEM_METRIC_POWER_STATE = 1;
+* SYSTEM_METRIC_BOOT_GET = 2;
+* SYSTEM_METRIC_MODEL = 3;
+* SYSTEM_METRIC_VENDOR = 4;
+* SYSTEM_METRIC_SERVER_LED = 5;
+* SYSTEM_METRIC_POWER_USAGE = 6;
+* SYSTEM_METRIC_FIRMWARE_BOOT_SOURCE_GET = 7;
+* SYSTEM_METRIC_SERIAL_NUMBER = 8;
+* SYSTEM_METRIC_BIOS_VERSION = 9;
+* SYSTEM_METRIC_BMC_VERSION = 10;
+* SYSTEM_METRIC_OPERATION_SYSTEM = 11;
+* SYSTEM_METRIC_HOSTINFO = 12;
+* SYSTEM_METRIC_PROCESSOR = 13;
+* SYSTEM_METRIC_DEVICE_TEMPERATURE = 14;
 
 Класс `DeviceContent`:
 
@@ -116,62 +116,42 @@ SYSTEM_METRIC_DEVICE_TEMPERATURE = 14;
 * `security_level`:
     * Тип параметра: `string`
     * Описание: Уровень безопасности.
+
 Варианты `ConnectorProtocol`:
 
-CONNECTOR_PROTOCOL_UNSPECIFIED (0):
-    * Описание: Невалидное значение.
-CONNECTOR_PROTOCOL_IPMI (1):
-    * Описание: Ipmi протокол для проверки подключения.
-CONNECTOR_PROTOCOL_REDFISH (2):
-    * Описание: Redfish протокол для проверки подключения.
-CONNECTOR_PROTOCOL_SNMP (3):
-    * Описание: Snmp протокол для проверки подключения.
-CONNECTOR_PROTOCOL_SSH (4):
-    * Описание: Ssh протокол для проверки подключения.
-CONNECTOR_PROTOCOL_WMI (5):
-    * Описание: Wmi протокол для проверки подключения.
-Из тела полученного запроса сервис берет данные необходимые для отправки SNMP-запрос к оборудованию. Общий вид используемого SNMP-запроса выглядит следующим образом:
+* CONNECTOR_PROTOCOL_UNSPECIFIED - Невалидное значение.
+* CONNECTOR_PROTOCOL_IPMI - Ipmi протокол для проверки подключения.
+* CONNECTOR_PROTOCOL_REDFISH - Redfish протокол для проверки подключения.
+* CONNECTOR_PROTOCOL_SNMP - Snmp протокол для проверки подключения.
+* CONNECTOR_PROTOCOL_SSH - Ssh протокол для проверки подключения.
+* CONNECTOR_PROTOCOL_WMI - Wmi протокол для проверки подключения.
 
+Из тела полученного запроса сервис берет данные необходимые для отправки SNMP-запрос к оборудованию. Общий вид используемого SNMP-запроса выглядит следующим образом:
+```bash
 snmpbulkwalk -OentU -v version -l security_name -u Login -a auth_protocol -A auth_key -x private_protocol -X private_key -c community -n context address oid
-CopyErrorCopied
+```
 Составляющие запроса:
 
-snmpbulkwalk
-Команда для получения данных
--OentU
-Параметры вывода информации
--v version
-Версия протокола
--l security_name
-Уровень аутентификации: noAuthNoPriv / authNoPriv / authPriv
--u Login
-Логин безопасности (только для версии 3)
--a auth_protocol
-Используемый протокол аутентификации (только для версии 3)
--A auth_key
-Ключ для аутентификации (только для версии 3)
--x private_protocol
-Используемый алгоритм шифрования (только для версии 3)
--X private_key
-Ключ для шифрования (только для версии 3)
--c community
-Community слово (пароль для версий 1 и 2)
--n context
-Контекст подключения (только для версии 3)
--address
-IP адрес устройства
--oid
-Идентификатор (путь) к запрашиваемому атрибуту
-oid для данной операции получается из SystemMetricTemplate.template
+* `snmpbulkwalk` Команда для получения данных
+* `-OentU` Параметры вывода информации
+* `-v version` Версия протокола
+* `-l security_name` Уровень аутентификации: noAuthNoPriv / authNoPriv / authPriv
+* `-u Login` Логин безопасности (только для версии 3)
+* `-a auth_protocol` Используемый протокол аутентификации (только для версии 3)
+* `-A auth_key` Ключ для аутентификации (только для версии 3)
+* `-x private_protocol` Используемый алгоритм шифрования (только для версии 3)
+* `-X private_key` Ключ для шифрования (только для версии 3)
+* `-c community` Community слово (пароль для версий 1 и 2)
+* `-n context` Контекст подключения (только для версии 3)
+* `address` IP адрес устройства
+* `oid` Идентификатор (путь) к запрашиваемому атрибуту. oid для данной операции получается из SystemMetricTemplate.template
 
 Полученные от устройства данные сервис отправляет GRPC-ответом.
 
 Ответ сервиса должен соответствовать классу CollectTemplateTemperatureResponse:
 
 * `temperature`:
-
     * Тип параметра: `DeviceTemperature`
-
     * Описание: Температура устройства.
 
 Тип `DeviceTemperature`:
@@ -192,18 +172,12 @@ oid для данной операции получается из SystemMetricT
     * Описание: Идентификатор rpc, с которого были собраны данные.
 Варианты `ServiceSource`:
 
-SERVICE_SOURCE_UNSPECIFIED = 0;
-    * Описание: Невалидное значение.
-SERVICE_SOURCE_BMC_MANAGER = 1;
-    * Описание: Реализация управления и сбора с BMC.
-SERVICE_SOURCE_LINUX_MANAGER = 2;
-    * Описание: Реализация управления и сбора с linux-хостов.
-SERVICE_SOURCE_WINDOWS_MANAGER = 3;
-    * Описание: Реализация управления и сбора с windows-хостов.
-SERVICE_SOURCE_HYPERVISOR_MANAGER = 4;
-    * Описание: Реализация управления и сбора с гипервизоров.
-SERVICE_SOURCE_TEMPLATE_MANAGER = 5;
-    * Описание: Реализация шаблонного мониторинга.
+* SERVICE_SOURCE_UNSPECIFIED - Невалидное значение.
+* SERVICE_SOURCE_BMC_MANAGER - Реализация управления и сбора с BMC.
+* SERVICE_SOURCE_LINUX_MANAGER - Реализация управления и сбора с linux-хостов.
+* SERVICE_SOURCE_WINDOWS_MANAGER - Реализация управления и сбора с windows-хостов.
+* SERVICE_SOURCE_HYPERVISOR_MANAGER - Реализация управления и сбора с гипервизоров.
+* SERVICE_SOURCE_TEMPLATE_MANAGER - Реализация шаблонного мониторинга.
 
 ## Пример реализации
 
