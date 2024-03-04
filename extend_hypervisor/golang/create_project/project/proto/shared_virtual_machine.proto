@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package tool_cluster.v4;
+
+message VirtualMachines {
+  // Идентификатор устройства.
+  string device_id = 1;
+  // Идентификатор гипервизора.
+  string hypervisor_id = 2;
+  // Массив виртуальных машин.
+  repeated VirtualMachine virtual_machines = 3;
+}
+
+message VirtualMachine {
+  // Наименование виртуальной машины.
+  string name = 1;
+  // Сетевые интерфейсы виртуальной машины.
+  repeated VirtualMachineNetwork networks = 2;
+}
+
+message VirtualMachineNetwork {
+  // IP-адреса.
+  repeated string ips = 1;
+  // MAC-адрес.
+  string mac = 2;
+}
