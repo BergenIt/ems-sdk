@@ -12,15 +12,15 @@ import "shared_device_memory.proto";
 /**
  * Сервис WindowsManager реализует логику мониторинга и инвентаризации оборудования и виртуальных машин на базе ОС Windows
  */
- service WindowsManager {
-    // Собрать инвентарные данные по ОЗУ
-    rpc CollectMemory(CollectWindowsMemoryRequest) returns (CollectWindowsMemoryResponse);
+service WindowsManager {
+  // Собрать инвентарные данные по ОЗУ
+  rpc CollectMemory(CollectWindowsMemoryRequest) returns (CollectWindowsMemoryResponse);
 }
 
 /**
  * Контракт запроса для rpc CollectMemory
  */
- message CollectWindowsMemoryRequest {
+message CollectWindowsMemoryRequest {
   // Данные об устройстве
   DeviceContent device = 1;
 }

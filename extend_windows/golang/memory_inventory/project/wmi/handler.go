@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"time"
 
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
@@ -16,11 +15,7 @@ func SendWinRMCommand(
 	ip, login, pass string,
 	port int,
 	cmd string,
-	timeout time.Duration,
 ) (string, error) {
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-
 	client, err := newWinRMClient(ip, login, pass, port)
 	if err != nil {
 		return "", fmt.Errorf("create WMI client error: %s", err)

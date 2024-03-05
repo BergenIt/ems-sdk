@@ -1,0 +1,7 @@
+version: "3.9"
+
+services:
+  windows-handler:
+    image: docker-windows-handler:latest
+    ports:
+      - 8081:8080
