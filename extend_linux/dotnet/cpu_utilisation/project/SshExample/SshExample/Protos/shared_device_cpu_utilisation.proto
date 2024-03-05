@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+import "shared_device.proto";
+
+// Данные потребления оборудованием по cpu.
+message DeviceCpuUtilisation {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Суммарные метрики потребления CPU.
+  CpuUnitUtilisation summary_utilisation = 2;
+  // Данные о статусе каждого из процессоров/ядер. Ключ - id процессора.
+  map<int32, CpuUnitUtilisation> unit_utilistaions = 3;
+}
+
+// Метрики потребления CPU.
+message CpuUnitUtilisation {
+  // Общий процент использования процессора.
+  int32 total_using = 1;
+  // Время простоя процессора, выраженное в процентах.
+  int32 idle_time = 2;
+  // Процент использования процессора пользовательскими процессами.
+  google.protobuf.Int32Value user_using = 3;
+  // Процент использования процессора системными процессами.
+  google.protobuf.Int32Value system_using = 4;
+  // Процент времени, в течение которого CPU выполнял процессы, выставленные пользователем вручную (nice).
+  google.protobuf.Int32Value nice_value_using = 5;
+  // Процент времени, потраченного на ожидание ввода-вывода.
+  google.protobuf.Int32Value io_waiting = 6;
+  // Процент времени, потраченного на обработку аппаратных прерываний.
+  google.protobuf.Int32Value hw_service_interrupts = 7;
+  // Процент времени, потраченного на обработку программных (системных) прерываний.
+  google.protobuf.Int32Value soft_service_interrupts = 8;
+  // Процент времени, потраченного на выполнение задач в виртуальной машине (виртуализация).
+  google.protobuf.Int32Value steal_time = 9;
+}
