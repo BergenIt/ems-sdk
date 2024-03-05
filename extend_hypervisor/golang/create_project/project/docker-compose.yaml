@@ -1,0 +1,31 @@
+version: "3.9"
+
+networks:
+  default:
+    name: 'ems-network'
+
+services:
+  hypervisor-manager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: '50M'
+        max-file: '5'
+    ulimits:
+      core:
+        hard: 0
+        soft: 0
+    hostname: hypervisor-manager
+    environment:
+      ServicePort: 8081
+    deploy:
+      resources:
+        limits:
+          cpus: "3"
+          memory: 2000M
+        reservations:
+          cpus: "0.5"
+          memory: 400M
