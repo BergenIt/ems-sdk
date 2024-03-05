@@ -1,0 +1,34 @@
+/**
+ * Контракты для сервиса hypervisor-manager
+ */
+
+syntax = "proto3";
+
+package tool_cluster.v4;
+
+import "shared_virtual_machine.proto";
+import "shared_hypervisor.proto";
+
+/**
+ * Сервис HypervisorManager реализует логику взаимодействия и сбора информации с гипервизоров
+ */
+service HypervisorManager  {
+  // Получение списка виртуальных машин гипервизора
+  rpc CollectVirtialMachinesList(CollectVirtialMachinesListRequest) returns (CollectVirtialMachinesListResponse);
+}
+
+/**
+ * Контракт запроса для rpc CollectVirtialMachinesList
+ */
+message CollectVirtialMachinesListRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectVirtialMachinesList
+ */
+message CollectVirtialMachinesListResponse {
+  // Спискок виртуальных машин
+  VirtualMachines virtual_machines = 1;
+}
