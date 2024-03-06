@@ -51,7 +51,7 @@ namespace BmcHandler.Services
 }
 ```
 
-Скофигурируем приложение и grpc-сервер в `Program.cs`:
+Сконфигурируем приложение и grpc-сервер в `Program.cs`:
 
 ```csharp
 using BmcHandler.Services;

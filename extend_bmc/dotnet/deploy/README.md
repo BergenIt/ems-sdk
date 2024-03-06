@@ -1,10 +1,10 @@
 # Развертывание модуля расширения
 
-После реализации модуля расширения template необходимо позаботиться о том, чтобы его можно было развернуть в Docker.
+После реализации модуля расширения Bmc необходимо позаботиться о том, чтобы его можно было развернуть в Docker.
 
 Образ необходим для того, чтобы можно было запустить приложение в docker-compose на стенде.
 
-После того, как приложение будет развернуто можно будет проверить работу сбора инвентарных данных ОЗУ в UI EMS-a.
+После того, как приложение будет развернуто можно будет проверить работу системной операции в UI EMS-a.
 
 ## Сборка в docker
 
@@ -27,26 +27,26 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["BmcManager.csproj", "."]
-RUN dotnet restore "./BmcManager.csproj"
+COPY ["BmcHandler.csproj", "."]
+RUN dotnet restore "./BmcHandler.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "./BmcManager.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./BmcHandler.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./BmcManager.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./BmcHandler.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "BmcManager.dll"]
+ENTRYPOINT ["dotnet", "BmcHandler.dll"]
 ```
 
 Выполним сборку docker образа:
 
 ```bash
-docker build --tag example ./
+docker build --tag bmc-handler ./
 ```
 
 ## Развертывание
@@ -63,12 +63,12 @@ networks:
 
 services:
   # Название вашего сервиса
-  snmp-example:
+  bmc-handler:
    # Название созданного вами образа
-    image: example:latest
+    image: bmc-handler:latest
     ports:
    # Порты для обращения к сервису внешний:внутренний
-      - 42763:8080
+      - 44444:8080
 ```
 
 Для запуска проекта в директории с файлом docker-compose.yaml необходимо выполнить команду:
@@ -80,23 +80,23 @@ docker compose up -d
 Убедитесь в том, что контейнер запущен:
 
 ```bash
-docker ps -a | grep 'snmp-example'
+docker ps -a | grep 'bmc-handler'
 ```
 
 Пример вывода:
 
 ```bash
 CONTAINER ID   IMAGE            COMMAND                  CREATED              STATUS              PORTS                    NAMES
-122ffc95ec59   example:latest   "dotnet BmcManager.…"   About a minute ago   Up About a minute   0.0.0.0:42763->8080/tcp   1-snmp-example-1
+122ffc95ec59   bmc-handler:latest   "dotnet BmcHandler.…"   About a minute ago   Up About a minute   0.0.0.0:42763->8080/tcp   1-bmc-handler-1
 ```
 
-## Проверка в системе
+## Проверка в EMS
 
 Развертывание проекта должно происходить на виртуальной машине с работоспособным EMS.
 
 После завершения разработки поместите получившийся проект на стенд и запустите созданный ранее `docker-compose`.
 
-Для проверки получения температуры по протоколу SNMP необходимо:
+Для проверки получения статуса LED необходимо:
 
 1) Авторизоваться в EMS
 2) Добавить или настроить существующий шаблон для сбора температуры
