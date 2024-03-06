@@ -58,15 +58,59 @@
 
 На данном этапе пустой шаблон модуля расширения готов для локального запуска.
 
+Для запуска рекомендуется использовать `Makefile` и утилиту `make`, создадим его и распишем набор команд:
+
+```makefile
+    MODULE_NAME=<название_корневого_модуля_по_усмотрению>
+    gen:
+        cd proto && \
+        protoc --go_out=./.. \
+        --go_opt=Mservice_hypervisor_manager.proto=${MODULE_NAME}/gen/cluster-contract \
+        --go_opt=Mshared_hypervisor.proto=${MODULE_NAME}/gen/cluster-contract \
+        --go_opt=Mshared_virtual_machine.proto=${MODULE_NAME}/gen/cluster-contract \
+        --go_opt=module=${MODULE_NAME} \
+        --go-grpc_out=./.. \
+        --go-grpc_opt=Mservice_hypervisor_manager.proto=${MODULE_NAME}/gen/cluster-contract \
+        --go-grpc_opt=Mshared_hypervisor.proto=${MODULE_NAME}/gen/cluster-contract \
+        --go-grpc_opt=Mshared_virtual_machine.proto=${MODULE_NAME}/gen/cluster-contract \
+        --go-grpc_opt=module=${MODULE_NAME} \
+        service_hypervisor_manager.proto shared_hypervisor.proto shared_virtual_machine.proto
+
+    tidy:
+        go mod tidy
+
+    build: gen tidy
+        CGO_ENABLED=0 go build -o bin
+```
+
+С помощью команды `make build` можно сбилдить проект под работу в скретче.
+
 Для подключения модуля к системе необходимо настроить `Dockerfile` и `docker-compose.yaml`, подробную информацию об этом можно найти в директории `deploy`.
 
 ## Подключение протофайлов
 
+Для работы сервиса необходимо протофайлы. Полный набор протофайлов можно найти в корне проекта `sdk`, в директории `.proto`.
 
-> Описываем зачем тут протофайлы
+Ограниченный набор прото-файлов для RPC `CollectVirtialMachinesList` расположен в директории `proto` проекта `create_project`.
 
-> Описываем как подключить к проекту протофайлы
+Из данных протофайлов необходимо сгенерировать код для корректной работы сервера, для этого рекомендуется использовать следующий набор утилит:
 
-> Описываем зачем мы их подключили и что можем с ними делать
+- protobuf-compiler
+- protoc-gen-go
+- protoc-gen-go-grpc
 
-> Указываем что пример итогового проекта находится в папке project
+Рекомендуемые команды для устанвоки в Ubuntu 22.04:
+
+```sh
+apt-get update && \
+apt install -y protobuf-compiler && \
+apt clean
+go env -w GOSUMDB=off
+go env -w GO111MODULE=on
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.32.0 && \
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
+```
+
+Сгенерировать код из прото-файлов можно с помощью команды `make gen`.
+
+Пример готового шаблона модуля расширения находится в директории `project`.
