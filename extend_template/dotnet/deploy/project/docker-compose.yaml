@@ -1,0 +1,11 @@
+﻿version: "3.9"
+
+networks:
+  default:
+    name: 'ems-network'
+
+services:
+  snmp-example:
+    image: example:latest
+    ports:
+      - 7777:8080
