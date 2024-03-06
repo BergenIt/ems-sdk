@@ -28,7 +28,7 @@ COPY . .
 RUN make build
 
 FROM scratch AS release
-LABEL ems.service.virtual-machine-set=default
+LABEL ems.service.service-health=default
 LABEL ems.service.secure=default
 LABEL ems.service.port=8081
 LABEL ems.grpc-service.healthcheck=81
@@ -36,6 +36,11 @@ WORKDIR /app
 COPY --from=build /src/bin ./bin
 ENTRYPOINT ["./bin"]
 ```
+
+Подробнее здесь:
+
+- <https://docs.docker.com/reference/dockerfile/>
+- <https://docs.docker.com/language/golang/build-images/>
 
 Сбилдить проект можно с помощью команды `docker build .`
 
@@ -47,7 +52,17 @@ ENTRYPOINT ["./bin"]
 
 Список лейблов с описанием:
 
-- LABEL ems.service.service-health=default - включение модуля расширения в обработку системой EMS.
+Один на выбор:
+
+- LABEL ems.service.service-health.operation-system
+  - Для привязки модуля расширения к операции для конкретных операционных систем устройств.
+  - Для этого объявите этот лейбл с названием и версией операционной системы устройства, разделенных пробелом, в качестве значения лейбла.
+- LABEL ems.service.service-health
+  - Для привязки модуля расширения к операции для всех устройств.
+  - Для этого объявите этот лейбл с любым значением.
+
+Дополнительные:
+
 - LABEL ems.service.secure=default - активация защищенного соединения.
 - LABEL ems.service.port=8081 - порт, который прослушивает сервер.
 - LABEL ems.grpc-service.healthcheck=81 - порт для проверки доступности сервера.
@@ -58,7 +73,7 @@ ENTRYPOINT ["./bin"]
 
 Важно определить в конфигурации работу в сети `ems-network`, пример рабочего файла конфигурации выглядит следующим образом:
 
-```
+```yaml
 version: "3.9"
 
 networks:
@@ -92,11 +107,16 @@ services:
           memory: 400M
 ```
 
+Подробнее об этом здесь:
+
+- <https://docs.docker.com/compose/>
+- <https://docs.docker.com/compose/compose-application-model/>
+
 Для запуска модуля расширения в эксплуатацию необходимо поместить папку `project` на ВМ, где запущен EMS и выполнить команду `docker-compose up --build -d` из корня проекта.
 
 Если приложения корректно запущено, то при выполнении команды `docker ps | grep project-service-manager-1` мы увидим вот такой результат:
 
-```table
+```bash
 CONTAINER ID   IMAGE                     COMMAND   CREATED         STATUS         PORTS     NAMES
 059ed982d404   project-service-manager   "./bin"   3 seconds ago   Up 2 seconds             project-service-manager-1
 ```

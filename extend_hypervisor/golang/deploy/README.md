@@ -56,10 +56,10 @@ Eсли не находит, то ищет сервис с лейблом "ems.h
 
 Один на выбор:
 
-- LABEL ems.windows.virtual-machine-set.operation-system
+- LABEL ems.hypervisor.virtual-machine-set.operation-system
   - Для привязки модуля расширения к операции для конкретных операционных систем устройств.
   - Для этого объявите этот лейбл с названием и версией операционной системы устройства, разделенных пробелом, в качестве значения лейбла.
-- LABEL ems.windows.virtual-machine-set
+- LABEL ems.hypervisor.virtual-machine-set
   - Для привязки модуля расширения к операции для всех устройств.
   - Для этого объявите этот лейбл с любым значением.
 
