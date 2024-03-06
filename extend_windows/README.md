@@ -25,6 +25,12 @@ Windows manager - стандартный модуль расширения, пр
 
    * Выполнение загруженных пользователем скриптов.
 
+## Разработка собственного windows модуля расширения
+
+* [Создание проекта](./golang/create_project/README.md)
+* [Реализация операции 'Сбор инвентарных данных по ОЗУ'](./golang/memory_inventory/README.md)
+* [Развертывание модуля расширения](./golang/deploy/README.md)
+
 ## Используемые технологии
 
 ### gRPC
@@ -65,9 +71,3 @@ message DeviceDataIdentity
 * <https://learn.microsoft.com/ru-ru/windows/win32/winrm/portal>
 * <https://learn.microsoft.com/ru-ru/windows/win32/winrm/installation-and-configuration-for-windows-remote-management>
 * <https://github.com/masterzen/winrm>
-
-## Разработка собственного windows модуля расширения
-
-* [Создание проекта](./golang/create_project/README.md)
-* [Реализация операции 'Сбор инвентарных данных по ОЗУ'](./golang/memory_inventory/README.md)
-* [Развертывание модуля расширения](./golang/deploy/README.md)
