@@ -1,11 +1,6 @@
 services:
   linux-manager:
     image: linuxmanager:latest
-    environment:
-      
-      Kestrel__EndPoints__Http__Url: http://*:4545
-      Kestrel__EndPoints__Http__Protocols: Http1
-
     build:
       context: .
       dockerfile: Dockerfile

@@ -32,10 +32,10 @@ RUN dotnet publish "./SshExample/SshExample.csproj" \
 	-p:IncludeAllContentForSelfExtract=true \
 	-p:DebugType=none
 
-
 FROM  mcr.microsoft.com/dotnet/runtime:8.0 AS final
 LABEL ems.linux=default
 WORKDIR /app
 EXPOSE 8080
+EXPOSE 443
 COPY --from=build /app/publish .
 ENTRYPOINT ["./SshExample"]
