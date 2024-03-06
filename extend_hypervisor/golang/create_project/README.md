@@ -2,65 +2,44 @@
 
 Данный документ описывает создание минимально доступного рабочего скелета модуля расширения без реализации функционала RPC.
 
+В будущем его можно использовать для обогащения операций необходимой логикой работы.
+
 ## Создание шаблона проекта
 
 Подключение модуля расширения к системе осуществляется с помощью следующих ключевых технологий:
 
-- протокол [gRPC](https://grpc.io/docs/what-is-grpc/introduction/)
+- [протокол gRPC](https://grpc.io/docs/what-is-grpc/introduction/)
 - [docker-compose](https://docs.docker.com/compose/)
 
-Для создания проекта на golang необходимо установить язык по следующей [инструкции](https://go.dev/doc/install).
+Для создания проекта на golang необходимо установить sdk по следующей [инструкции](https://go.dev/doc/install).
 
 Далее в директории проекта необходимо инициализировать файл `go.mod` для подгрузки внешних зависимостей с помощью команды `go mod init <название_корневого_модуля_по_усмотрению>`.
 
-Далее необходимо [сгенерировать](#Подключение-протофайлов) код по необходимым протофайлам для работы gRPC сервера.
+## Подключение протофайлов
 
-Для создания сервера `gRPC` в go нам необходимо:
+Для работы сервиса необходимы протофайлы. Полный набор протофайлов можно найти в корне проекта `sdk`, в директории `.proto`.
 
-1. Создать структуру, которая будет реализовывать интерфейс сервиса, описанного в протофайле, и сгенерированного в коде.
+Копия набора прото-файлов для RPC `CollectVirtualMachinesList` расположены в директории `proto` [проекта](./project/).
 
-```golang
-    // Инстанс сервиса с реализацией RPC.
-    type microservice struct {
-        pb.UnimplementedHypervisorManagerServer
-    }
+Из данных протофайлов необходимо сгенерировать код для корректной работы сервера, для этого рекомендуется использовать следующий набор утилит:
 
-    // RPC по сбору списка виртуальных машин с гипервизра ESXI.
-    func (r *microservice) CollectVirtialMachinesList(context.Context, *pb.CollectVirtialMachinesListRequest) (*pb.CollectVirtialMachinesListResponse, error) {
-        //реализация rpc
-        //...
+- [protobuf-compiler](https://grpc.io/docs/protoc-installation/)
+- [protoc-gen-go](https://pkg.go.dev/github.com/golang/protobuf/protoc-gen-go)
+- [protoc-gen-go-grpc](https://pkg.go.dev/google.golang.org/grpc/cmd/protoc-gen-go-grpc)
 
-        return nil, errors.New("not implemented")
-    }
+Для установки в Ubuntu 22.04:
+
+```sh
+apt-get update && \
+apt install -y protobuf-compiler && \
+apt clean
+go env -w GOSUMDB=off
+go env -w GO111MODULE=on
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.32.0 && \
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
 ```
 
-2. Создать инстанс структуры сервиса, создать сущность сервера gRPC, связать их, и запустить сервер.
-
-```golang
-    func run() error {
-        // Создаем инстанс сервиса.
-        m := microservice{}
-
-        // Создаем инстанс сервера.
-        server := grpc.NewServer()
-
-        // Регистрируем сервис.
-        pb.RegisterHypervisorManagerServer(server, &m)
-
-        // Создаем листененра.
-        lis, err := net.Listen("tcp", listenPort)
-        if err != nil {
-            return fmt.Errorf("create listener: %s", err)
-        }
-
-        // Запускаем gRPC сервер.
-        return server.Serve(lis)
-    }
-```
-
-На данном этапе пустой шаблон модуля расширения готов для локального запуска.
-
-Для запуска рекомендуется использовать `Makefile` и утилиту `make`, создадим его и распишем набор команд:
+Рекомендуется использовать `Makefile` и утилиту `make` для работы с проектом, создадим его и распишем набор команд:
 
 ```makefile
     MODULE_NAME=<название_корневого_модуля_по_усмотрению>
@@ -85,34 +64,57 @@
         CGO_ENABLED=0 go build -o bin
 ```
 
-С помощью команды `make build` можно сбилдить проект под работу в скретче.
+Сгенерировать код из прото-файлов можно с помощью команды `make gen`.
 
-Для подключения модуля к системе необходимо настроить `Dockerfile` и `docker-compose.yaml`, подробную информацию об этом можно найти в директории `deploy`.
+С помощью команды `make build` можно сбилдить проект.
 
-## Подключение протофайлов
+## Создание gRPC сервера
 
-Для работы сервиса необходимо протофайлы. Полный набор протофайлов можно найти в корне проекта `sdk`, в директории `.proto`.
+Для создания сервера `gRPC` в go нам необходимо:
 
-Ограниченный набор прото-файлов для RPC `CollectVirtialMachinesList` расположен в директории `proto` проекта `create_project`.
+1. Создать структуру, которая будет реализовывать интерфейс сервиса, описанного в протофайле, и сгенерированного в коде.
 
-Из данных протофайлов необходимо сгенерировать код для корректной работы сервера, для этого рекомендуется использовать следующий набор утилит:
+```golang
+// Инстанс сервиса с реализацией RPC.
+type microservice struct {
+    pb.UnimplementedHypervisorManagerServer
+}
 
-- protobuf-compiler
-- protoc-gen-go
-- protoc-gen-go-grpc
+// RPC по сбору списка виртуальных машин с гипервизра ESXI.
+func (r *microservice) CollectVirtialMachinesList(context.Context, *pb.CollectVirtialMachinesListRequest) (*pb.CollectVirtialMachinesListResponse, error) {
+    //реализация rpc
+    //...
 
-Рекомендуемые команды для устанвоки в Ubuntu 22.04:
-
-```sh
-apt-get update && \
-apt install -y protobuf-compiler && \
-apt clean
-go env -w GOSUMDB=off
-go env -w GO111MODULE=on
-go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.32.0 && \
-go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
+    return nil, errors.New("not implemented")
+}
 ```
 
-Сгенерировать код из прото-файлов можно с помощью команды `make gen`.
+2. Создать инстанс структуры сервиса, создать сущность сервера gRPC, связать их, и запустить сервер.
+
+```golang
+func run() error {
+    // Создаем инстанс сервиса.
+    m := microservice{}
+
+    // Создаем инстанс сервера.
+    server := grpc.NewServer()
+
+    // Регистрируем сервис.
+    pb.RegisterHypervisorManagerServer(server, &m)
+
+    // Создаем листененра.
+    lis, err := net.Listen("tcp", listenPort)
+    if err != nil {
+        return fmt.Errorf("create listener: %s", err)
+    }
+
+    // Запускаем gRPC сервер.
+    return server.Serve(lis)
+}
+```
+
+На данном этапе пустой шаблон модуля расширения готов для локального запуска.
+
+Для подключения модуля к системе необходимо настроить `Dockerfile` и `docker-compose.yaml`, подробную информацию об этом можно найти в директории `deploy`.
 
 Пример готового шаблона модуля расширения находится в директории `project`.

@@ -37,6 +37,11 @@ COPY --from=build /src/bin ./bin
 ENTRYPOINT ["./bin"]
 ```
 
+Подробнее здесь:
+
+- <https://docs.docker.com/reference/dockerfile/>
+- <https://docs.docker.com/language/golang/build-images/>
+
 Сбилдить проект можно с помощью команды `docker build .`
 
 Запустить решение в контейнере можно с помощью команды `docker run -dp 127.0.0.1:8080:8080 <id_образа>`.
@@ -49,8 +54,10 @@ Eсли не находит, то ищет сервис с лейблом "ems.h
 
 Список лейблов с описанием:
 
+> ИЛИ ТАК ИЛИ ТАК ЛЕЙБЛЫ
+
 - LABEL ems.hypervisor.virtual-machine-set=default - включение модуля расширения в обработку системой EMS.
-- LABEL ems.service.secure=default - активация защищенного соединения.
+- LABEL ems.service.secure=default - активация защищенного соединения, в случае использования tls на gRPC сервере.
 - LABEL ems.service.port=8081 - порт, который прослушивает сервер.
 - LABEL ems.grpc-service.healthcheck=81 - порт для проверки доступности сервера.
 
@@ -60,7 +67,7 @@ Eсли не находит, то ищет сервис с лейблом "ems.h
 
 Важно определить в конфигурации работу в сети `ems-network`, пример рабочего файла конфигурации выглядит следующим образом:
 
-```
+```yaml
 version: "3.9"
 
 networks:
@@ -94,11 +101,16 @@ services:
           memory: 400M
 ```
 
+Подробнее об этом здесь:
+
+- <https://docs.docker.com/compose/>
+- <https://docs.docker.com/compose/compose-application-model/>
+
 Для запуска модуля расширения в эксплуатацию необходимо поместить папку `project` на ВМ, где запущен EMS и выполнить команду `docker-compose up --build -d` из корня проекта.
 
 Если приложения корректно запущено, то при выполнении команды `docker ps | grep project-hypervisor-manager-1` мы увидим вот такой результат:
 
-```table
+```bash
 CONTAINER ID   IMAGE                     COMMAND   CREATED         STATUS         PORTS     NAMES
 059ed982d404   project-hypervisor-manager   "./bin"   3 seconds ago   Up 2 seconds             project-hypervisor-manager-1
 ```

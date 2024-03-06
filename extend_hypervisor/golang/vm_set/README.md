@@ -1,18 +1,42 @@
-# Название сценария
-
-## Обзор операции
+# Сбор перечня виртуальных машин
 
 Данная операция необходима для определения списка гипервизоров, заведенных в системе.
 
-Proto-контракт для данной операции находится [здесь](project/proto/service_hypervisor_manager.proto).
+## Обзор операции
+
+Данная операция реализуется следующим RPC:
+
+```proto
+// Сервис HypervisorManager реализует логику взаимодействия и сбора информации с гипервизоров
+service HypervisorManager  {
+  // Получение списка виртуальных машин гипервизора
+  rpc CollectVirtialMachinesList(CollectVirtialMachinesListRequest) returns (CollectVirtialMachinesListResponse);
+}
+
+// Контракт запроса для rpc CollectVirtialMachinesList
+message CollectVirtialMachinesListRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+// Контракт ответа для rpc CollectVirtialMachinesList
+message CollectVirtialMachinesListResponse {
+  // Спискок виртуальных машин
+  VirtualMachines virtual_machines = 1;
+}
+```
+
+С полной структурой данных вы можете ознакомиться в [протофайлах](../../../.proto/service_hypervisor_manager.proto).
 
 ## Пример реализации
 
-Реализацию можно посмотреть в директории [project](project/main.go).
+Реализация операции будет производиться на ESXI версии 7.???????? запущеной на оборудовании `Gagar>n oracul gen. 1`.
 
 Дополняем уже имеющийся [шаблон](../create_project/project/main.go) релизацией RPC `CollectVirtialMachinesList`.
 
 В ходе обработки запроса на языке golang для гипервизора `ESXI` мы воспользуемся библиотекой [govmomi](https://github.com/vmware/govmomi) для взаимодействия с VMware vSphere APIs и сбора информации с гипервизора.
+
+> КАК Я ПОНЯЛ ОТКУДА МНЕ ПОЛУЧИТЬ ДАННЫЕ (ссылка на пример, че нибудь такое)
 
 Во входящем запросе мы получаем креды и адрес для подключения ESXI. Используем их и создаем клиента:
 
@@ -75,3 +99,5 @@ for _, vm := range virtualMachines {
 ```
 
 В завершении отправляем полученный результат как ответ по RPC.
+
+Пример готового проекта расположен в папке [project](./project)
