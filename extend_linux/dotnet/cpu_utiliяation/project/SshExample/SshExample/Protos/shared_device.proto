@@ -1,15 +1,19 @@
 syntax = "proto3";
 
+
 package tool_cluster.v4;
 
+import "google/protobuf/wrappers.proto";
 import "shared_common.proto";
 
 // Описание источника сбора данных.
 message DeviceDataIdentity {
   // Идентификатор устройства.
   string device_id = 1;
+  // Идентификатор объекта прав доступа.
+  string access_object_id = 2;
   // Идентификатор rpc, с которого были собраны данные.
-  ServiceSource source = 2;
+  ServiceSource source = 3;
 }
 
 // Результат выполнения операции
@@ -36,12 +40,14 @@ enum OperationState {
 message DeviceContent {
   // Идентификатор устройства.
   string device_id = 1;
+  // Идентификатор объекта прав доступа.
+  string access_object_id = 2;
   // Название модели устройства.
-  string model_name = 2;
+  string model_name = 3;
   // Название вендора устройства.
-  string vendor_name = 3;
+  string vendor_name = 4;
   // Интерфейсы подключения к устройству.
-  repeated DeviceConnector connectors = 4;
+  repeated DeviceConnector connectors = 5;
 }
 
 // Интерфейс подключения к устройству.
@@ -51,12 +57,12 @@ message DeviceConnector {
   // Адрес подключения (ip/fqdn)
   string address = 2;
   // Mac адрес
-  string mac = 3;
-  // Учетные данные подключения. 
+  google.protobuf.StringValue mac = 3;
+  // Учетные данные подключения.
   repeated Credential credentials = 4;
 }
 
-// Учетные данные подключения. 
+// Учетные данные подключения.
 message Credential {
   // Протокол подключения.
   ConnectorProtocol protocol = 1;
@@ -93,13 +99,13 @@ enum ConnectorProtocol {
   // Невалидное значение.
   CONNECTOR_PROTOCOL_UNSPECIFIED = 0;
   // Ipmi протокол для проверки подключения.
-  CONNECTOR_PROTOCOL_IPMI = 1;    
+  CONNECTOR_PROTOCOL_IPMI = 1;
   // Redfish протокол для проверки подключения.
-  CONNECTOR_PROTOCOL_REDFISH = 2; 
+  CONNECTOR_PROTOCOL_REDFISH = 2;
   // Snmp протокол для проверки подключения.
-  CONNECTOR_PROTOCOL_SNMP = 3;    
+  CONNECTOR_PROTOCOL_SNMP = 3;
   // Ssh протокол для проверки подключения.
-  CONNECTOR_PROTOCOL_SSH = 4;     
+  CONNECTOR_PROTOCOL_SSH = 4;
   // Wmi протокол для проверки подключения.
-  CONNECTOR_PROTOCOL_WMI = 5;     
+  CONNECTOR_PROTOCOL_WMI = 5;
 }

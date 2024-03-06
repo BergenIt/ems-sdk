@@ -1,22 +1,23 @@
 syntax = "proto3";
 
+
 package tool_cluster.v4;
 
 import "google/protobuf/wrappers.proto";
 import "shared_device.proto";
 
 // Данные потребления оборудованием по cpu.
-message DeviceCpuUtilisation {
+message DeviceCpuUtilization {
   // Описание источника сбора данных.
   DeviceDataIdentity device_identity = 1;
   // Суммарные метрики потребления CPU.
-  CpuUnitUtilisation summary_utilisation = 2;
+  CpuUnitUtilization summary_utilization = 2;
   // Данные о статусе каждого из процессоров/ядер. Ключ - id процессора.
-  map<int32, CpuUnitUtilisation> unit_utilistaions = 3;
+  map<int32, CpuUnitUtilization> unit_utilistaions = 3;
 }
 
 // Метрики потребления CPU.
-message CpuUnitUtilisation {
+message CpuUnitUtilization {
   // Общий процент использования процессора.
   int32 total_using = 1;
   // Время простоя процессора, выраженное в процентах.

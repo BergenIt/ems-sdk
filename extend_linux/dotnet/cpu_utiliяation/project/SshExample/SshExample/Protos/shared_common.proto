@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+
 package tool_cluster.v4;
 
 // Идентификаторы rpc

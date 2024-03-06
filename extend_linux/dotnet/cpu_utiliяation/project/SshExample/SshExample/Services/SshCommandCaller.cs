@@ -3,21 +3,21 @@ using ToolCluster.V4;
 
 namespace Infrastructure.Service;
 
-public class SshCommandCaller 
+public class SshCommandCaller
 {
     private static readonly string[] _commands = { "top -b -n1 -1 -p0 -w 400", "top -b -n1 -w 400" };
     private static string TopCpuPrefix = "%cpu";
 
     public record HandleResult(int Success, string Stdout, string Stderr);
-    public static CollectLinuxCpuUtilisationResponse GetCpuUtilisation(CollectLinuxCpuUtilisationRequest request)
+    public static CollectLinuxCpuUtilizationResponse GetCpuUtilisation(CollectLinuxCpuUtilizationRequest request)
     {
-        HandleResult[] responses= _commands.Select(cmd=> CallSsh(request,cmd)).ToArray();
+        HandleResult[] responses = _commands.Select(cmd => CallSsh(request, cmd)).ToArray();
         return ProcessResponse(responses, request);
     }
-    public static HandleResult CallSsh(CollectLinuxCpuUtilisationRequest request, string command)
+    public static HandleResult CallSsh(CollectLinuxCpuUtilizationRequest request, string command)
     {
         DeviceConnector connection = request.Device.Connectors.First();
-        Credential creds=connection.Credentials.First();
+        Credential creds = connection.Credentials.First();
 
         using (SshClient client = new SshClient(connection.Address, creds.Port, creds.Login, creds.Password))
         {
@@ -34,7 +34,7 @@ public class SshCommandCaller
                 cmdRes.Result, cmdRes.Error);
         }
     }
-    public static CollectLinuxCpuUtilisationResponse ProcessResponse(HandleResult[] results, CollectLinuxCpuUtilisationRequest request)
+    public static CollectLinuxCpuUtilizationResponse ProcessResponse(HandleResult[] results, CollectLinuxCpuUtilizationRequest request)
     {
         string response = "";
         foreach (HandleResult res in results)
@@ -45,16 +45,16 @@ public class SshCommandCaller
             }
         }
 
-        CollectLinuxCpuUtilisationResponse statDeviceCpu = new()
+        CollectLinuxCpuUtilizationResponse statDeviceCpu = new()
         {
-            CpuUtilisation = new()
+            CpuUtilization = new()
             {
                 DeviceIdentity = new DeviceDataIdentity()
                 {
                     DeviceId = request.Device.DeviceId,
                     Source = ServiceSource.LinuxManager
                 },
-                SummaryUtilisation =new()
+                SummaryUtilization = new()
             }
         };
 
@@ -87,10 +87,10 @@ public class SshCommandCaller
             {
                 continue;
             }
+            CpuUnitUtilization cpu = new();
 
             foreach (string entiry in item[(processorIdEnd + 3)..].Split(',', StringSplitOptions.TrimEntries))
             {
-
                 string[] parts = entiry.Split(' ', 2, StringSplitOptions.TrimEntries);
 
                 if (parts.Length != 2)
@@ -105,17 +105,26 @@ public class SshCommandCaller
                 {
                     switch (key)
                     {
-                        case "us": statDeviceCpu.CpuUtilisation.SummaryUtilisation.UserUsing = (int)Math.Ceiling(intValue); break;
-                        case "sy": statDeviceCpu.CpuUtilisation.SummaryUtilisation.SystemUsing = (int)Math.Ceiling(intValue); break;
-                        case "ni": statDeviceCpu.CpuUtilisation.SummaryUtilisation.NiceValueUsing = (int)Math.Ceiling(intValue); break;
-                        case "id": statDeviceCpu.CpuUtilisation.SummaryUtilisation.IdleTime = (int)Math.Ceiling(intValue); break;
-                        case "wa": statDeviceCpu.CpuUtilisation.SummaryUtilisation.IoWaiting = (int)Math.Ceiling(intValue); break;
-                        case "hi": statDeviceCpu.CpuUtilisation.SummaryUtilisation.HwServiceInterrupts = (int)Math.Ceiling(intValue); break;
-                        case "si": statDeviceCpu.CpuUtilisation.SummaryUtilisation.SoftServiceInterrupts = (int)Math.Ceiling(intValue); break;
-                        case "st": statDeviceCpu.CpuUtilisation.SummaryUtilisation.StealTime = (int)Math.Ceiling(intValue); break;
+                        case "us": cpu.UserUsing = (int)Math.Ceiling(intValue); break;
+                        case "sy": cpu.SystemUsing = (int)Math.Ceiling(intValue); break;
+                        case "ni": cpu.NiceValueUsing = (int)Math.Ceiling(intValue); break;
+                        case "id": cpu.IdleTime = (int)Math.Ceiling(intValue); break;
+                        case "wa": cpu.IoWaiting = (int)Math.Ceiling(intValue); break;
+                        case "hi": cpu.HwServiceInterrupts = (int)Math.Ceiling(intValue); break;
+                        case "si": cpu.SoftServiceInterrupts = (int)Math.Ceiling(intValue); break;
+                        case "st": cpu.StealTime = (int)Math.Ceiling(intValue); break;
                         default: break;
                     }
                 }
+               
+            }
+            if (processorId == -1)
+            {
+                statDeviceCpu.CpuUtilization.SummaryUtilization = cpu;
+            }
+            else
+            {
+                statDeviceCpu.CpuUtilization.UnitUtilistaions.Add(processorId, cpu);
             }
         }
         return statDeviceCpu;

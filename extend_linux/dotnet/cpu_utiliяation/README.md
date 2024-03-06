@@ -208,89 +208,101 @@ Enum `ConnectorProtocol`:
 	
 *	Добавьте метод:
 	
-		string response = "";
-		foreach (HandleResult res in results)
+		public static CollectLinuxCpuUtilizationResponse ProcessResponse(HandleResult[] results, CollectLinuxCpuUtilizationRequest request)
 		{
-			if (res.Success == 0)
+			string response = "";
+			foreach (HandleResult res in results)
 			{
-				response += res.Stdout;
-			}
-		}
-
-		CollectLinuxCpuUtilisationResponse statDeviceCpu = new()
-		{
-			CpuUtilisation = new()
-			{
-				DeviceIdentity = new DeviceDataIdentity()
+				if (res.Success == 0)
 				{
-					DeviceId = request.Device.DeviceId,
-					Source = ServiceSource.LinuxManager
-				},
-				SummaryUtilisation =new()
-			}
-		};
-
-		IEnumerable<string> rows = response.ToLowerInvariant()
-			.Split('\n', StringSplitOptions.TrimEntries)
-			.Where(s => s.StartsWith(TopCpuPrefix))
-			.SelectMany(c => c
-				.Split(TopCpuPrefix, StringSplitOptions.TrimEntries)
-				.Where(d => !string.IsNullOrWhiteSpace(d))
-				.Select(s => TopCpuPrefix + s));
-
-		foreach (string item in rows)
-		{
-			int processorIdEnd = item.IndexOf(' ', TopCpuPrefix.Length);
-
-			if (processorIdEnd == -1)
-			{
-				continue;
+					response += res.Stdout;
+				}
 			}
 
-			string? strProcessorId = item[TopCpuPrefix.Length..processorIdEnd];
-
-			int processorId;
-
-			if (strProcessorId == "(s):")
+			CollectLinuxCpuUtilizationResponse statDeviceCpu = new()
 			{
-				processorId = -1;
-			}
-			else if (!int.TryParse(strProcessorId, out processorId))
+				CpuUtilization = new()
+				{
+					DeviceIdentity = new DeviceDataIdentity()
+					{
+						DeviceId = request.Device.DeviceId,
+						Source = ServiceSource.LinuxManager
+					},
+					SummaryUtilization = new()
+				}
+			};
+
+			IEnumerable<string> rows = response.ToLowerInvariant()
+				.Split('\n', StringSplitOptions.TrimEntries)
+				.Where(s => s.StartsWith(TopCpuPrefix))
+				.SelectMany(c => c
+					.Split(TopCpuPrefix, StringSplitOptions.TrimEntries)
+					.Where(d => !string.IsNullOrWhiteSpace(d))
+					.Select(s => TopCpuPrefix + s));
+
+			foreach (string item in rows)
 			{
-				continue;
-			}
+				int processorIdEnd = item.IndexOf(' ', TopCpuPrefix.Length);
 
-			foreach (string entiry in item[(processorIdEnd + 3)..].Split(',', StringSplitOptions.TrimEntries))
-			{
-
-				string[] parts = entiry.Split(' ', 2, StringSplitOptions.TrimEntries);
-
-				if (parts.Length != 2)
+				if (processorIdEnd == -1)
 				{
 					continue;
 				}
 
-				string key = parts[1];
-				string strValue = parts[0];
+				string? strProcessorId = item[TopCpuPrefix.Length..processorIdEnd];
 
-				if (float.TryParse(strValue, out float intValue))
+				int processorId;
+
+				if (strProcessorId == "(s):")
 				{
-					switch (key)
+					processorId = -1;
+				}
+				else if (!int.TryParse(strProcessorId, out processorId))
+				{
+					continue;
+				}
+				CpuUnitUtilization cpu = new();
+
+				foreach (string entiry in item[(processorIdEnd + 3)..].Split(',', StringSplitOptions.TrimEntries))
+				{
+					string[] parts = entiry.Split(' ', 2, StringSplitOptions.TrimEntries);
+
+					if (parts.Length != 2)
 					{
-						case "us": statDeviceCpu.CpuUtilisation.SummaryUtilisation.UserUsing = (int)Math.Ceiling(intValue); break;
-						case "sy": statDeviceCpu.CpuUtilisation.SummaryUtilisation.SystemUsing = (int)Math.Ceiling(intValue); break;
-						case "ni": statDeviceCpu.CpuUtilisation.SummaryUtilisation.NiceValueUsing = (int)Math.Ceiling(intValue); break;
-						case "id": statDeviceCpu.CpuUtilisation.SummaryUtilisation.IdleTime = (int)Math.Ceiling(intValue); break;
-						case "wa": statDeviceCpu.CpuUtilisation.SummaryUtilisation.IoWaiting = (int)Math.Ceiling(intValue); break;
-						case "hi": statDeviceCpu.CpuUtilisation.SummaryUtilisation.HwServiceInterrupts = (int)Math.Ceiling(intValue); break;
-						case "si": statDeviceCpu.CpuUtilisation.SummaryUtilisation.SoftServiceInterrupts = (int)Math.Ceiling(intValue); break;
-						case "st": statDeviceCpu.CpuUtilisation.SummaryUtilisation.StealTime = (int)Math.Ceiling(intValue); break;
-						default: break;
+						continue;
 					}
+
+					string key = parts[1];
+					string strValue = parts[0];
+
+					if (float.TryParse(strValue, out float intValue))
+					{
+						switch (key)
+						{
+							case "us": cpu.UserUsing = (int)Math.Ceiling(intValue); break;
+							case "sy": cpu.SystemUsing = (int)Math.Ceiling(intValue); break;
+							case "ni": cpu.NiceValueUsing = (int)Math.Ceiling(intValue); break;
+							case "id": cpu.IdleTime = (int)Math.Ceiling(intValue); break;
+							case "wa": cpu.IoWaiting = (int)Math.Ceiling(intValue); break;
+							case "hi": cpu.HwServiceInterrupts = (int)Math.Ceiling(intValue); break;
+							case "si": cpu.SoftServiceInterrupts = (int)Math.Ceiling(intValue); break;
+							case "st": cpu.StealTime = (int)Math.Ceiling(intValue); break;
+							default: break;
+						}
+					}
+				   
+				}
+				if (processorId == -1)
+				{
+					statDeviceCpu.CpuUtilization.SummaryUtilization = cpu;
+				}
+				else
+				{
+					statDeviceCpu.CpuUtilization.UnitUtilistaions.Add(processorId, cpu);
 				}
 			}
+			return statDeviceCpu;
 		}
-		return statDeviceCpu;
 		
 	Этот метод должен заниматься анализом полученных в результате выполнения команд данных и сборкой ответа для пользователя.
 	На вход метода должны поступать примерно такие данные:
@@ -324,7 +336,8 @@ Enum `ConnectorProtocol`:
 	Затем отфильтровывает все лишнее, оставляя только строки, начинающиеся с %Cpu.
 	Каждая строка - это статистика отдельного процессора. %Cpu(s) - общие, сводные, данные по всем процессорам.
 	Далее метод разделяет строки на блоки по символу ',' и обрабатывает каждый блок отдельно.
-	Результатом работы метода является объект CollectLinuxCpuUtilisationResponse со сводными данными по всем процессорам.
+	Результатом работы метода является объект CollectLinuxCpuUtilisationResponse. Сводные данные будут лежать в подобъекте summary_utilization.
+	Данные по каждому процессору будут лежать в unit_utilistaions.
 	
 *	Добавьте метод:
 

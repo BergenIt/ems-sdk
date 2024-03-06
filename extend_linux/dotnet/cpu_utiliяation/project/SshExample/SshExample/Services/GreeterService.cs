@@ -7,7 +7,7 @@ namespace SshExample.Services
 {
     public class LinuxManagerService : LinuxManager.LinuxManagerBase
     {
-        public override Task<CollectLinuxCpuUtilisationResponse> CollectCpuUtilisation(CollectLinuxCpuUtilisationRequest request, ServerCallContext context)
+        public override Task<CollectLinuxCpuUtilizationResponse> CollectCpuUtilization(CollectLinuxCpuUtilizationRequest request, ServerCallContext context)
         {
             return Task.FromResult(SshCommandCaller.GetCpuUtilisation(request));
         }
