@@ -61,6 +61,7 @@ type microservice struct {
 
 // RPC по сбору списка виртуальных машин с гипервизра ESXI.
 func (r *microservice) DebugAccess(ctx context.Context, req *pb.DebugServiceAccessRequest) (*pb.DebugServiceAccessResponse, error) {
+	// Составление адреса в зависимости от входных данных.
 	address := ""
 	switch f := req.Address.(type) {
 	case *pb.DebugServiceAccessRequest_AddressPort:
@@ -79,6 +80,7 @@ func (r *microservice) DebugAccess(ctx context.Context, req *pb.DebugServiceAcce
 		}
 	)
 
+	// Пинг адреса зависимости от протокола.
 	switch req.Protocol {
 	case pb.ServiceProtocol_SERVICE_PROTOCOL_GRPC,
 		pb.ServiceProtocol_SERVICE_PROTOCOL_WS,
@@ -100,6 +102,7 @@ func (r *microservice) DebugAccess(ctx context.Context, req *pb.DebugServiceAcce
 	return out, nil
 }
 
+// Определение статуса сервиса.
 func determineAvailability(availability bool, err error) pb.ServiceAvailableState {
 	if err == nil && availability {
 		return pb.ServiceAvailableState_SERVICE_AVAILABLE_STATE_AVAILABLE
