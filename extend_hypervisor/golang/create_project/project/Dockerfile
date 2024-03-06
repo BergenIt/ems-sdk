@@ -9,11 +9,14 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.32.0 && \
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
 
 WORKDIR /src
-
 COPY . .
 RUN make build
 
 FROM scratch AS release
+LABEL ems.hypervisor=ems.hypervisor.virtual-machine-set
+LABEL ems.service.secure=default
+LABEL ems.service.port=8081
+LABEL ems.grpc-service.healthcheck=81
 WORKDIR /app
 COPY --from=build /src/bin ./bin
 ENTRYPOINT ["./bin"]
