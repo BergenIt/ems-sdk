@@ -1,16 +1,38 @@
-# Название сценария
+# Проверка доступности инстанса сервиса
 
-Данный документ описывает подход к разработке модуля расширения для RPC `DebugAccess`.
+Данная операция необходима для определения доступности инстанса сервиса при заведении системы.
 
 ## Обзор операции
 
-Данная операция необходима для проверки доступности инстанса сервиса при заведении в систему в зависимости от протокола.
+Данная операция реализуется следующим RPC:
 
-Proto-контракт для данной операции находится [здесь](project/proto/service_service_manager.proto).
+```proto
+service ServiceManager {
+  rpc DebugAccess(DebugServiceAccessRequest) returns (DebugServiceAccessResponse);
+}
+
+// Контракт запроса для rpc DebugAccess
+message DebugServiceAccessRequest {
+  oneof address {
+    // URI сервиса.
+    string uri = 2;
+    // Адрес и порт сервиса.
+    AddressPort address_port = 3;
+  }
+  // Протокол сервиса
+  ServiceProtocol protocol = 4;
+}
+
+// Контракт ответа для rpc DebugAccess
+message DebugServiceAccessResponse {
+  // Результат проверки
+  DebugAccessResult result = 1;
+}
+```
+
+С полной структурой данных вы можете ознакомиться в [протофайлах](../../../.proto/service_hypervisor_manager.proto).
 
 ## Пример реализации
-
-Реализацию можно посмотреть в директории [project](project/main.go).
 
 Дополняем уже имеющийся [шаблон](../create_project/project/main.go) релизацией RPC `DebugAccess`.
 
@@ -77,3 +99,5 @@ default:
 ```
 
 В завершении отправляем полученный результат как ответ по RPC.
+
+Пример готового проекта расположен в папке [project](./project)
