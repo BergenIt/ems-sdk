@@ -1,5 +1,9 @@
-# Название сценария
-Пример реализации системной операции "Получению температуры по протоколу SNMP". ссылка на документацию(https://docs.bergen.tech/ems/release-documents/latest/#/specifications/ds/host-domain/template-manager/README?id=%d0%9f%d0%be%d0%bb%d1%83%d1%87%d0%b8%d1%82%d1%8c-%d1%82%d0%b5%d0%bc%d0%bf%d0%b5%d1%80%d0%b0%d1%82%d1%83%d1%80%d1%83-%d1%83%d1%81%d1%82%d1%80%d0%be%d0%b9%d1%81%d1%82%d0%b2%d0%b0)
+# Сбор температуры устройств
+
+После формирования скелета проекта можно перейти к наполнению логикой операции сбора температуры устройств модуля расширения template.
+
+В данном разделе описана логика сбора информации в рамках этой системной операции.
+
 ## Обзор операции
 
 Данная операция отвечает за получение данных по операционной системе устройства по протоколу SNMP. Выполняется после получения сервисом следующего GRPC-запроса.
@@ -7,129 +11,35 @@
 Запрос отправляемый сервису должен соответствовать `CollectTemplateTemperatureRequest`:
 
 * `device`
-    * Тип параметра: `DeviceContent`
-    * Описание Данные по 1 устройству.
+  * Тип параметра: `DeviceContent`
+  * Описание Данные по 1 устройству.
 
 * `metric_templates`:
-    * Тип параметра: `RepeatedField<SystemMetricTemplate>`
-    * Описание: Идентификатор сетевого интерфейса.
+  * Тип параметра: `RepeatedField<SystemMetricTemplate>`
+  * Описание: Идентификатор сетевого интерфейса.
 
 Класс `SystemMetricTemplate`:
 
 * `system_metric_template_id`:
-    * Тип параметра: `string`
-    * Описание: Идентификатор шаблона системной метрики.
+  * Тип параметра: `string`
+  * Описание: Идентификатор шаблона системной метрики.
 * `template`:
-    * Тип параметра: `string`
-    * Описание: Шаблон для сбора данных системной метрики (путь к данным).
+  * Тип параметра: `string`
+  * Описание: Шаблон для сбора данных системной метрики (путь к данным).
 * `system_metric`:
-    * Тип параметра: `SystemMetric (Enum)`
-    * Описание: Тип системной метрики.
+  * Тип параметра: `SystemMetric (Enum)`
+  * Описание: Тип системной метрики.
 
-Варианты `SystemMetric`:
+Данная структура является общей для реализации операции сбора температуры устройств по разным протоколам, поэтому может содержать большее количество полей, чем поддерживает template.
 
-* SYSTEM_METRIC_UNSPECIFIED = 0;
-* SYSTEM_METRIC_POWER_STATE = 1;
-* SYSTEM_METRIC_BOOT_GET = 2;
-* SYSTEM_METRIC_MODEL = 3;
-* SYSTEM_METRIC_VENDOR = 4;
-* SYSTEM_METRIC_SERVER_LED = 5;
-* SYSTEM_METRIC_POWER_USAGE = 6;
-* SYSTEM_METRIC_FIRMWARE_BOOT_SOURCE_GET = 7;
-* SYSTEM_METRIC_SERIAL_NUMBER = 8;
-* SYSTEM_METRIC_BIOS_VERSION = 9;
-* SYSTEM_METRIC_BMC_VERSION = 10;
-* SYSTEM_METRIC_OPERATION_SYSTEM = 11;
-* SYSTEM_METRIC_HOSTINFO = 12;
-* SYSTEM_METRIC_PROCESSOR = 13;
-* SYSTEM_METRIC_DEVICE_TEMPERATURE = 14;
+Для корректной работы сбора данных, устройство должно иметь хотя бы одно действительное подключение с протоколом SNMP (поле **`protocol`** списка **`credentials`** со значением **`CONNECTOR_PROTOCOL_SNMP`**), остальные устройства модуль должен игнорировать.
 
-Класс `DeviceContent`:
+Из тела полученного запроса сервис берет данные необходимые для отправки SNMP-запроса к оборудованию. Общий вид используемого SNMP-запроса выглядит следующим образом:
 
-* `device_id`:
-    * Тип параметра: `string`
-    * Описание: Идентификатор устройства.
-* `model_name`:
-    * Тип параметра: `string`
-    * Описание: Название модели устройства.
-* `vendor_name`:
-    * Тип параметра: `string`
-    * Описание: Название вендора устройства.
-* `connectors`:
-    * Тип параметра: `RepeatedField<DeviceConnector>`
-    * Описание: Идентификатор сетевого интерфейса.
-Класс `DeviceConnector`:
-
-* `device_network_id`:
-    * Тип параметра: `string`
-    * Описание: Идентификатор сетевого интерфейса устройства.
-* `address`:
-    * Тип параметра: `string`
-    * Описание: IP/FQDN адрес устройства.
-* `mac`:
-    * Тип параметра: `string`
-    * Описание: MAC-адрес устройства.
-* `credentials`:
-    * Тип параметра: `RepeatedField<Credential>`
-    * Описание: Учетные данные подключения.
-Класс `Credential`:
-
-* `protocol`:
-    * Тип параметра: ConnectorProtocol (Enum)
-    * Описание: Протокол подключения.
-* `login`:
-    * Тип параметра: `string`
-    * Описание: Логин для подключения.
-* `password`:
-    * Тип параметра: `string`
-    * Описание: Пароль для подключения.
-* `port`:
-    * Тип параметра: `int32`
-    * Описание: Порт подключения.
-* `cipher`:
-    * Тип параметра: `int32`
-    * Описание: Шифрование (только для IPMI).
-* `version`:
-    * Тип параметра: `uint32`
-    * Описание: Версия протокола (только для SNMP).
-* `community`:
-    * Тип параметра: `string`
-    * Описание: Community слово (только для SNMP).
-* `security_name`:
-    * Тип параметра: `string`
-    * Описание: Security name (только для SNMP).
-* `context`:
-    * Тип параметра: `string`
-    * Описание: Контекст подключения (только для SNMP).
-* `auth_protocol`:
-    * Тип параметра: `string`
-    * Описание: Auth protocol (только для SNMP).
-* `auth_key`:
-    * Тип параметра: `string`
-    * Описание: Auth key (только для SNMP).
-* `private_protocol`:
-    * Тип параметра: `string`
-    * Описание: Private protocol (только для SNMP).
-* `private_key`:
-    * Тип параметра: `string`
-    * Описание: Private key (только для SNMP).
-* `security_level`:
-    * Тип параметра: `string`
-    * Описание: Уровень безопасности.
-
-Варианты `ConnectorProtocol`:
-
-* CONNECTOR_PROTOCOL_UNSPECIFIED - Невалидное значение.
-* CONNECTOR_PROTOCOL_IPMI - Ipmi протокол для проверки подключения.
-* CONNECTOR_PROTOCOL_REDFISH - Redfish протокол для проверки подключения.
-* CONNECTOR_PROTOCOL_SNMP - Snmp протокол для проверки подключения.
-* CONNECTOR_PROTOCOL_SSH - Ssh протокол для проверки подключения.
-* CONNECTOR_PROTOCOL_WMI - Wmi протокол для проверки подключения.
-
-Из тела полученного запроса сервис берет данные необходимые для отправки SNMP-запрос к оборудованию. Общий вид используемого SNMP-запроса выглядит следующим образом:
 ```bash
 snmpbulkwalk -OentU -v version -l security_name -u Login -a auth_protocol -A auth_key -x private_protocol -X private_key -c community -n context address oid
 ```
+
 Составляющие запроса:
 
 * `snmpbulkwalk` Команда для получения данных
@@ -151,195 +61,211 @@ snmpbulkwalk -OentU -v version -l security_name -u Login -a auth_protocol -A aut
 Ответ сервиса должен соответствовать классу CollectTemplateTemperatureResponse:
 
 * `temperature`:
-    * Тип параметра: `DeviceTemperature`
-    * Описание: Температура устройства.
+  * Тип параметра: `DeviceTemperature`
+  * Описание: Температура устройства.
 
 Тип `DeviceTemperature`:
 
 * `device_identity`:
-    * Тип параметра: `DeviceDataIdentity`
-    * Описание: Описание источника сбора данных.
+  * Тип параметра: `DeviceDataIdentity`
+  * Описание: Описание источника сбора данных.
 * `temperature`:
-    * Тип параметра: `google.protobuf.DoubleValue`
-    * Описание: Идентификатор сетевого устройства, по которому было собрано значение.
+  * Тип параметра: `google.protobuf.DoubleValue`
+  * Описание: Идентификатор сетевого устройства, по которому было собрано значение.
 Тип `DeviceDataIdentity`:
 
 * `device_id`:
-    * Тип параметра: `string`
-    * Описание: Идентификатор устройства.
+  * Тип параметра: `string`
+  * Описание: Идентификатор устройства.
 * `source`:
-    * Тип параметра: `ServiceSource (Enum)`
-    * Описание: Идентификатор rpc, с которого были собраны данные.
-Варианты `ServiceSource`:
-
-* SERVICE_SOURCE_UNSPECIFIED - Невалидное значение.
-* SERVICE_SOURCE_BMC_MANAGER - Реализация управления и сбора с BMC.
-* SERVICE_SOURCE_LINUX_MANAGER - Реализация управления и сбора с linux-хостов.
-* SERVICE_SOURCE_WINDOWS_MANAGER - Реализация управления и сбора с windows-хостов.
-* SERVICE_SOURCE_HYPERVISOR_MANAGER - Реализация управления и сбора с гипервизоров.
-* SERVICE_SOURCE_TEMPLATE_MANAGER - Реализация шаблонного мониторинга.
+  * Тип параметра: `ServiceSource (Enum)`
+  * Описание: Идентификатор rpc, с которого были собраны данные.
 
 ## Пример реализации
 
-1) Для отправки Snmp запросов используется библиотека `Lextm.SharpSnmpLib`, более подробно можн ознакомиться по ссылке https://github.com/lextudio/sharpsnmplib?tab=readme-ov-file
-2) Создадим класс представляющий из себя данные необходимые для подключения:
-```s
+Реализация операции будет производиться на ???? со следующими характеристикам:
+
+* ????
+
+Для отправки Snmp запросов будем использовать библиотеку `Lextm.SharpSnmpLib` - [github](https://github.com/lextudio/sharpsnmplib?tab=readme-ov-file)
+
+### Реализация отправки Snmp запросов
+
+Создадим класс c данными необходимыми для подключения:
+
+```csharp
 public record SnmpCredential(
-       string Ip
-       string Login,
-       int Port,
-       int Version,
-       string SecurityName,
-       string SecurityLevel,
-       string? Community,
-       string? Context,
-       string? AuthProtocol,
-       string? AuthKey,
-       string? PrivateProtocol,
-       string? PrivateKey);
+    string Ip
+    string Login,
+    int Port,
+    int Version,
+    string SecurityName,
+    string SecurityLevel,
+    string? Community,
+    string? Context,
+    string? AuthProtocol,
+    string? AuthKey,
+    string? PrivateProtocol,
+    string? PrivateKey);
 ```
-3) Создадим класс выполняющий snmp запрос:
-```s
-public class SnmpClient
+
+Реализуем отправку запросов:
+
+```csharp
+string SendRequest(SnmpCredential credential, string oidTemplate, int port, int timeout)
+{
+    string result;
+
+    // Переменные используемые библиотекой Lextm.SharpSnmpLib
+    IPEndPoint endpoint = new(IPAddress.Parse(credential.Ip), port);
+    OctetString community = new(credential.Community);
+    ObjectIdentifier oid = new(oidTemplate);
+    VersionCode versionCode = (credential.Version == 1 || credential.Version == 2) ? VersionCode.V2 : VersionCode.V3;
+
+    // Попытка получить данные по конкретному пути (реализация функции Get)
+    // Например - При запросе 1.2.3.4 вернет 1.2.3.4
+    string resultGet = "Null";
+
+    try
     {
-        //Функция получает на вход Данный для подключения, Путь к данным, Порт (стандартный - 161), Таймаут в миллисекундах (стандартный - 5000)
-        public static string SendRequest(SnmpCredential credential, string oidTemplate, int port, int timeout)
+        GetRequestMessage message = new(0, versionCode, community, new List<Variable> { new(oid) });
+
+        ISnmpMessage response = message.GetResponse(timeout, endpoint);
+
+        if (response.Pdu().ErrorStatus.ToInt32() == 0)
         {
-            string result;
-            // Переменные используемые библиотекой Lextm.SharpSnmpLib
-            IPEndPoint endpoint = new(IPAddress.Parse(credential.Ip), port);
-            OctetString community = new(credential.Community);
-            ObjectIdentifier oid = new(oidTemplate);
-            VersionCode versionCode = (credential.Version == 1 || credential.Version == 2) ? VersionCode.V2 : VersionCode.V3;
-
-            //Попытка получить данные по конкретному пути (реализация функции Get)
-            //Например - При запросе 1.2.3.4 вернет 1.2.3.4
-            string resultGet = "Null";
-            try
-            {
-                GetRequestMessage message = new(0, versionCode, community, new List<Variable> { new(oid) });
-
-                ISnmpMessage response = message.GetResponse(timeout, endpoint);
-                if (response.Pdu().ErrorStatus.ToInt32() == 0)
-                {
-                    resultGet = response.Pdu().Variables.FirstOrDefault().Data.ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                result = "Error: " + ex.Message;
-            }
-            //Возвращаем если получен валидный ответ
-            if (resultGet != "NoSuchObject" && resultGet != "Null")
-            {
-                return resultGet;
-            }
-
-            //Если по конкретному пути получить данные не вышло пробуем получить следующий по списку (реализация функции Walk)
-            //Например - При запросе 1.2.3.4 вернет 1.2.3.4 или 1.2.3.4.0
-            List<Variable> resultGetBulk = new();
-            try
-            {
-                GetBulkRequestMessage message = new(0, versionCode, community, 0, 1, new List<Variable> { new(oid) });
-
-                ISnmpMessage response = message.GetResponse(timeout, endpoint);
-                if (response.Pdu().ErrorStatus.ToInt32() == 0)
-                {
-                    resultGetBulk = response.Pdu().Variables.ToList();
-                }
-            }
-            catch (Exception ex)
-            {
-                return "Error: " + ex.Message;
-            }
-
-            //При возврате пустого массива возвращаем ошибку
-            return resultGetBulk.Count == 0 ? "Error: No valid oid" : resultGetBulk.First().Data.ToString();
+            resultGet = response.Pdu().Variables.FirstOrDefault().Data.ToString();
         }
     }
+    catch (Exception ex)
+    {
+        result = "Error: " + ex.Message;
+    }
+
+    //Возвращаем если получен валидный ответ
+    if (resultGet != "NoSuchObject" && resultGet != "Null")
+    {
+        return resultGet;
+    }
+
+    // Если по конкретному пути получить данные не вышло пробуем получить следующий по списку (реализация функции Walk)
+    // Например - При запросе 1.2.3.4 вернет 1.2.3.4 или 1.2.3.4.0
+    
+    List<Variable> resultGetBulk = new();
+    
+    try
+    {
+        GetBulkRequestMessage message = new(0, versionCode, community, 0, 1, new List<Variable> { new(oid) });
+
+        ISnmpMessage response = message.GetResponse(timeout, endpoint);
+        if (response.Pdu().ErrorStatus.ToInt32() == 0)
+        {
+            resultGetBulk = response.Pdu().Variables.ToList();
+        }
+    }
+    catch (Exception ex)
+    {
+        return "Error: " + ex.Message;
+    }
+
+    //При возврате пустого массива возвращаем ошибку
+    return resultGetBulk.Count == 0 ? "Error: No valid oid" : resultGetBulk.First().Data.ToString();
+}
 ```
-4) Добавляем в папку с протофайлами следующие протофайлы:
-    1. service_template_manager.proto
-    2. shared_common.proto
-    3. shared_device.proto
-    4. shared_device_available
-    5. shared_device_initial.proto
-    6. shared_device_operation_system.proto
-    7. shared_device_power_usage.proto
-    8. shared_device_temperature.proto
-    9. shared_device_template.proto
-5) Создадим класс обрабатывающий grpc запрос:
-```s
+
+### Реализация RPC
+
+Добавим в проект необходимые протофайлы:
+
+1. service_template_manager.proto
+2. shared_common.proto
+3. shared_device.proto
+4. shared_device_available
+5. shared_device_initial.proto
+6. shared_device_operation_system.proto
+7. shared_device_power_usage.proto
+8. shared_device_temperature.proto
+9. shared_device_template.proto
+
+Полный список протофайлов вы можете найти в [директории](../../../.proto).
+
+Реализуем требуемое rpc:
+
+```csharp
 public class MyService : TemplateManager.TemplateManagerBase
+{
+    public override Task<CollectTemplateTemperatureResponse> CollectTemperature(CollectTemplateTemperatureRequest request, ServerCallContext context)
     {
-        public override Task<CollectTemplateTemperatureResponse> CollectTemperature(CollectTemplateTemperatureRequest request, ServerCallContext context)
+        // Переменные необходимые для ответа
+        string deviceId = request.Device.DeviceId;
+        double? temperature = null;
+
+        // Получение данных для подключений (их может быть несколько)
+        IEnumerable<SnmpCredential> connectCreds = request.Device.Connectors
+            .SelectMany(connector => connector.Credentials.Where(credentials => credentials.Protocol == ConnectorProtocol.Snmp)
+            .Select(credentials => new SnmpCredential(
+                connector.Address,
+                credentials.Login,
+                credentials.Password,
+                credentials.Port,
+                credentials.Version,
+                credentials.SecurityName,
+                credentials.SecurityLevel,
+                credentials.Community,
+                credentials.Context,
+                credentials.AuthProtocol,
+                credentials.AuthKey,
+                credentials.PrivateProtocol,
+                credentials.PrivateKey)
+        ));
+
+        // Получение путей к данным (их может быть несколько)
+        IEnumerable<string> templates = request.MetricTemplates.Where(template => template.SystemMetric == SystemMetric.DeviceTemperature).Select(template => template.Template);
+
+        foreach (string template in templates)
         {
+            foreach(SnmpCredential cred in connectCreds)
             {
-                //Переменные необходимые для ответа
-                string deviceId = request.Device.DeviceId;
-                double? temperature = null;
-
-                //Получение данных для подключений (их может быть несколько)
-                IEnumerable<SnmpCredential> connectCreds = request.Device.Connectors
-                    .SelectMany(connector => connector.Credentials.Where(credentials => credentials.Protocol == ConnectorProtocol.Snmp)
-                    .Select(credentials => new SnmpCredential(
-                        connector.Address,
-                        credentials.Login,
-                        credentials.Password,
-                        credentials.Port,
-                        credentials.Version,
-                        credentials.SecurityName,
-                        credentials.SecurityLevel,
-                        credentials.Community,
-                        credentials.Context,
-                        credentials.AuthProtocol,
-                        credentials.AuthKey,
-                        credentials.PrivateProtocol,
-                        credentials.PrivateKey)
-                ));
-
-                //Получение путей к данным (их может быть несколько)
-                IEnumerable<string> templates = request.MetricTemplates.Where(template => template.SystemMetric == SystemMetric.DeviceTemperature).Select(template => template.Template);
-
-                foreach (string template in templates)
-                {
-                    foreach(SnmpCredential cred in connectCreds)
-                    {
-                        string respond = SnmpClient.SendRequest(cred, template, 161, 10000);
-                        if (!respond.StartsWith("Error"))        
-                            //Валидация данных и остановка опроса в случае успеха
-                            if (double.TryParse(respond, out double temp))                            
-                                if (temp < 2000 && temp > 0)
-                                {
-                                    temperature = temp;
-                                    break;
-                                }
-                    }
-                    if (temperature != null) break;
-                }
-
-                //Создание и отправка ответа
-                return Task.FromResult(new CollectTemplateTemperatureResponse()
-                {
-                    Temperature = new DeviceTemperature()
-                    {
-                        DeviceIdentity = new DeviceDataIdentity()
+                string respond = SnmpClient.SendRequest(cred, template, 161, 10000);
+                if (!respond.StartsWith("Error"))        
+                    //Валидация данных и остановка опроса в случае успеха
+                    if (double.TryParse(respond, out double temp))                            
+                        if (temp < 2000 && temp > 0)
                         {
-                            DeviceId = deviceId,
-                            Source = ServiceSource.TemplateManager
-                        },
-                        Temperature = temperature 
-                    }
-                });
+                            temperature = temp;
+                            break;
+                        }
             }
+
+            if (temperature != null) break;
         }
+
+        // Создание и отправка ответа
+        return Task.FromResult(new CollectTemplateTemperatureResponse()
+        {
+            Temperature = new DeviceTemperature()
+            {
+                DeviceIdentity = new DeviceDataIdentity()
+                {
+                    DeviceId = deviceId,
+                    Source = ServiceSource.TemplateManager
+                },
+                Temperature = temperature 
+            }
+        });
     }
+}
 ```
 
-## Локальный запуск
-После сборки и запуска приложения, откроется консоль, в которой будет написаны адреса доступные для отправки запросов приложению. Grpc использует защищенное соединение, поэтому адрес запущенного сервиса будет начинаться с https://
-Тело запроса для проверки:
-```s
+## Проверка реализации
+
+Проверить работу сервиса можно через Postman, подробнее об этом описано здесь:
+
+* <https://learning.postman.com/docs/sending-requests/grpc/first-grpc-request/>
+
+Пример тела запроса для проверки:
+
+```json
 {
     "device": {
         "connectors": [
@@ -374,8 +300,10 @@ public class MyService : TemplateManager.TemplateManagerBase
     ]
 }
 ```
-Тело ответа:
-```s
+
+Пример тела ответа:
+
+```json
 "temperature": {
         "device_identity": {
             "device_id": "labore enim fugiat",
@@ -387,4 +315,5 @@ public class MyService : TemplateManager.TemplateManagerBase
         }
     }
 ```
-## Пример итогового проекта находится в папке project
+
+Пример готового проекта расположен в папке [project](./project)
