@@ -44,6 +44,8 @@ message CheckSsoStatusResponse {
 message PutSsoSettingsRequest {
   DeviceContent device = 1;
   SsoState target_state = 2;
+  string sso_dn = 3;
+  string sso_password = 4;
 }
 
 message PutSsoSettingsResponse {
