@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+import "shared_device.proto";
+
+// Данные потребления оборудованием по оперативной памяти устройства.
+message DeviceMemoryUtilization {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Общий объем оперативной памяти устройства в мегабайтах.
+  google.protobuf.UInt32Value total = 2;
+  // Объем свободной оперативной памяти в мегабайтах.
+  google.protobuf.UInt32Value free = 3;
+  // Объем оперативной памяти, используемый в буфере, в мегабайтах.
+  google.protobuf.UInt32Value bufferes = 4;
+  // Объем оперативной памяти, закешированный в мегабайтах.
+  google.protobuf.UInt32Value cached = 5;
+  // Общий объем swap-памяти устройства в мегабайтах.
+  google.protobuf.UInt32Value swap_total = 6;
+  // Объем свободной swap-памяти в мегабайтах.
+  google.protobuf.UInt32Value swap_free = 7;
+  // Объем закешированной swap-памяти в мегабайтах.
+  google.protobuf.UInt32Value swap_cached = 8;
+}

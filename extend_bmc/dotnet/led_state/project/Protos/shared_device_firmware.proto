@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+import "shared_device.proto";
+
+// Данные оборудования о текущих версиях прошивки bmc, uefi.
+message DeviceFirmwareVersion {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Текущая версия прошивки uefi.
+  google.protobuf.StringValue uefi_version = 2;
+  // Текущая версия прошивки bmc.
+  google.protobuf.StringValue bmc_version = 3;
+}

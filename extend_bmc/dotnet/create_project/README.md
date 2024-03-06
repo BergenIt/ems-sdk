@@ -1,6 +1,6 @@
 # Создание проекта
 
-Для начала разработки собственных модулей расширения template создадим скелет проекта
+Для начала разработки собственных модулей расширения Bmc создадим скелет проекта
 
 В будущем его можно использовать для обогащения операций необходимой логикой работы.
 
@@ -8,45 +8,27 @@
 
 ### Создайте проект из шаблона dotnet
 
-Используя visual studio создадим проект из шаблона dotnet grpc api.
+Используя Visual Studio создадим проект из шаблона Dotnet gRPC API.
 
 Подробнее:
 
 * <https://learn.microsoft.com/en-us/aspnet/core/grpc/?view=aspnetcore-8.0>
 
-Добавляем в папку Protos необходимые прото файлы, для примера возьмем:
+Подключение модуля расширения к системе осуществляется с помощью следующих ключевых технологий:
 
-```proto
-//Тип используемого синтаксиса
-syntax = "proto3";
-//Пространство имен, которое будет использоваться с этим сервисом
-option csharp_namespace = "BmcManager";
-//Название пакета
-package example;
-//Имя сервиса
-service MyProtoService
-{
-//Название функции
-  rpc SendPing (PingRequest) returns (PingReply);
-}
-//Класс передаваемый сервису
-message PingRequest
-{
-  string requestString = 1;
-}
-//Класс получаемый в ответ
-message PingReply
-{
-  string respondString = 1;
-}
-```
+- Протокол [gRPC](https://grpc.io/docs/what-is-grpc/introduction/)
+- [docker-compose](https://docs.docker.com/compose/)
+
+Для работы сервиса необходимы протофайлы. Полный набор протофайлов можно найти в корне проекта `sdk`, в директории `.proto`.
+
+Копия набора прото-файлов для RPC `CollectLedState` расположены в директории `Protos` [проекта](./project/).
 
 Добавим ссылку на протофайлы в проект:
 
 ```xml
- <ItemGroup>
-  <Protobuf ProtoRoot="../" Include="Protos/*.proto" AdditionalImportDirs="Protos/" OutputDir="$(IntermediateOutputPath)/%(RecursiveDir)" />
- </ItemGroup>
+  <ItemGroup>
+		<Protobuf ProtoRoot="./" Include="Protos/*.proto" AdditionalImportDirs="Protos/" OutputDir="$(IntermediateOutputPath)/%(RecursiveDir)" />
+	</ItemGroup>
 ```
 
 Реализуем простейший grpc сервис для подключенного протофайла:
@@ -54,15 +36,16 @@ message PingReply
 ```csharp
 using Grpc.Core;
 
-namespace BmcManager.Services
+using ToolCluster.V4;
+
+namespace BmcHandler.Services
 {
-    // Наша реализация grpc сервиса
-    public class MyService : MyProtoService.MyProtoServiceBase
+    public class BmcHandlerService : BmcManager.BmcManagerBase
     {
-        // Наша реализация rpc SendPing
-        public override Task<PingReply> SendPing(PingRequest request, ServerCallContext context)
+        // RPC по сбору статуса LED.
+        public override async Task<CollectBmcLedStateResponse> CollectLedState(CollectBmcLedStateRequest request, ServerCallContext context)
         {
-            return Task.FromResult(new PingReply { RespondString = "Respond string"});
+            throw new RpcException(new Status(StatusCode.Unimplemented, ""));
         }
     }
 }
@@ -71,14 +54,23 @@ namespace BmcManager.Services
 Скофигурируем приложение и grpc-сервер в `Program.cs`:
 
 ```csharp
+using BmcHandler.Services;
+
 var builder = WebApplication.CreateBuilder(args);
-//Добавление grpc функционала в конструтор
+
+// Добавление gRPC функционала в контейнер.
 builder.Services.AddGrpc();
+// Добавление gRPC рефлексии в контейнер.
+builder.Services.AddGrpcReflection();
 
 var app = builder.Build();
-//Добавление сервиса в приложение
-app.MapGrpcService<MyService>();
-app.Run();
+
+// Настройка конвейера gRPC сервиса.
+app.MapGrpcService<BmcHandlerService>();
+// Сопоставление входящих запросов со службой рефлексии gRPC.
+app.MapGrpcReflectionService();
+
+await app.RunAsync();
 ```
 
 На данном этапе пустой шаблон модуля расширения готов для локального запуска.

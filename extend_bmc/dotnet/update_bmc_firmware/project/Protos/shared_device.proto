@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+import "shared_common.proto";
+
+// Описание источника сбора данных.
+message DeviceDataIdentity {
+  // Идентификатор устройства.
+  string device_id = 1;
+  // Идентификатор объекта прав доступа.
+  string access_object_id = 2;
+  // Идентификатор rpc, с которого были собраны данные.
+  ServiceSource source = 3;
+}
+
+// Результат выполнения операции
+message OperationResult {
+  // Идентификатор устройства, на котором происходила операция.
+  string device_id = 1;
+  // Тип результата выполнения операции.
+  OperationState state = 2;
+  // Текстовое описание результата выполнения операции.
+  string output = 3;
+}
+
+// Тип результата выполнения операции.
+enum OperationState {
+  // Невалидное значение.
+  OPERATION_STATE_UNSPECIFIED = 0;
+  // Операция завершена успешно.
+  OPERATION_STATE_SUCCESS = 1;
+  // Выполнение операции завершилось с ошибкой.
+  OPERATION_STATE_FAILED = 2;
+}
+
+// Данные по 1 устройству.
+message DeviceContent {
+  // Идентификатор устройства.
+  string device_id = 1;
+  // Идентификатор объекта прав доступа.
+  string access_object_id = 2;
+  // Название модели устройства.
+  string model_name = 3;
+  // Название вендора устройства.
+  string vendor_name = 4;
+  // Интерфейсы подключения к устройству.
+  repeated DeviceConnector connectors = 5;
+}
+
+// Интерфейс подключения к устройству.
+message DeviceConnector {
+  // Идентификатор сетевого интерфейса.
+  string device_network_id = 1;
+  // Адрес подключения (ip/fqdn)
+  string address = 2;
+  // Mac адрес
+  google.protobuf.StringValue mac = 3;
+  // Учетные данные подключения.
+  repeated Credential credentials = 4;
+}
+
+// Учетные данные подключения.
+message Credential {
+  // Протокол подключения.
+  ConnectorProtocol protocol = 1;
+  // Логин для подключения.
+  string login = 2;
+  // Пароль для подключения.
+  string password = 3;
+  // Порт подключения.
+  int32 port = 4;
+  // Шифрование (только для IPMI).
+  int32 cipher = 5;
+  // Версия протокола (только для SNMP).
+  int32 version = 6;
+  // Community слово (только для SNMP).
+  string community = 7;
+  // Security name (только для SNMP).
+  string security_name = 8;
+  // Контекст подключения (только для SNMP).
+  string context = 9;
+  // Auth protocol (только для SNMP).
+  string auth_protocol = 10;
+  // Auth key (только для SNMP).
+  string auth_key = 11;
+  // Private protocol (только для SNMP).
+  string private_protocol = 12;
+  // Private key (только для SNMP).
+  string private_key = 13;
+  // Уровень безопасности (только для SNMP).
+  string security_level = 14;
+}
+
+// Протоколы подключения.
+enum ConnectorProtocol {
+  // Невалидное значение.
+  CONNECTOR_PROTOCOL_UNSPECIFIED = 0;
+  // Ipmi протокол для проверки подключения.
+  CONNECTOR_PROTOCOL_IPMI = 1;
+  // Redfish протокол для проверки подключения.
+  CONNECTOR_PROTOCOL_REDFISH = 2;
+  // Snmp протокол для проверки подключения.
+  CONNECTOR_PROTOCOL_SNMP = 3;
+  // Ssh протокол для проверки подключения.
+  CONNECTOR_PROTOCOL_SSH = 4;
+  // Wmi протокол для проверки подключения.
+  CONNECTOR_PROTOCOL_WMI = 5;
+}
