@@ -19,15 +19,17 @@
 
 		"Kestrel": {
 			"EndPoints": {
-				"Http2": {
-					"Url": "https://*:4545",
-					"Protocols": "Http1AndHttp2"
+				"Http": {
+					"Url": "http://*:4545",
+					"Protocols": "Http1"
 				}
 			}
 		}
 4) В файл SshGrpcExample.csproj в группу <PropertyGroup> добавьте 
 	
+		<RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
 		<PublishAot>true</PublishAot>
+		<InvariantGlobalization>true</InvariantGlobalization>
 
 5) В файл SshGrpcExample.csproj в группу <ItemGroup> добавьте зависимости
 	
