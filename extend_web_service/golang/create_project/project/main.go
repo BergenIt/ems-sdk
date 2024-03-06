@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	pb "hypervisor/gen/cluster-contract"
+	pb "service/gen/cluster-contract"
 	"log"
 	"net"
 	"os"

@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	pb "hypervisor/gen/cluster-contract"
+	pb "service/gen/cluster-contract"
 	"log"
 	"net"
 	"os"
