@@ -41,11 +41,11 @@ message PingReply
   string respondString = 1;
 }
 ```
-4) Необходимо добавить ссылку на протофайл в проекте. для этого добавляем в файл SnmpExample.csproj следующие строки между тегами <Project...> и </Project>
+4) Необходимо добавить ссылку на протофайлы в проекте. Для этого добавляем в файл SnmpExample.csproj следующие строки между тегами <Project...> и </Project>
 ```s
-  <ItemGroup>
-	  <Protobuf Include="Protos\my_proto.proto" GrpcServices="Server" />
-  </ItemGroup>
+	<ItemGroup>
+		<Protobuf ProtoRoot="../" Include="Protos/*.proto" AdditionalImportDirs="Protos/" OutputDir="$(IntermediateOutputPath)/%(RecursiveDir)" />
+	</ItemGroup>
 ```
 5) Добавляем в папку Services файл MyService.cs:
 ```s

@@ -181,11 +181,210 @@ snmpbulkwalk -OentU -v version -l security_name -u Login -a auth_protocol -A aut
 
 ## Пример реализации
 
+1) Для отправки Snmp запросов используется библиотека `Lextm.SharpSnmpLib`, более подробно можн ознакомиться по ссылке https://github.com/lextudio/sharpsnmplib?tab=readme-ov-file
+2) Создадим класс представляющий из себя данные необходимые для подключения:
+```s
+public record SnmpCredential(
+       string Ip
+       string Login,
+       int Port,
+       int Version,
+       string SecurityName,
+       string SecurityLevel,
+       string? Community,
+       string? Context,
+       string? AuthProtocol,
+       string? AuthKey,
+       string? PrivateProtocol,
+       string? PrivateKey);
+```
+3) Создадим класс выполняющий snmp запрос:
+```s
+public class SnmpClient
+    {
+        //Функция получает на вход Данный для подключения, Путь к данным, Порт (стандартный - 161), Таймаут в миллисекундах (стандартный - 5000)
+        public static string SendRequest(SnmpCredential credential, string oidTemplate, int port, int timeout)
+        {
+            string result;
+            // Переменные используемые библиотекой Lextm.SharpSnmpLib
+            IPEndPoint endpoint = new(IPAddress.Parse(credential.Ip), port);
+            OctetString community = new(credential.Community);
+            ObjectIdentifier oid = new(oidTemplate);
+            VersionCode versionCode = (credential.Version == 1 || credential.Version == 2) ? VersionCode.V2 : VersionCode.V3;
 
-> Описываем на примере чего будем реализовывать (желательно брать что-то не похожее на наше стандартное окружение)
+            //Попытка получить данные по конкретному пути (реализация функции Get)
+            //Например - При запросе 1.2.3.4 вернет 1.2.3.4
+            string resultGet = "Null";
+            try
+            {
+                GetRequestMessage message = new(0, versionCode, community, new List<Variable> { new(oid) });
 
-> Описываем откуда мы знаем как это реализовывать (например ссылка на вендорское описание апи)
+                ISnmpMessage response = message.GetResponse(timeout, endpoint);
+                if (response.Pdu().ErrorStatus.ToInt32() == 0)
+                {
+                    resultGet = response.Pdu().Variables.FirstOrDefault().Data.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                result = "Error: " + ex.Message;
+            }
+            //Возвращаем если получен валидный ответ
+            if (resultGet != "NoSuchObject" && resultGet != "Null")
+            {
+                return resultGet;
+            }
 
-> Вкладываем снипетами куски кода прям сюда и описываем что это и зачем это и почему так
+            //Если по конкретному пути получить данные не вышло пробуем получить следующий по списку (реализация функции Walk)
+            //Например - При запросе 1.2.3.4 вернет 1.2.3.4 или 1.2.3.4.0
+            List<Variable> resultGetBulk = new();
+            try
+            {
+                GetBulkRequestMessage message = new(0, versionCode, community, 0, 1, new List<Variable> { new(oid) });
 
-> Указываем что пример итогового проекта находится в папке project
+                ISnmpMessage response = message.GetResponse(timeout, endpoint);
+                if (response.Pdu().ErrorStatus.ToInt32() == 0)
+                {
+                    resultGetBulk = response.Pdu().Variables.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return "Error: " + ex.Message;
+            }
+
+            //При возврате пустого массива возвращаем ошибку
+            return resultGetBulk.Count == 0 ? "Error: No valid oid" : resultGetBulk.First().Data.ToString();
+        }
+    }
+```
+4) Добавляем в папку с протофайлами следующие протофайлы:
+    1. service_template_manager.proto
+    2. shared_common.proto
+    3. shared_device.proto
+    4. shared_device_available
+    5. shared_device_initial.proto
+    6. shared_device_operation_system.proto
+    7. shared_device_power_usage.proto
+    8. shared_device_temperature.proto
+    9. shared_device_template.proto
+5) Создадим класс обрабатывающий grpc запрос:
+```s
+public class MyService : TemplateManager.TemplateManagerBase
+    {
+        public override Task<CollectTemplateTemperatureResponse> CollectTemperature(CollectTemplateTemperatureRequest request, ServerCallContext context)
+        {
+            {
+                //Переменные необходимые для ответа
+                string deviceId = request.Device.DeviceId;
+                double? temperature = null;
+
+                //Получение данных для подключений (их может быть несколько)
+                IEnumerable<SnmpCredential> connectCreds = request.Device.Connectors
+                    .SelectMany(connector => connector.Credentials.Where(credentials => credentials.Protocol == ConnectorProtocol.Snmp)
+                    .Select(credentials => new SnmpCredential(
+                        connector.Address,
+                        credentials.Login,
+                        credentials.Password,
+                        credentials.Port,
+                        credentials.Version,
+                        credentials.SecurityName,
+                        credentials.SecurityLevel,
+                        credentials.Community,
+                        credentials.Context,
+                        credentials.AuthProtocol,
+                        credentials.AuthKey,
+                        credentials.PrivateProtocol,
+                        credentials.PrivateKey)
+                ));
+
+                //Получение путей к данным (их может быть несколько)
+                IEnumerable<string> templates = request.MetricTemplates.Where(template => template.SystemMetric == SystemMetric.DeviceTemperature).Select(template => template.Template);
+
+                foreach (string template in templates)
+                {
+                    foreach(SnmpCredential cred in connectCreds)
+                    {
+                        string respond = SnmpClient.SendRequest(cred, template, 161, 10000);
+                        if (!respond.StartsWith("Error"))        
+                            //Валидация данных и остановка опроса в случае успеха
+                            if (double.TryParse(respond, out double temp))                            
+                                if (temp < 2000 && temp > 0)
+                                {
+                                    temperature = temp;
+                                    break;
+                                }
+                    }
+                    if (temperature != null) break;
+                }
+
+                //Создание и отправка ответа
+                return Task.FromResult(new CollectTemplateTemperatureResponse()
+                {
+                    Temperature = new DeviceTemperature()
+                    {
+                        DeviceIdentity = new DeviceDataIdentity()
+                        {
+                            DeviceId = deviceId,
+                            Source = ServiceSource.TemplateManager
+                        },
+                        Temperature = temperature 
+                    }
+                });
+            }
+        }
+    }
+```
+
+## Локальный запуск
+После сборки и запуска приложения, откроется консоль, в которой будет написаны адреса доступные для отправки запросов приложению. Grpc использует защищенное соединение, поэтому адрес запущенного сервиса будет начинаться с https://
+Тело запроса для проверки:
+```s
+{
+    "device": {
+        "connectors": [
+            {
+                "credentials": [
+                    {
+                        "port": 161,
+                        "security_level": "security_level",
+                        "version": 2,
+                        "security_name": "security_name",
+                        "protocol": "CONNECTOR_PROTOCOL_SNMP",
+                        "private_key": "private_key",
+                        "context": "context",
+                        "login": "login",
+                        "community": "public",
+                        "auth_protocol": "auth_protocol",
+                        "auth_key": "auth_key",
+                        "password": "password",
+                        "cipher": 0,
+                        "private_protocol": "private_protocol"
+                    }
+                ],
+                "address": "10.1.18.23"
+            }
+        ]
+    },
+    "metric_templates": [
+        {
+            "system_metric": 14,
+            "template": ".1.3.6.1.2.1.2.2.1.3.1"
+        }
+    ]
+}
+```
+Тело ответа:
+```s
+"temperature": {
+        "device_identity": {
+            "device_id": "labore enim fugiat",
+            "access_object_id": "",
+            "source": "SERVICE_SOURCE_TEMPLATE_MANAGER"
+        },
+        "temperature": {
+            "value": 6
+        }
+    }
+```
+## Пример итогового проекта находится в папке project
