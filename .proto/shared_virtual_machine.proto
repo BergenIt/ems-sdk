@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/wrappers.proto";
+
+import "shared_hypervisor.proto";
+
+message VirtualMachines {
+  // Индентификатор гипервизора.
+  HypervisorIdentity identity = 1;
+  // Массив виртуальных машин.
+  repeated VirtualMachine virtual_machines = 2;
+}
+
+message VirtualMachine {
+  // Наименование виртуальной машины.
+  string name = 1;
+  // Сетевые интерфейсы виртуальной машины.
+  repeated VirtualMachineNetwork networks = 2;
+}
+
+message VirtualMachineNetwork {
+  // IP-адреса.
+  repeated string ips = 1;
+  // MAC-адрес.
+  google.protobuf.StringValue mac = 2;
+}
+
+message HypervisorVmContent {
+  // Индентификатор гипервизора.
+  HypervisorIdentity identity = 1;
+  // Массив сущностей виртуальных машин с информацией.
+  repeated VirtualMachineContent virtual_machines = 2;
+}
+
+message VirtualMachineContent {
+  // Идентификатор устройства.
+  string virtual_machine_id = 1;
+  // Информация о ЦПУ.
+  VirtualMachineProcessor cpu = 2;
+  // Информация о ОЗУ.
+  VirtualMachineMemory memory = 3;
+  // Информация о дисках.
+  repeated VirtualMachineDisk disks = 4;
+  // Информация о операционной системе.
+  VirtualMachineOperationSystem operation_system = 5;
+  // Информация о времени работы.
+  google.protobuf.Duration uptime = 6;
+  // Информация о состоянии питания.
+  VirtualMachinePowerState power_state = 7;
+}
+
+enum VirtualMachinePowerState {
+  // Невалидное значение.
+  VIRTUAL_MACHINE_POWER_STATE_UNSPECIFIED = 0;
+  // Виртуальная машина включена.
+  VIRTUAL_MACHINE_POWER_STATE_ON = 1;
+  // Виртуальная машина выключена.
+  VIRTUAL_MACHINE_POWER_STATE_OFF = 2;
+}
+
+message VirtualMachineProcessor {
+  // Колличество ядер.
+  int32 cores = 1;
+  // Время простоя процессора, выраженное в процентах.
+  google.protobuf.Int32Value idle_time = 2;
+  // Процент использования процессора системными процессами.
+  google.protobuf.Int32Value system_using = 3;
+}
+
+message VirtualMachineMemory {
+  // Общий объем оперативной памяти устройства в мегабайтах.
+  uint32 total = 1;
+  // Объем свободной оперативной памяти в мегабайтах.
+  google.protobuf.UInt32Value free = 2;
+  // Объем оперативной памяти, используемый в буфере, в мегабайтах.
+  google.protobuf.UInt32Value bufferes = 3;
+}
+
+message VirtualMachineDisk {
+  // Тип - disk, part и т.д.
+  string type = 1;
+  // Партиция диска.
+  string disk_partition = 2;
+  // Размер диска в киллобайтах.
+  int64 size = 3;
+  // Количество свободного пространства.
+  int64 free_space = 4;
+  // Количество занятого пространства.
+  int64 total_using = 5;
+}
+
+message VirtualMachineOperationSystem {
+  // Полученное значение операционной системы.
+  string operation_system = 1;
+  // Имя хоста операционной системы.
+  string hostname = 2;
+}

@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+import "shared_device.proto";
+
+// PCI слоты устройства.
+message DevicePciSlots {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // PCI слоты устройства.
+  repeated PciSlot slots = 2;
+}
+
+// PCI слот устройства.
+message PciSlot {
+  // Название слота, может содержать его расположение.
+  string name = 1;
+  // Технология/поколение PCI слота.
+  string pci_type = 2;
+  // Длина слота.
+  string slot_type = 3;
+  // Поддержка hot plug.
+  google.protobuf.BoolValue hot_plug = 4;
+  // Вендор устройства в слоте.
+  string vendor = 5;
+  // Модель устройства в слоте.
+  string model = 6;
+  // Название устройства в слоте.
+  string pci_device_name = 7;
+  // Тип устройства в слоте.
+  string pci_device_type = 8;
+  // Описание устройства в слоте.
+  string pci_device_description = 9;
+  // Ревизия прошивки.
+  string firmware_revision = 10;
+  // Номер партии.
+  string part_number = 11;
+  // SKU номер.
+  string sku_number = 12;
+  // Серийный номер.
+  string serial_number = 13;
+  // Местоположение (чаще всего номер слота + номер сокета).
+  string location = 14;
+  // Ширина шины.
+  string link_lines = 15;
+  // Статус слота (наличия в нем устройства).
+  PciSlotState slot_state = 16;
+  // Текущий статус устройства в слоте.
+  PciDeviceState device_state = 17;
+}
+
+// Текущий статус устройства в слоте.
+enum PciDeviceState {
+  // Невалидное значение.
+  PCI_DEVICE_STATE_UNSPECIFIED = 0;
+  // Состояние устройства неизвестно. Невозможно точно определить текущее состояние.
+  PCI_DEVICE_STATE_UNKNOWN = 1;
+  // Устройство находится в нормальном состоянии. Нет проблем или ошибок.
+  PCI_DEVICE_STATE_OK = 2;
+  // Предупреждение относительно состояния устройства. Возможны проблемы, но они не являются критическими.
+  PCI_DEVICE_STATE_WARNING = 3;
+  // Критическое состояние устройства. Присутствуют серьезные проблемы или ошибки, требующие немедленного внимания и решения.
+  PCI_DEVICE_STATE_CRITICAL = 4;
+}
+
+// Статус слота (наличия в нем устройства).
+enum PciSlotState {
+  // Невалидное значение.
+  PCI_SLOT_STATE_UNSPECIFIED = 0;
+  // Состояние слота неизвестно.
+  PCI_SLOT_STATE_UNKNOWN = 1;
+  // Устройство установлено в слот.
+  PCI_SLOT_STATE_HAS = 2;
+  // Слот пустой.
+  PCI_SLOT_STATE_EMPTY = 3;
+}

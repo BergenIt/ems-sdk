@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+
+// Данные оборудования о текущем статусе Led.
+message DeviceLed {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Текущий статус Led.
+  LedState state = 2;
+}
+
+// Статус Led.
+enum LedState {
+  // Невалидное значение.
+  LED_STATE_UNSPECIFIED = 0;
+  // Неизвестно.
+  LED_STATE_UNKNOWN = 1;
+  // Led включен.
+  LED_STATE_ON = 2;
+  // Led выключен.
+  LED_STATE_OFF = 3;
+  // Led моргает.
+  LED_STATE_BLINK = 4;
+}

@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+message HypervisorContent {
+  // Индентификатор гипервизора.
+  HypervisorIdentity identity = 1;
+  // Тип гипервизора.
+  HypervisorType type = 2;
+  // Адрес гипервизора.
+  string address = 3;
+  // Логин.
+  string login = 4;
+  // Пароль.
+  string password = 5;
+  // Порт.
+  int32 port = 6;
+  // Заведенные виртуальные машины, где ключ - название виртуальной машины, а значение - device_id в системе.
+  map<string, string> known_vms = 7;
+}
+
+enum HypervisorType {
+  // Невалидное значение.
+  HYPERVISOR_TYPE_UNSPECIFIED = 0;
+  // Тип ESXI.
+  HYPERVISOR_TYPE_ESXI = 1;
+  // Тип QEMU.
+  HYPERVISOR_TYPE_QEMU = 2;
+}
+
+message HypervisorCommonContent {
+  // Индентификатор гипервизора.
+  HypervisorIdentity identity = 1;
+  // Версия гипервизора.
+  string version = 2;
+}
+
+// Статус доступности гипервизора устройства.
+message HypervisorAvailable {
+  // Индентификатор гипервизора.
+  HypervisorIdentity identity = 1;
+  // Статус гипервизора.
+  HypervisorAvailableState state = 2;
+}
+
+enum HypervisorAvailableState {
+  // Невалидное значение.
+  HYPERVISOR_AVAILABLE_STATE_UNSPECIFIED = 0;
+  // Сетевой интерфейс доступен.
+  HYPERVISOR_AVAILABLE_STATE_AVAILABLE = 1;
+  // Сетевой интерфейс недоступен.
+  HYPERVISOR_AVAILABLE_STATE_UNAVAILABLE = 2;
+}
+
+// Описание источника сбора данных.
+message HypervisorIdentity {
+  // Идентификатор хостового устройства гипервизора.
+  string hypervisor_owner_id = 1;
+  // Идентификатор объекта прав доступа.
+  string access_object_id = 2;
+  // Идентификатор гипервизора, с которого были собраны данные.
+  string hypervisor_id = 3;
+}

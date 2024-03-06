@@ -1,0 +1,243 @@
+/**
+ * Контракты для сервиса windows-manager
+ */
+
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+import "shared_device_available.proto";
+import "shared_device_cpu.proto";
+import "shared_device_cpu_utilization.proto";
+import "shared_device_disk.proto";
+import "shared_device_initial.proto";
+import "shared_device_memory.proto";
+import "shared_device_memory_utilization.proto";
+import "shared_device_operation_system.proto";
+import "shared_device_pci_slot.proto";
+import "shared_device_template.proto";
+import "shared_device_uptime.proto";
+
+/**
+ * Сервис WindowsManager реализует логику мониторинга и инвентаризации оборудования и виртуальных машин на базе ОС Windows
+ */
+service WindowsManager {
+  // Получить данные о доступности хоста
+  rpc CheckAvailable(CheckWindowsAvailableRequest) returns (CheckWindowsAvailableResponse);
+  // Получить данные для заведения хоста
+  rpc CollectDeviceInitialContent(CollectDeviceInitialContentWindowsRequest) returns (CollectDeviceInitialContentWindowsResponse);
+  // Собрать данные об ОС
+  rpc CollectOperationSystem(CollectWindowsOperationSystemRequest) returns (CollectWindowsOperationSystemResponse);
+  // Собрать информацию об аптайме
+  rpc CollectUptime(CollectWindowsUptimeRequest) returns (CollectWindowsUptimeResponse);
+  // Собрать инвентарные данные по ОЗУ
+  rpc CollectMemory(CollectWindowsMemoryRequest) returns (CollectWindowsMemoryResponse);
+  // Собрать инвентарные данные по ЦПУ
+  rpc CollectCpu(CollectWindowsCpuRequest) returns (CollectWindowsCpuResponse);
+  // Собрать статистику утилизации ОЗУ
+  rpc CollectMemoryUtilization(CollectWindowsMemoryUtilizationRequest) returns (CollectWindowsMemoryUtilizationResponse);
+  // Собрать статистику утилизации ЦПУ
+  rpc CollectCpuUtilization(CollectWindowsCpuUtilizationRequest) returns (CollectWindowsCpuUtilizationResponse);
+  // Собрать инвентарные данные и статистику утилизации по дискам
+  rpc CollectDisk(CollectWindowsDiskRequest) returns (CollectWindowsDiskResponse);
+  // Собрать инвентарные данные PCI слотов и устройств
+  rpc CollectPciSlots(CollectWindowsPciSlotRequest) returns (CollectWindowsPciSlotResponse);
+  // Выполнить PowerShell-скрипт на хосте
+  rpc InvokeScript(InvokeScriptWindowsRequest) returns (InvokeScriptWindowsResponse);
+}
+
+/**
+ * Контракт запроса для rpc CheckAvailable
+ */
+message CheckWindowsAvailableRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CheckAvailable
+ */
+message CheckWindowsAvailableResponse {
+  // Данные о доступности хоста по сетевым интерфейсам
+  DeviceAvailable connector_state = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectDeviceInitialContent
+ */
+message CollectDeviceInitialContentWindowsRequest {
+  // Данные об устройстве
+  DeviceInitialInput device_input = 1;
+}
+
+/**
+* Контракт ответа для rpc CollectDeviceInitialContent
+*/
+message CollectDeviceInitialContentWindowsResponse {
+  // Данные для заведения хоста
+  DeviceInitialContent content = 2;
+}
+
+/**
+ * Контракт запроса для rpc CollectOperationSystem
+ */
+message CollectWindowsOperationSystemRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectOperationSystem
+ */
+message CollectWindowsOperationSystemResponse {
+  // Данные об операциионной системе
+  DeviceOperationSystem operation_system = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectUptime
+ */
+message CollectWindowsUptimeRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectUptime
+ */
+message CollectWindowsUptimeResponse {
+  // Данные об аптайме
+  DeviceUptime uptime = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectMemory
+ */
+message CollectWindowsMemoryRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectMemory
+ */
+message CollectWindowsMemoryResponse {
+  // Инвентарные данные по ОЗУ
+  DeviceMemory memory = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectCpu
+ */
+message CollectWindowsCpuRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectCpu
+ */
+message CollectWindowsCpuResponse {
+  // Инвентарные данные по ЦПУ
+  DeviceCpu cpu = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectMemoryUtilization
+ */
+message CollectWindowsMemoryUtilizationRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectMemoryUtilization
+ */
+message CollectWindowsMemoryUtilizationResponse {
+  // Статистические данные по ОЗУ
+  DeviceMemoryUtilization memory_utilization = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectCpuUtilization
+ */
+message CollectWindowsCpuUtilizationRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectCpuUtilization
+ */
+message CollectWindowsCpuUtilizationResponse {
+  // Статистические данные по ЦПУ
+  DeviceCpuUtilization cpu_utilization = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectDisk
+ */
+message CollectWindowsDiskRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Шаблоны сбора инвентарки устройства
+  repeated InventoryTemplate inventories = 2;
+  // Шаблоны сбора сенсоров устройства
+  repeated SensorTemplate sensors = 3;
+}
+
+/**
+ * Контракт ответа для rpc CollectDisk
+ */
+message CollectWindowsDiskResponse {
+  // Перечень собранных дисков с устройства
+  DeviceDisk disk = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectPciSlots
+ */
+message CollectWindowsPciSlotRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectPciSlots
+ */
+message CollectWindowsPciSlotResponse {
+  // PCI слоты устройства
+  DevicePciSlots pci_slot = 1;
+}
+
+/**
+ * Контракт запроса для rpc InvokeScript
+ */
+message InvokeScriptWindowsRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Ссылка на скрипт
+  string script_url = 2;
+  // Режим выполнения скрипта
+  WindowsInvokeMode invoke_mode = 3;
+}
+
+/**
+ * Контракт ответа для rpc InvokeScript
+ */
+message InvokeScriptWindowsResponse {
+  // Результат выполнения скрипта
+  OperationResult result = 1;
+}
+
+// Режимы выполнения скрипта
+enum WindowsInvokeMode {
+  // Невалидное значение
+  WINDOWS_INVOKE_MODE_UNSPECIFIED = 0;
+  // Стандартный режим запуска скрипта
+  WINDOWS_INVOKE_MODE_STANDARD = 1;
+  // Запуск скрипта с правами администратора
+  WINDOWS_INVOKE_MODE_ADMIN = 2;
+}

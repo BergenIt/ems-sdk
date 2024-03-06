@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_common.proto";
+
+// Множество статусов агентов.
+message DeviceAgentSet {
+  // Описание источника сбора данных.
+  ServiceSource source = 1;
+  // Множество статусов агентов.
+  repeated AgentEntry entries = 2;
+}
+
+// Запись статуса агента.
+message AgentEntry {
+  // Ip-адрес ноды где установлен агент.
+  string address = 1;
+  // Статус агента.
+  AgentState state = 2;
+}
+
+// Статус агента.
+enum AgentState {
+  // Невалидное значение.
+  AGENT_STATE_UNSPECIFIED = 0;
+  // Агент находится в нормальном состоянии.
+  AGENT_STATE_OK = 2;
+  // Агент недоступен.
+  AGENT_STATE_DEAD = 3;
+}

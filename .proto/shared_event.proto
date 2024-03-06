@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+enum Event {
+  EVENT_SYSTEMBACKUPSTORAGEOVERFLOW_UNSPECIFIED = 0; // Хранилище NFS переполнено
+}
