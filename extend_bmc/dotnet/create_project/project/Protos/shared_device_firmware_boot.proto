@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+
+// Параметр загрузки firmware на оборудовании.
+message DeviceFirmwareBootSource {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Текущий параметр загрузки firmware на оборудовании.
+  FirmwareBootSource boot_source = 2;
+}
+
+// Текущий параметр загрузки firmware на оборудовании.
+enum FirmwareBootSource {
+  /*
+   * Невалидное значение.
+   */  
+  FIRMWARE_BOOT_SOURCE_UNSPECIFIED = 0;
+  /*
+   * Не удалось прозвонить - статус неизвестен или невозможно определить источник загрузки.
+   */
+  FIRMWARE_BOOT_SOURCE_UNKNOWN = 1;
+  /*
+   * UEFI - загрузка через UEFI (Unified Extensible Firmware Interface), который представляет собой интерфейс для взаимодействия 
+   * между операционной системой и фирменным программным обеспечением (Firmware) на уровне загрузки.
+   */
+  FIRMWARE_BOOT_SOURCE_UEFI = 2;
+  /*
+   * Legacy - загрузка в режиме Legacy BIOS, который представляет собой традиционный режим загрузки, 
+   * основанный на BIOS (Basic Input/Output System).
+   */
+  FIRMWARE_BOOT_SOURCE_LEGACY = 3;
+}

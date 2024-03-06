@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+
+// Параметр загрузки на оборудовании.
+message DeviceBootSource {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Текущий параметр загрузки на оборудовании.
+  BootSource boot_source = 2;
+  // Выбор включения перегрузки параметра загрузки.
+  BootSourceOverrideEnabled override_enabled = 3;
+  // Выбор автоматического применения конфигурации для повторных попыток.
+  AutomaticRetryConfig automatic_retry_config = 4;
+}
+
+// Параметр загрузки на оборудовании.
+enum BootSource {
+  // Невалидное значение.
+  BOOT_SOURCE_UNSPECIFIED = 0;
+  // Не удалось определить.
+  BOOT_SOURCE_UNKNOWN = 1;
+  // Отсутствует - нет конкретного параметра загрузки.
+  BOOT_SOURCE_NONE = 2;
+  // Загрузка с диска (HDD).
+  BOOT_SOURCE_DISK = 3;
+  // Безопасная загрузка.
+  BOOT_SOURCE_SAFE = 4;
+  // Диагностика (verbose).
+  BOOT_SOURCE_DIAG = 5;
+  // Загрузка с CD.
+  BOOT_SOURCE_CDROM = 6;
+  // Загрузка в BIOS.
+  BOOT_SOURCE_BIOS = 7;
+  // Загрузка по PXE.
+  BOOT_SOURCE_PXE = 8;
+  // Загрузка с флоппи-диска.
+  BOOT_SOURCE_FLOPPY = 9;
+  // Загрузка с USB.
+  BOOT_SOURCE_USB = 10;
+}
+
+// Выбор включения перегрузки параметра загрузки.
+enum BootSourceOverrideEnabled {
+  // Невалидное значение.
+  BOOT_SOURCE_OVERRIDE_ENABLED_UNSPECIFIED = 0;
+  // Не удалось определить.
+  BOOT_SOURCE_OVERRIDE_ENABLED_UNKNOWN = 1;
+  // Отсутствует - не включено переопределение.
+  BOOT_SOURCE_OVERRIDE_ENABLED_IGNORE = 2;
+  // Выключено - переопределение отключено.
+  BOOT_SOURCE_OVERRIDE_ENABLED_DISABLED = 3;
+  // Один раз - переопределение включено на один раз.
+  BOOT_SOURCE_OVERRIDE_ENABLED_ONCE = 4;
+  // Постоянно - переопределение включено постоянно.
+  BOOT_SOURCE_OVERRIDE_ENABLED_CONTINUOUS = 5;
+}
+
+// Выбор автоматического применения конфигурации для повторных попыток.
+enum AutomaticRetryConfig {
+  // Невалидное значение.
+  AUTOMATIC_RETRY_CONFIG_UNSPECIFIED = 0;
+  // Не удалось определить.
+  AUTOMATIC_RETRY_CONFIG_UNKNOWN = 1;
+  // Отсутствует - не включена автоматическая повторная попытка.
+  AUTOMATIC_RETRY_CONFIG_IGNORE = 2;
+  // Выключено - автоматическая повторная попытка отключена.
+  AUTOMATIC_RETRY_CONFIG_DISABLED = 3;
+  // Включено - включена автоматическая повторная попытка с учетом количества попыток.
+  AUTOMATIC_RETRY_CONFIG_ATTEMPTS = 4;
+}

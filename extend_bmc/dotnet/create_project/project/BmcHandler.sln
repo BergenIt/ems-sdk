@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BmcManager", "BmcManager.csproj", "{E9E04EA4-CE06-4BE9-9F39-0825B0FA4204}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BmcHandler", "BmcHandler.csproj", "{E9E04EA4-CE06-4BE9-9F39-0825B0FA4204}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,834 @@
+/**
+ * Контракты для сервиса bmc-manager
+ */
+
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+import "shared_device.proto";
+import "shared_device_available.proto";
+import "shared_device_boot_source.proto";
+import "shared_device_cpu.proto";
+import "shared_device_cpu_utilization.proto";
+import "shared_device_disk.proto";
+import "shared_device_event.proto";
+import "shared_device_firmware.proto";
+import "shared_device_firmware_boot.proto";
+import "shared_device_initial.proto";
+import "shared_device_ipmi.proto";
+import "shared_device_led.proto";
+import "shared_device_memory.proto";
+import "shared_device_memory_utilization.proto";
+import "shared_device_operation_system.proto";
+import "shared_device_pci_slot.proto";
+import "shared_device_power_state.proto";
+import "shared_device_power_usage.proto";
+import "shared_device_power_usage_limit.proto";
+import "shared_device_redfish.proto";
+import "shared_device_temperature.proto";
+import "shared_device_template.proto";
+
+/**
+ * Сервис BmcManager реализует логику мониторинга и управления оборудования (в том числе и на BMC устройства) по протоколам Redfish и IPMI.
+ */
+service BmcManager {
+  // Получить данные о доступности хоста
+  rpc CheckAvailable(CheckBmcAvailableRequest) returns (CheckBmcAvailableResponse);
+  // Получить данные для заведения хоста
+  rpc CollectDeviceInitialContent(CollectDeviceInitialContentBmcRequest) returns (CollectDeviceInitialContentBmcResponse);
+  // Собрать данные об ОС
+  rpc CollectOperationSystem(CollectBmcOperationSystemRequest) returns (CollectBmcOperationSystemResponse);
+  // Собрать инвентарные данные по ОЗУ
+  rpc CollectMemory(CollectBmcMemoryRequest) returns (CollectBmcMemoryResponse);
+  // Собрать инвентарные данные по ЦПУ
+  rpc CollectCpu(CollectBmcCpuRequest) returns (CollectBmcCpuResponse);
+  // Собрать статистику утилизации ОЗУ
+  rpc CollectMemoryUtilization(CollectBmcMemoryUtilizationRequest) returns (CollectBmcMemoryUtilizationResponse);
+  // Собрать статистику утилизации ЦПУ
+  rpc CollectCpuUtilization(CollectBmcCpuUtilizationRequest) returns (CollectBmcCpuUtilizationResponse);
+  // Собрать инвентарные данные и статистику утилизации по дискам
+  rpc CollectDisk(CollectBmcDiskRequest) returns (CollectBmcDiskResponse);
+  // Собрать инвентарные данные PCI слотов и устройств
+  rpc CollectPciSlots(CollectBmcPciSlotRequest) returns (CollectBmcPciSlotResponse);
+  // Собрать значения температуры
+  rpc CollectTemperature(CollectBmcTemperatureRequest) returns (CollectBmcTemperatureResponse);
+  // Собрать значения энергопотребления
+  rpc CollectPowerUsage(CollectBmcPowerUsageRequest) returns (CollectBmcPowerUsageResponse);
+  // Собрать значения сенсоров и их статус
+  rpc CollectSensors(CollectBmcSensorRequest) returns (CollectBmcSensorResponse);
+  // Собрать значения инвентарной информации
+  rpc CollectInventories(CollectBmcInventoriesRequest) returns (CollectBmcInventoriesResponse);
+  // Собрать полный список IPMI сенсоров
+  rpc CollectIpmiSensorMeta(CollectBmcIpmiSensorMetaRequest) returns (CollectBmcIpmiSensorMetaResponse);
+  // Собрать полный список IPMI инвентарной информации
+  rpc CollectIpmiInventoryMeta(CollectBmcIpmiInventoryMetaRequest) returns (CollectBmcIpmiInventoryMetaResponse);
+  // Собрать полный список Redfish сенсоров
+  rpc CollectRedfishSensorMeta(CollectBmcRedfishSensorMetaRequest) returns (CollectBmcRedfishSensorMetaResponse);
+  // Собрать полный список Redfish инвентарной информации
+  rpc CollectRedfishInventoryMeta(CollectBmcRedfishInventoryMetaRequest) returns (CollectBmcRedfishInventoryMetaResponse);
+  // Собрать статус питания
+  rpc CollectPowerState(CollectBmcPowerStateRequest) returns (CollectBmcPowerStateResponse);
+  // Собрать текущий статус BMC устройства
+  rpc CollectBmcState(CollectBmcStateRequest) returns (CollectBmcStateResponse);
+  // Собрать журнал логов BMC устройства
+  rpc CollectEvents(CollectBmcEventsRequest) returns (CollectBmcEventsResponse);
+  // Собрать статус LED
+  rpc CollectLedState(CollectBmcLedStateRequest) returns (CollectBmcLedStateResponse);
+  // Собрать информацию о версиях прошивок
+  rpc CollectFirmwareVersion(CollectBmcFirmwareVersionRequest) returns (CollectBmcFirmwareVersionResponse);
+  // Собрать текущее максимальное энергопотребления
+  rpc CollectPowerUsageLimit(CollectBmcPowerUsageLimitRequest) returns (CollectBmcPowerUsageLimitResponse);
+  // Собрать текущий загрузочный носитель
+  rpc CollectBootSource(CollectBmcBootSourceRequest) returns (CollectBmcBootSourceResponse);
+  // Собрать текущий режим загрузки BIOS (Legacy/UEFI)
+  rpc CollectFirmwareBootSource(CollectBmcFirmwareBootSourceRequest) returns (CollectBmcFirmwareBootSourceResponse);
+  // Изменить статус LED
+  rpc ChangeLedState(ChangeLedStateBmcRequest) returns (ChangeLedStateBmcResponse);
+  // Изменить текущее максимальное энергопотребления
+  rpc ChangePowerUsageLimit(ChangePowerUsageLimitBmcRequest) returns (ChangePowerUsageLimitBmcResponse);
+  // Изменить текущий загрузочный носитель
+  rpc ChangeBootSource(ChangeBootSourceBmcRequest) returns (ChangeBootSourceBmcResponse);
+  // Изменить текущий режим загрузки BIOS (Legacy/UEFI)
+  rpc ChangeFirmwareBootSource(ChangeFirmwareBootSourceBmcRequest) returns (ChangeFirmwareBootSourceBmcResponse);
+  // Выключить оборудование
+  rpc PowerOff(PowerOffBmcRequest) returns (PowerOffBmcResponse);
+  // Включить оборудование
+  rpc PowerOn(PowerOnBmcRequest) returns (PowerOnBmcResponse);
+  // Перезагрузить оборудование
+  rpc Reboot(RebootBmcRequest) returns (RebootBmcResponse);
+  // Эмулировать нажатие кнопки на корпусе сервера
+  rpc PushButton(PushButtonBmcRequest) returns (PushButtonBmcResponse);
+  // Эмулировать апаратное прерывание (NMI)
+  rpc InvokeNmi(InvokeNmiBmcRequest) returns (InvokeNmiBmcResponse);
+  // Перезагрузить BMC-консоль
+  rpc RebootBmc(RebootBmcConsoleRequest) returns (RebootBmcConsoleResponse);
+  // Обновить версию прошивки BMC-консоли
+  rpc BmcFirmwareUpdate(BmcFirmwareUpdateRequest) returns (BmcFirmwareUpdateResponse);
+  // Обновить версию прошивки BIOS (Legacy/UEFI)
+  rpc UefiFirmwareUpdate(UefiFirmwareUpdateBmcRequest) returns (UefiFirmwareUpdateBmcResponse);
+}
+
+/**
+ * Контракт запроса для rpc CheckAvailable
+ */
+message CheckBmcAvailableRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CheckAvailable
+ */
+message CheckBmcAvailableResponse {
+  // Данные о доступности хоста по сетевым интерфейсам
+  DeviceAvailable connector_state = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectDeviceInitialContent
+ */
+message CollectDeviceInitialContentBmcRequest {
+  // Данные об устройстве
+  DeviceInitialInput device_input = 1;
+}
+
+/**
+* Контракт ответа для rpc CollectDeviceInitialContent
+*/
+message CollectDeviceInitialContentBmcResponse {
+  // Данные для заведения хоста
+  DeviceInitialContent content = 2;
+}
+
+/**
+ * Контракт запроса для rpc CollectOperationSystem
+ */
+message CollectBmcOperationSystemRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectOperationSystem
+ */
+message CollectBmcOperationSystemResponse {
+  // Данные об операционной системе
+  DeviceOperationSystem operation_system = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectMemory
+ */
+message CollectBmcMemoryRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectMemory
+ */
+message CollectBmcMemoryResponse {
+  // Инвентарные данные по ОЗУ
+  DeviceMemory memory = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectCpu
+ */
+message CollectBmcCpuRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectCpu
+ */
+message CollectBmcCpuResponse {
+  // Инвентарные данные по ЦПУ
+  DeviceCpu cpu = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectMemoryUtilization
+ */
+message CollectBmcMemoryUtilizationRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectMemoryUtilization
+ */
+message CollectBmcMemoryUtilizationResponse {
+  // Статистические данные по ОЗУ
+  DeviceMemoryUtilization memory_utilization = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectCpuUtilization
+ */
+message CollectBmcCpuUtilizationRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectCpuUtilization
+ */
+message CollectBmcCpuUtilizationResponse {
+  // Статистические данные по ЦПУ
+  DeviceCpuUtilization cpu_utilization = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectDisk
+ */
+message CollectBmcDiskRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectDisk
+ */
+message CollectBmcDiskResponse {
+  // Перечень собранных дисков с устройства
+  DeviceDisk disk = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectPciSlots
+ */
+message CollectBmcPciSlotRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectPciSlots
+ */
+message CollectBmcPciSlotResponse {
+  // PCI слоты устройства
+  DevicePciSlots pci_slot = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectTemperature
+ */
+message CollectBmcTemperatureRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Список шаблонов по сбору метрик
+  repeated SystemMetricTemplate metric_templates = 2;
+}
+
+/**
+ * Контракт ответа для rpc CollectTemperature
+ */
+message CollectBmcTemperatureResponse {
+  // Перечень собранной температуры с устройств
+  DeviceTemperature temperature = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectPowerUsage
+ */
+message CollectBmcPowerUsageRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Список шаблонов по сбору метрик
+  repeated SystemMetricTemplate metric_templates = 2;
+}
+
+/**
+ * Контракт ответа для rpc CollectPowerUsage
+ */
+message CollectBmcPowerUsageResponse {
+  // Перечень собранных данных энергопотребления с устройства
+  DevicePowerUsage usage = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectSensors
+ */
+message CollectBmcSensorRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Список шаблонов по сенсорам
+  repeated SensorTemplate sensors = 2;
+}
+
+/**
+ * Контракт ответа для rpc CollectSensors
+ */
+message CollectBmcSensorResponse {
+  // Перечень собранных данных сенсоров с устройства
+  DeviceSensorValues sensor_values = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectInventories
+ */
+message CollectBmcInventoriesRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Список шаблонов по инвентарке
+  repeated InventoryTemplate inventories = 2;
+}
+
+/**
+ * Контракт ответа для rpc CollectInventories
+ */
+message CollectBmcInventoriesResponse {
+  // Перечень собранных инвентарных данных с устройства
+  DeviceInventoryValues inventory_values = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectIpmiSensorMeta
+ */
+message CollectBmcIpmiSensorMetaRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectIpmiSensorMeta
+ */
+message CollectBmcIpmiSensorMetaResponse {
+  // Список метаданных о сенсорах устройства
+  IpmiSensors sensor_metas = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectIpmiInventoryMeta
+ */
+message CollectBmcIpmiInventoryMetaRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectIpmiInventoryMeta
+ */
+message CollectBmcIpmiInventoryMetaResponse {
+  // Список метаданных о инвентарной информации оборудования
+  IpmiInventories inventory_metas = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectRedfishSensorMeta
+ */
+message CollectBmcRedfishSensorMetaRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Endpoint страницы сбора данных
+  google.protobuf.StringValue page_key = 2;
+}
+
+/**
+ * Контракт ответа для rpc CollectRedfishSensorMeta
+ */
+message CollectBmcRedfishSensorMetaResponse {
+  // Массив метаданных о сенсорах устройства
+  RedfishSensors sensor_metas = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectRedfishInventoryMeta
+ */
+message CollectBmcRedfishInventoryMetaRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Endpoint страницы сбора данных
+  google.protobuf.StringValue page_key = 2;
+}
+
+/**
+ * Контракт ответа для rpc CollectRedfishInventoryMeta
+ */
+message CollectBmcRedfishInventoryMetaResponse {
+  // Массив метаданных о инвентарной информации оборудования
+  RedfishInventories inventory_metas = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectPowerState
+ */
+message CollectBmcPowerStateRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Список шаблонов по сбору метрик
+  repeated SystemMetricTemplate metric_templates = 2;
+}
+
+/**
+ * Контракт ответа для rpc CollectPowerState
+ */
+message CollectBmcPowerStateResponse {
+  // Данные по статусу питания устройства
+  DevicePowerState power_state = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectBmcState
+ */
+message CollectBmcStateRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectBmcState
+ */
+message CollectBmcStateResponse {
+  // Описание источника сбора данных
+  DeviceDataIdentity device_identity = 1;
+  // Данные по статусу питания BMC-консоли
+  BmcState state = 2;
+}
+
+// Статусы питания BMC-консоли
+enum BmcState {
+  // Невалидное значение.
+  BMC_STATE_UNSPECIFIED = 0;
+  // Состояние BMC-консоли неизвестно. Невозможно точно определить текущее состояние.
+  BMC_STATE_UNKNOWN = 1;
+  // BMC-консоль находится в нормальном состоянии. Нет проблем или ошибок.
+  BMC_STATE_OK = 2;
+  // Предупреждение относительно состояния BMC-консоли. Возможны проблемы, но они не являются критическими.
+  BMC_STATE_WARNING = 3;
+  // Критическое состояние BMC-консоли. Присутствуют серьезные проблемы или ошибки, требующие немедленного внимания и решения.
+  BMC_STATE_CRITICAL = 4;
+}
+
+/**
+ * Контракт запроса для rpc CollectEvents
+ */
+message CollectBmcEventsRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Последние собранные id события в рамках протоколов
+  repeated EventLatestEventId latest_event_ids = 2;
+  // Подходящие к устройству шаблоны метрик
+  repeated EventTemplate event_templates = 3;
+}
+
+/**
+ * Контракт ответа для rpc CollectEvents
+ */
+message CollectBmcEventsResponse {
+  // Массив событий мониторинга для данного устройства
+  DeviceEvents events = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectLedState
+ */
+message CollectBmcLedStateRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Список шаблонов по сбору метрик
+  repeated SystemMetricTemplate metric_templates = 2;
+}
+
+/**
+ * Контракт ответа для rpc CollectLedState
+ */
+message CollectBmcLedStateResponse {
+  // Текущий статус Led устройства
+  DeviceLed led = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectFirmwareVersion
+ */
+message CollectBmcFirmwareVersionRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Список шаблонов по сбору метрик
+  repeated SystemMetricTemplate metric_templates = 2;
+}
+
+/**
+ * Контракт ответа для rpc CollectFirmwareVersion
+ */
+message CollectBmcFirmwareVersionResponse {
+  // Данные о прошивках (BMC/BIOS) устройства
+  DeviceFirmwareVersion firmware_version = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectPowerUsageLimit
+ */
+message CollectBmcPowerUsageLimitRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectPowerUsageLimit
+ */
+message CollectBmcPowerUsageLimitResponse {
+  // Данные о текущем максимальном энергопотреблении устройства
+  DevicePowerUsageLimit limit = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectBootSource
+ */
+message CollectBmcBootSourceRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Список шаблонов по сбору метрик
+  repeated SystemMetricTemplate metric_templates = 2;
+}
+
+/**
+ * Контракт ответа для rpc CollectBootSource
+ */
+message CollectBmcBootSourceResponse {
+  // Данные о текущем загрузочном носителе
+  DeviceBootSource source = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectFirmwareBootSource
+ */
+message CollectBmcFirmwareBootSourceRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Список шаблонов по сбору метрик
+  repeated SystemMetricTemplate metric_templates = 2;
+}
+
+/**
+ * Контракт ответа для rpc CollectFirmwareBootSource
+ */
+message CollectBmcFirmwareBootSourceResponse {
+  // Данные о текущем режиме загрузки BIOS (Legacy/UEFI)
+  DeviceFirmwareBootSource source = 1;
+}
+
+/**
+ * Контракт запроса для rpc ChangeLedState
+ */
+message ChangeLedStateBmcRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Статус Led
+  LedState state = 2;
+}
+
+/**
+ * Контракт ответа для rpc ChangeLedState
+ */
+message ChangeLedStateBmcResponse {
+  // Результат выполнения операции управления
+  OperationResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc ChangePowerUsageLimit
+ */
+message ChangePowerUsageLimitBmcRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Значение максимального энергопотребления
+  google.protobuf.DoubleValue limit = 2;
+}
+
+/**
+ * Контракт ответа для rpc ChangePowerUsageLimit
+ */
+message ChangePowerUsageLimitBmcResponse {
+  // Результат выполнения операции управления
+  OperationResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc ChangeBootSource
+ */
+message ChangeBootSourceBmcRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Текущий параметр загрузки на оборудовании
+  BootSource boot_source = 2;
+  // Выбор включения перегрузки параметра загрузки
+  BootSourceOverrideEnabled override_enabled = 3;
+  // Выбор автоматического применения конфигурации для повторных попыток
+  AutomaticRetryConfig automatic_retry_config = 4;
+}
+
+/**
+ * Контракт ответа для rpc ChangeBootSource
+ */
+message ChangeBootSourceBmcResponse {
+  // Результат выполнения операции управления
+  OperationResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc ChangeFirmwareBootSource
+ */
+message ChangeFirmwareBootSourceBmcRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Текущий параметр загрузки на оборудовании
+  FirmwareBootSource boot_source = 2;
+}
+
+/**
+ * Контракт ответа для rpc ChangeFirmwareBootSource
+ */
+message ChangeFirmwareBootSourceBmcResponse {
+  // Результат выполнения операции управления
+  OperationResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc PowerOff
+ */
+message PowerOffBmcRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Режим выключения оборудования
+  BmcPowerOffMode mode = 2;
+}
+
+// Режимы выключения оборудования
+enum BmcPowerOffMode {
+  // Невалидное значение
+  BMC_POWER_OFF_MODE_UNSPECIFIED = 0;
+  // Стандартный режим выключения оборудования
+  BMC_POWER_OFF_MODE_STANDARD = 1;
+  // Soft-режим выключения оборудования
+  BMC_POWER_OFF_MODE_SOFT = 2;
+}
+
+/**
+ * Контракт ответа для rpc PowerOff
+ */
+message PowerOffBmcResponse {
+  // Результат выполнения операции управления
+  OperationResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc PowerOn
+ */
+message PowerOnBmcRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Режим включения оборудования
+  BmcPowerOnMode mode = 2;
+}
+
+// Режимы включения оборудования
+enum BmcPowerOnMode {
+  // Невалидное значение
+  BMC_POWER_ON_MODE_UNSPECIFIED = 0;
+  // Стандартный режим включения оборудования
+  BMC_POWER_ON_MODE_STANDARD = 1;
+  // Soft-режим включения оборудования
+  BMC_POWER_ON_MODE_SOFT = 2;
+}
+
+/**
+ * Контракт ответа для rpc PowerOn
+ */
+message PowerOnBmcResponse {
+  // Результат выполнения операции управления
+  OperationResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc Reboot
+ */
+message RebootBmcRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Режим перезагрузки оборудования
+  BmcRebootMode mode = 2;
+}
+
+// Режимы перезагрузки оборудования
+enum BmcRebootMode {
+  // Невалидное значение
+  BMC_REBOOT_MODE_UNSPECIFIED = 0;
+  // Стандартный режим перезагрузки оборудования
+  BMC_REBOOT_MODE_STANDARD = 1;
+  // Soft-режим перезагрузки оборудования
+  BMC_REBOOT_MODE_SOFT = 2;
+}
+
+/**
+ * Контракт ответа для rpc Reboot
+ */
+message RebootBmcResponse {
+  // Результат выполнения операции управления
+  OperationResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc PushButton
+ */
+message PushButtonBmcRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc PushButton
+ */
+message PushButtonBmcResponse {
+  // Результат выполнения операции управления
+  OperationResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc InvokeNmi
+ */
+message InvokeNmiBmcRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc InvokeNmi
+ */
+message InvokeNmiBmcResponse {
+  // Результат выполнения операции управления
+  OperationResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc RebootBmc
+ */
+message RebootBmcConsoleRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Режим перезагрузки BMC-консоли
+  RebootBmcConsoleMode mode = 2;
+}
+
+// Режимы перезагрузки BMC-консоли
+enum RebootBmcConsoleMode {
+  // Невалидное значение
+  REBOOT_BMC_CONSOLE_MODE_UNSPECIFIED = 0;
+  // Стандартный режим включения BMC-консоли
+  REBOOT_BMC_CONSOLE_MODE_STANDARD = 1;
+  // Soft-режим включения BMC-консоли
+  REBOOT_BMC_CONSOLE_MODE_SOFT = 2;
+}
+
+/**
+ * Контракт ответа для rpc RebootBmc
+ */
+message RebootBmcConsoleResponse {
+  // Результат выполнения операции управления
+  OperationResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc BmcFirmwareUpdate
+ */
+message BmcFirmwareUpdateRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Ссылка на файл прошивки
+  string firmware_url = 2;
+  // Режим обновления прошивки BMC
+  BmcFirmwareUpdateMode mode = 3;
+}
+
+// Режимы обновления прошивки BMC
+enum BmcFirmwareUpdateMode {
+  // Невалидное значение
+  BMC_FIRMWARE_UPDATE_MODE_UNSPECIFIED = 0;
+  // Обновление прошивки BMC через Redfish
+  BMC_FIRMWARE_UPDATE_MODE_API = 1;
+  // Обновление прошивки BMC через IPMI
+  BMC_FIRMWARE_UPDATE_MODE_RAW_IPMI = 2;
+}
+
+/**
+ * Контракт ответа для rpc BmcFirmwareUpdate
+ */
+message BmcFirmwareUpdateResponse {
+  // Результат выполнения операции управления
+  OperationResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc UefiFirmwareUpdate
+ */
+message UefiFirmwareUpdateBmcRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+  // Ссылка на файл прошивки
+  string firmware_url = 2;
+  // Режим обновления прошивки BIOS/UEFI
+  UefiFirmwareUpdateBmcMode mode = 3;
+}
+
+// Режимы обновления прошивки BIOS/UEFI
+enum UefiFirmwareUpdateBmcMode {
+  // Невалидное значение
+  UEFI_FIRMWARE_UPDATE_BMC_MODE_UNSPECIFIED = 0;
+  // Обновление прошивки BIOS/UEFI через Redfish
+  UEFI_FIRMWARE_UPDATE_BMC_MODE_API = 1;
+  // Обновление прошивки BIOS/UEFI через IPMI
+  UEFI_FIRMWARE_UPDATE_BMC_MODE_RAW_IPMI = 2;
+}
+
+/**
+ * Контракт ответа для rpc UefiFirmwareUpdate
+ */
+message UefiFirmwareUpdateBmcResponse {
+  // Результат выполнения операции управления
+  OperationResult result = 1;
+}
