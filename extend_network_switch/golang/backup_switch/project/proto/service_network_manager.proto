@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+
+// Описание сервиса для мониторинга доступности и управления конфигурациями коммутаторов
+service NetworkManager {
+  // процедура для сохранения настроек коммутатора
+  rpc CreateConfig(CreateNetworkConfigRequest) returns (CreateNetworkConfigResponse);
+}
+
+message CreateNetworkConfigRequest {
+  DeviceContent device = 1;
+}
+
+message CreateNetworkConfigResponse {
+  OperationResult result = 1;
+}
