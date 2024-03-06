@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_service_instance.proto";
+
+service ServiceManager {
+  rpc CheckAvailable(CheckServiceAvailableRequest) returns (CheckServiceAvailableResponse);
+  rpc DebugAccess(DebugServiceAccessRequest) returns (DebugServiceAccessResponse);
+  rpc DebugRule(DebugRuleRequest) returns (DebugRuleResponse);
+}
+
+/**
+ * Контракт запроса для rpc DebugAccess
+ */
+message DebugServiceAccessRequest {
+  oneof address {
+    // URI сервиса.
+    string uri = 2;
+    // Адрес и порт сервиса.
+    AddressPort address_port = 3;
+  }
+  // Протокол сервиса
+  ServiceProtocol protocol = 4;
+}
+
+/**
+ * Контракт ответа для rpc DebugAccess
+ */
+message DebugServiceAccessResponse {
+  // Результат проверки
+  DebugAccessResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc CheckAvailable
+ */
+message CheckServiceAvailableRequest {
+  // Инстанс сервиса
+  ServiceInstance service_instance = 1;
+  // Массив правил монитогинга протокола TCP
+  repeated TcpRule tcp_rules = 2;
+  // Массив правил монитогинга протокола UDP
+  repeated UdpRule udp_rules = 3;
+  // Массив правил монитогинга протокола WS
+  repeated WsRule ws_rules = 4;
+  // Массив правил монитогинга протокола HTTP
+  repeated HttpRule http_rules = 5;
+  // Массив правил монитогинга протокола GRPC
+  repeated GrpcRule grpc_rules = 6;
+}
+
+/**
+ * Контракт ответа для rpc CheckAvailable
+ */
+message CheckServiceAvailableResponse {
+  // Состояния сервисов по правилам мониторинга
+  CheckAvailableResult result = 1;
+}
+
+/**
+ * Контракт запроса для rpc DebugRule
+ */
+message DebugRuleRequest {
+  // Инстанс сервиса
+  ServiceInstance service_instance = 1;
+  oneof rule {
+    // Правило монитогинга протокола TCP
+    TcpRule tcp_rule = 2;
+    // Правило монитогинга протокола UDP
+    UdpRule udp_rule = 3;
+    // Правило монитогинга протокола WS
+    WsRule ws_rule = 4;
+    // Правило монитогинга протокола HTTP
+    HttpRule http_rule = 5;
+    // Правило монитогинга протокола GRPC
+    GrpcRule grpc_rule = 6;
+  }
+}
+
+/**
+ * Контракт ответа для rpc DebugRule
+ */
+message DebugRuleResponse {
+  // Состояние правила мониторинга
+  DebugRuleState state = 1;
+}

@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+import "shared_device.proto";
+
+/**
+ * Описание сервиса по сетевой установке ОС
+ */
+service OsInstaller {
+  rpc FilePxeInstall(FilePxeInstallRequest) returns (FilePxeInstallResponse);          // процедура для установки ОС из ISO файла.
+  rpc NetbootPxeInstall(NetbootPxeInstallRequest) returns (NetbootPxeInstallResponse); // процедура для установки ОС из сетевого репозитория.
+}
+
+/**
+ * По данному контракту отправляется команда на сетевую установку ОС из ISO файла.
+ */
+message FilePxeInstallRequest {
+  TargetPxeDevice target_device = 1;              // Информация о машине, на которую нужно установить ОС.
+  string kickstart_url = 2;                       // Ссылка на kickstart-файл, который будет использован при установке ОС.
+  string iso_url = 3;                             // Ссылка на ISO образ ОС.
+  google.protobuf.StringValue vm_profile_url = 4; // Дополнительный файл для автоматической установки (только для Alt Linux).
+  OsFilePxeInstallTypes os_type = 5;              // Название и версия устанавливаемой ОС.
+}
+
+/**
+ * Список названий + версий ОС, для которых поддерживается установка из ISO файла.
+ */
+enum OsFilePxeInstallTypes {
+  OS_FILE_PXE_INSTALL_TYPES_UNSPECIFIED = 0;    // UNSPECIFIED-маркер для предотвращения ошибок с нулевым значением
+  OS_FILE_PXE_INSTALL_TYPES_UBUNTU_20_04 = 1;   // Linux Ubuntu 20.04
+  OS_FILE_PXE_INSTALL_TYPES_UBUNTU_22_04 = 2;   // Linux Ubuntu 22.04
+  OS_FILE_PXE_INSTALL_TYPES_ESXI_6 = 3;         // VMware ESXi 6
+  OS_FILE_PXE_INSTALL_TYPES_ESXI_7 = 4;         // VMware ESXi 7
+  OS_FILE_PXE_INSTALL_TYPES_CENTOS_7 = 5;       // Linux Centos 7
+  OS_FILE_PXE_INSTALL_TYPES_DEBIAN_11 = 6;      // Linux Debian 11
+  OS_FILE_PXE_INSTALL_TYPES_ESXI_8  = 7;        // VMware ESXi 8
+  OS_FILE_PXE_INSTALL_TYPES_CENTOS_8 = 8;       // Linux Centos 8
+  OS_FILE_PXE_INSTALL_TYPES_ORACLE_LINUX_8 = 9; // Oracle Linux 8
+  OS_FILE_PXE_INSTALL_TYPES_REDOS_7 = 10;       // Linux Redos 7
+  OS_FILE_PXE_INSTALL_TYPES_ASTRA_2  = 11;      // Linux Astra 2
+  OS_FILE_PXE_INSTALL_TYPES_ALT_LINUX_10 = 12;  // Alt Linux 10
+}
+
+/**
+ * По данному контракту отправляется команда на сетевую установку ОС из сетевого репозитория (без ISO файла).
+ */
+message NetbootPxeInstallRequest {
+  TargetPxeDevice target_device = 1;              // Информация о машине, на которую нужно установить ОС.
+  string kickstart_url = 2;                       // Ссылка на kickstart-файл, который будет использован при установке ОС.
+  string repository_url = 3;                      // URL репозитория, который содержит файлы начальной загрузки (vmlinu{z,x}, initrd{.gz})
+  google.protobuf.StringValue vm_profile_url = 4; // Дополнительный файл для автоматической установки (только для Alt Linux).
+  OsNetbootPxeInstallTypes os_type = 5;           // Название и версия устанавливаемой ОС.
+}
+
+/**
+ * Список названий + версий ОС, для которых поддерживается установка из сетевого репозитория.
+ */
+enum OsNetbootPxeInstallTypes {
+  OS_NETBOOT_PXE_INSTALL_TYPES_UNSPECIFIED = 0;  // UNSPECIFIED-маркер для предотвращения ошибок с нулевым значением
+  OS_NETBOOT_PXE_INSTALL_TYPES_UBUNTU_20_04 = 1; // Linux Ubuntu 20.04
+  OS_NETBOOT_PXE_INSTALL_TYPES_UBUNTU_22_04 = 2; // Linux Ubuntu 22.04
+  OS_NETBOOT_PXE_INSTALL_TYPES_CENTOS_7 = 3;     // Linux Centos 7
+  OS_NETBOOT_PXE_INSTALL_TYPES_CENTOS_8 = 4;     // Linux Centos 8
+}
+
+/**
+ * Информация о машине, на которую нужно установить ОС.
+ */
+message TargetPxeDevice {
+  DeviceContent target_device = 1; // внутренние данные по устройству
+  string target_mac = 2;           // MAC-адрес сетевого устройства, которое будет использовано при установке ОС.
+}
+
+/**
+ * IP адрес, полученный в ходе установки.
+ */
+message NewIpAddress {
+  string new_address = 1;
+}
+
+/**
+ * Информация об окончании установки ОС из ISO файла.
+ */
+message FilePxeInstallResponse {
+  OperationResult result = 1; // Информация об устройстве, на которое была установлена ОС.
+  NewIpAddress address = 2;   // IP адрес, полученный в ходе установки.
+}
+
+/**
+ * Информация об окончании установки ОС из сетевого репозитория.
+ */
+message NetbootPxeInstallResponse {
+  OperationResult result = 1; // Информация об устройстве, на которое была установлена ОС.
+  NewIpAddress address = 2;   // IP адрес, полученный в ходе установки.
+}
+
+/**
+ * Уведомление об окончании подготовки к установке ОС (но еще не самой установки ОС).
+ */
+message PrepareComplete {
+  string device_id = 1; // ID сетевого интерфейса целевого устройства
+  string os_name = 2;   // Название ОС, подготовленной для установки
+}
+
+/**
+ * Уведомление о начале установки ОС.
+ */
+message InstallStarted {
+  string device_id = 1; // ID сетевого интерфейса целевого устройства
+  string os_name = 2;   // Название ОС, подготовленной для установки
+  string ip = 3;        // IP адрес, целевого устройства, полученный от DHCP.
+}

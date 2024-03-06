@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+
+service SsoCenter {
+  rpc MutateLdapInput(MutateLdapInputRequest) returns (MutateLdapInputResponse);
+  rpc MutateLdapOutput(MutateLdapOutputRequest) returns (MutateLdapOutputResponse);
+  rpc CheckStatus(CheckSsoStatusRequest) returns (CheckSsoStatusResponse);
+  rpc PutSettings(PutSsoSettingsRequest) returns (PutSsoSettingsResponse);
+  rpc GenerateIframe(GenerateIframeRequest) returns (GenerateIframeResponse);
+  rpc CloseSession(CloseSsoSessionRequest) returns (CloseSsoSessionResponse);
+}
+
+message MutateLdapInputRequest {
+  bytes request = 1;
+}
+
+message MutateLdapInputResponse {
+  bytes mutated_request = 1;
+}
+
+message MutateLdapOutputRequest {
+  bytes original_request = 1;
+  bytes mutated_request = 2;
+  bytes response = 3;
+}
+
+message MutateLdapOutputResponse {
+  bytes mutated_response = 1;
+}
+
+message CheckSsoStatusRequest {
+  DeviceContent device = 1;
+}
+
+message CheckSsoStatusResponse {
+  string device_id = 1;
+  SsoState state = 2;
+}
+
+message PutSsoSettingsRequest {
+  DeviceContent device = 1;
+  SsoState target_state = 2;
+}
+
+message PutSsoSettingsResponse {
+  OperationResult result = 1;
+}
+
+enum SsoState {
+  SSO_STATE_UNSPECIFIED = 0;
+  SSO_STATE_INACTIVE = 1;
+  SSO_STATE_ACTIVE = 2;
+}
+
+message GenerateIframeRequest {
+  DeviceContent device = 1;
+  string login = 2;
+  string password = 3;
+}
+
+message GenerateIframeResponse {
+  string device_id = 1;
+  map<string, string> local_storage = 2;
+  map<string, string> session_storage = 3;
+  map<string, string> cookies = 4;
+  string endpoint = 5;
+  string endpoint_postfix = 6;
+  repeated string queries = 7;
+  string output = 8;
+}
+
+message CloseSsoSessionRequest {
+  DeviceContent device = 1;
+  string login = 2;
+}
+
+message CloseSsoSessionResponse {
+  string device_id = 1;
+}

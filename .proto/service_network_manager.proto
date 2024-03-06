@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+import "shared_device.proto";
+
+// Описание сервиса для мониторинга доступности и управления конфигурациями коммутаторов
+service NetworkManager {
+  // процедура для мониторинга доступности оборудования
+  rpc IcmpHealth(IcmpHealthRequest) returns (IcmpHealthRequestResponse);
+  // процедура для восстановления настроек коммутатора
+  rpc RestoreConfig(RestoreNetworkConfigRequest) returns (RestoreNetworkConfigResponse);
+  // процедура для сохранения настроек коммутатора
+  rpc CreateConfig(CreateNetworkConfigRequest) returns (CreateNetworkConfigResponse);
+}
+
+// По данному контракту отправляется команда на проверку доступности оборудования
+message IcmpHealthRequest {
+  // Список ip адресов для проверки.
+  repeated string ip_addresses = 1;
+  // Список доменных имен для проверки.
+  repeated string fqdn_addresses = 2;
+  // Список диапазонов-ip адресов в формате 192.168.1.FIRST-192.168.1.LAST для проверки (меняется только последний октет).
+  repeated string ip_ranges = 3;
+  // Список масок подсетей для проверки в формате 192.168.1.0/22, минимальный октет - 18.
+  repeated string masks = 4;
+}
+
+// Перечень адресов, прошедших проверку
+message IcmpHealthRequestResponse {
+  // Перечень адресов, прошедших проверку
+  repeated IcmpAvailableAddress addresses = 1;
+}
+
+message IcmpAvailableAddress {
+  // Адрес (ip или fqdn) на котором проверена доступность.
+  string address = 1;
+  // Mac полученный с проверенного адреса (null, если не удалось получить)
+  google.protobuf.StringValue mac = 2;
+  // Список доменных имен, полученных с dns
+  repeated string domain_names = 3;
+  // Операционная система собранная с адреса
+  string operation_system = 4;
+}
+
+message RestoreNetworkConfigRequest {
+  DeviceContent device = 1;
+  // Конфигурация для восстановления.
+  string config = 2;
+}
+
+message RestoreNetworkConfigResponse {
+  OperationResult result = 1;
+}
+
+message CreateNetworkConfigRequest {
+  DeviceContent device = 1;
+}
+
+message CreateNetworkConfigResponse {
+  OperationResult result = 1;
+}

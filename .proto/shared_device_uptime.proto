@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/duration.proto";
+import "shared_device.proto";
+
+// Данные оборудования по времени работы.
+message DeviceUptime {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Продолжительность времени, в течение которого оборудование работает.
+  google.protobuf.Duration uptime = 2;
+}
