@@ -1,0 +1,260 @@
+/**
+ * Контракты для сервиса hypervisor-manager
+ */
+
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_device_cpu.proto";
+import "shared_device_cpu_utilization.proto";
+import "shared_device_disk.proto";
+import "shared_device_initial.proto";
+import "shared_device_memory.proto";
+import "shared_device_memory_utilization.proto";
+import "shared_device_operation_system.proto";
+import "shared_device_pci_slot.proto";
+import "shared_device_uptime.proto";
+import "shared_hypervisor.proto";
+import "shared_virtual_machine.proto";
+
+/**
+ * Сервис HypervisorManager реализует логику взаимодействия и сбора информации с гипервизоров
+ */
+service HypervisorManager  {
+  // Проверка доступности гипервизора
+  rpc CheckAvailable(CheckHypervisorAvailableRequest) returns (CheckHypervisorAvailableResponse);
+  // Получение данных для заведения гипервизора
+  rpc CollectHypervisorInitialContent(CollectHypervisorInitialContentRequest) returns (CollectHypervisorInitialContentResponse);
+  // Получение общей информации о гипервизоре
+  rpc CollectCommonContent(CollectHypervisorCommonContentRequest) returns (CollectHypervisorCommonContentResponse);
+  // Получение информации о дисках гипервизора
+  rpc CollectDisk(CollectHypervisorDiskRequest) returns (CollectHypervisorDiskResponse);
+  // Получение инвентарной информации о ЦПУ гипервизора
+  rpc CollectCpu(CollectHypervisorCpuRequest) returns (CollectHypervisorCpuResponse);
+  // Получение статистической информации о ЦПУ гипервизора
+  rpc CollectCpuUtilization(CollectHypervisorCpuUtilizationRequest) returns (CollectHypervisorCpuUtilizationResponse);
+  // Получение инвентарной информации о ОЗУ гипервизора
+  rpc CollectMemory(CollectHypervisorMemoryRequest) returns (CollectHypervisorMemoryResponse);
+  // Получение статистической информации о ОЗУ гипервизора
+  rpc CollectMemoryUtilization(CollectHypervisorMemoryUtilizationRequest) returns (CollectHypervisorMemoryUtilizationResponse);
+  // Получение информации о PCI-слотах гипервизора
+  rpc CollectPciSlots(CollectHypervisorPciSlotRequest) returns (CollectHypervisorPciSlotResponse);
+  // Получение информации о OC гипервизора
+  rpc CollectOperationSystem(CollectHypervisorOperationSystemRequest) returns (CollectHypervisorOperationSystemResponse);
+  // Получение информации о времени работы гипервизора
+  rpc CollectUptime(CollectHypervisorUptimeRequest) returns (CollectHypervisorUptimeResponse);
+  // Получение списка виртуальных машин гипервизора
+  rpc CollectVirtualMachinesList(CollectVirtualMachinesListRequest) returns (CollectVirtualMachinesListResponse);
+  // Получение информации о виртуальных машинах гипервизора
+  rpc CollectVirtualMachinesContent(CollectVirtualMachinesContentRequest) returns (CollectVirtualMachinesContentResponse);
+}
+
+/**
+ * Контракт запроса для rpc CheckAvailable
+ */
+message CheckHypervisorAvailableRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CheckAvailable
+ */
+message CheckHypervisorAvailableResponse {
+  // Информация о состоянии гипервизора
+  HypervisorAvailable connector_state = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectHypervisorInitialContent
+ */
+message CollectHypervisorInitialContentRequest {
+  // Входные данные для сбора информации
+  DeviceInitialInput device_input = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectHypervisorInitialContent
+ */
+message CollectHypervisorInitialContentResponse {
+  // Инфомрация, необходимая при заведении
+  DeviceInitialContent content = 2;
+}
+
+/**
+ * Контракт запроса для rpc CollectCommonContent
+ */
+message CollectHypervisorCommonContentRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectCommonContent
+ */
+message CollectHypervisorCommonContentResponse {
+  // Общая информация о гипервизоре
+  HypervisorCommonContent content = 2;
+}
+
+/**
+ * Контракт запроса для rpc CollectDisk
+ */
+message CollectHypervisorDiskRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectDisk
+ */
+message CollectHypervisorDiskResponse {
+  // Информация о дисках
+  DeviceDisk disk = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectCpu
+ */
+message CollectHypervisorCpuRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectCpu
+ */
+message CollectHypervisorCpuResponse {
+  // Инвентарная информация о ЦПУ
+  DeviceCpu cpu = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectCpuUtilization
+ */
+message CollectHypervisorCpuUtilizationRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectCpuUtilization
+ */
+message CollectHypervisorCpuUtilizationResponse {
+  // Статистическая информация о ЦПУ
+  DeviceCpuUtilization cpu_utilization = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectMemory
+ */
+message CollectHypervisorMemoryRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectMemory
+ */
+message CollectHypervisorMemoryResponse {
+  // Инвентарная инфомрация о ОЗУ
+  DeviceMemory memory = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectMemoryUtilization
+ */
+message CollectHypervisorMemoryUtilizationRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectMemoryUtilization
+ */
+message CollectHypervisorMemoryUtilizationResponse {
+  // Статистическая информация о ОЗУ
+  DeviceMemoryUtilization memory_utilization = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectPciSlots
+ */
+message CollectHypervisorPciSlotRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectPciSlots
+ */
+message CollectHypervisorPciSlotResponse {
+  // Информация о PCI-слотах
+  DevicePciSlots pci_slot = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectOperationSystem
+ */
+message CollectHypervisorOperationSystemRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectOperationSystem
+ */
+message CollectHypervisorOperationSystemResponse {
+  // Информация о операционной системе
+  DeviceOperationSystem operation_system = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectUptime
+ */
+message CollectHypervisorUptimeRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectUptime
+ */
+message CollectHypervisorUptimeResponse {
+  // Информация о времени работы
+  DeviceUptime uptime = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectVirtualMachinesList
+ */
+message CollectVirtualMachinesListRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectVirtualMachinesList
+ */
+message CollectVirtualMachinesListResponse {
+  // Спискок виртуальных машин
+  VirtualMachines virtual_machines = 1;
+}
+
+/**
+ * Контракт запроса для rpc CollectVirtualMachinesContent
+ */
+message CollectVirtualMachinesContentRequest {
+  // Информация о гипервизоре
+  HypervisorContent hypervisor = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectVirtualMachinesContent
+ */
+message CollectVirtualMachinesContentResponse {
+  // Инфомрация о виртуальных машинах
+  HypervisorVmContent virtual_machines = 1;
+}

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+enum Subject {
+  SUBJECT_SYSTEMBACKUPMASTERTRIGGER_UNSPECIFIED = 0; // Сделать бэкап системы EMS сообщение для мастера
+  SUBJECT_CREATENODESYSTEMBACKUP = 1;    // Сделать бэкап системы EMS сообщение для всех нод о старте бэкапа включая мастер ноду
+}

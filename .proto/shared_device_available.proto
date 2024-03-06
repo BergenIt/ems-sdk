@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+
+// Статус доступности сетевых интерфейсов устройства.
+message DeviceAvailable {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Статус сетевых интерфейсов устройства.
+  repeated DeviceConnectorAvailable connector_states = 3;
+}
+
+// Статус доступности сетевого интерфейса устройства.
+message DeviceConnectorAvailable {
+  // Идентификатор сетевого интерфейса устройства.
+  string device_network_id = 1;
+  // Статус доступности сетевого интерфейса.
+  ConnectorAvailableState state = 2;
+}
+
+// Статусы доступности сетевого интерфейса.
+enum ConnectorAvailableState {
+  // Невалидное значение.
+  CONNECTOR_AVAILABLE_STATE_UNSPECIFIED = 0;
+  // Сетевой интерфейс доступен.
+  CONNECTOR_AVAILABLE_STATE_AVAILABLE = 1;
+  // Сетевой интерфейс недоступен.
+  CONNECTOR_AVAILABLE_STATE_UNAVAILABLE = 2;
+}
