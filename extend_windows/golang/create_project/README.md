@@ -2,17 +2,72 @@
 
 ## Создание шаблона проекта
 
-Процесс создание проекта будет описан на примере редактора кода Visual Studio Code.
+Подключение модуля расширения к системе осуществляется с помощью следующих ключевых технологий:
 
- - В Visual Studio Code откройте папку, в которой вы создадите корневой каталог приложения Go. Чтобы открыть папку, щелкните значок Обозреватель на панели действий и нажмите кнопку "Открыть папку".
+- протокол [gRPC](https://grpc.io/docs/what-is-grpc/introduction/)
+- [docker-compose](https://docs.docker.com/compose/)
 
- - Щелкните **"Создать папку"** на панели Обозреватель, а затем создайте корневой директор для примера приложения Go с именемsample-app
+Для создания проекта на golang необходимо установить язык по следующей [инструкции](https://go.dev/doc/install).
 
- - Нажмите кнопку **"Создать файл"** на панели Обозреватель, а затем назовите файл **`main.go`**
+Далее в директории проекта необходимо инициализировать файл `go.mod` для подгрузки внешних зависимостей с помощью команды `go mod init windows-handler`.
 
- - Нажмите кнопку **"Создать файл"** на панели Обозреватель, а затем назовите файл **`Makefile`** для генерации Proto-файлов исходного кода и бинарного файла приложения
+Далее необходимо [сгенерировать](#Подключение-протофайлов) код по необходимым протофайлам для работы gRPC сервера.
 
- - Скопируйте следующие инструкции в **`Makefile`** файл:
+Для создания сервера `gRPC` в go нам необходимо:
+
+1. Создать структуру, которая будет реализовывать интерфейс сервиса, описанного в протофайле, и сгенерированного в коде.
+
+```golang
+// Инстанс сервиса с реализацией RPC.
+type microservice struct {
+	pb.UnimplementedWindowsManagerServer
+}
+
+// RPC по сбору инвентарных данных по ОЗУ с ОС Windows.
+func (r *microservice) CollectMemory(
+	ctx context.Context,
+	req *pb.CollectWindowsMemoryRequest,
+) (*pb.CollectWindowsMemoryResponse, error) {
+	//реализация rpc
+	//...
+
+	return nil, errors.New("not implemented")
+}
+```
+
+2. Создать инстанс структуры сервиса, создать сущность сервера gRPC, связать их, и запустить сервер.
+
+```golang
+func run() error {
+	// Создаем инстанс сервиса.
+	m := microservice{}
+
+	// Создаем инстанс сервера.
+	server := grpc.NewServer()
+
+	// Регистрируем сервис.
+	pb.RegisterWindowsManagerServer(server, &m)
+
+	// Регистрируем рефлексию для сервиса, чтобы получать информацию об общедоступных RPC (опционально).
+	reflection.Register(server)
+
+	// Создаем листененра.
+	lis, err := net.Listen("tcp", listenPort)
+	if err != nil {
+		return fmt.Errorf("create listener: %s", err)
+	}
+
+	log.Printf("microservice start serving on port %q", listenPort)
+
+	// Запускаем gRPC сервер.
+	return server.Serve(lis)
+}
+```
+
+На данном этапе пустой шаблон модуля расширения готов для локального запуска.
+
+Для запуска рекомендуется использовать `Makefile` и утилиту `make`, создадим его и распишем набор команд:
+
 
 ```makefile
 MODULE_NAME=windows-handler
@@ -39,85 +94,34 @@ build: gen tidy
 	CGO_ENABLED=0 go build -o bin
 ```
 
- - Откройте терминал, **"Терминал"** -> **"Создать треминал"**, а затем выполните команду **`go mod init sample-app`**, чтобы инициализировать пример приложения Go.
+С помощью команды `make build` можно сбилдить проект под работу в скретче.
 
- - Скопируйте следующий код в **`main.go`** файл:
-
-```go
-package main
-
-import (
-	"context"
-	"errors"
-	"fmt"
-	"log"
-	"net"
-	pb "windows-handler/gen/cluster-contract"
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-)
-
-const (
-	listenPort = ":8080"
-)
-
-func main() {
-	if err := run(); err != nil {
-		log.Fatalf("run: %s", err)
-	}
-}
-
-func run() error {
-	m := microservice{}
-	server := grpc.NewServer()
-
-	pb.RegisterWindowsManagerServer(server, &m)
-	reflection.Register(server)
-
-	lis, err := net.Listen("tcp", listenPort)
-	if err != nil {
-		return fmt.Errorf("create listener: %s", err)
-	}
-
-	log.Printf("microservice start serving on port %q", listenPort)
-	return server.Serve(lis)
-}
-
-type microservice struct {
-	pb.UnimplementedWindowsManagerServer
-}
-
-func (r *microservice) CollectMemory(
-	ctx context.Context,
-	req *pb.CollectWindowsMemoryRequest,
-) (*pb.CollectWindowsMemoryResponse, error) {
-	//реализация rpc
-	//...
-
-	return nil, errors.New("not implemented")
-}
-
-```
-
-Ориентир gRPC-операций и сервиса идёт на конкретный модуль расширения, а именно сбор информации с Windows.
-
-Подробнее описано здесь:
- - https://learn.microsoft.com/ru-ru/azure/developer/go/configure-visual-studio-code
+Для подключения модуля к системе необходимо настроить `Dockerfile` и `docker-compose.yaml`, подробную информацию об этом можно найти в директории `deploy`.
 
 ## Подключение протофайлов
 
-Протофайлы необходимы для определения gRPC-сервиса и контрактов (RPC), на основе которых можно взаимодействовать с сервисом.
+Для работы сервиса необходимо протофайлы. Полный набор протофайлов можно найти в корне проекта `sdk`, в директории `.proto`.
 
-Варианты подключения протофайлов к проекту:
- - Создать отдельную папку в корне проекта и поместить туда файлы с расширением **`.proto`**
- 
- - Добавить через сабмодули проект в Gitlab, который содержит файлы с расширением **`.proto`**
-   Пример команды для добавления сабмодуля: **`git submodule add https://gitlab.com/my_project/proto_example`**
+Ограниченный набор прото-файлов для RPC `CollectMemory` расположен в директории `proto` проекта `create_project`.
 
-После подключения прототофайлов разработчик сервиса может пользоваться контрактами и разрабатывать RPC.
+Из данных протофайлов необходимо сгенерировать код для корректной работы сервера, для этого рекомендуется использовать следующий набор утилит:
 
-Подробнее можно прочитать здесь:
- - https://grpc.io/docs/what-is-grpc/introduction/
+- protobuf-compiler
+- protoc-gen-go
+- protoc-gen-go-grpc
 
-Пример готового проекта расположен в папке [project](./project)
+Рекомендуемые команды для устанвоки в Ubuntu 22.04:
+
+```sh
+apt-get update && \
+apt install -y protobuf-compiler && \
+apt clean
+go env -w GOSUMDB=off
+go env -w GO111MODULE=on
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.32.0 && \
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
+```
+
+Сгенерировать код из прото-файлов можно с помощью команды `make gen`.
+
+Пример готового шаблона модуля расширения находится в директории `project`.

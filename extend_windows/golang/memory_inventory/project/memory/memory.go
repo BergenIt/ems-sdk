@@ -37,12 +37,14 @@ func GetMemoryInv(
 	return parseRAMInvInfo(res), nil
 }
 
+// Формирование команды для отправки по WMI
 func composeWmiCmd(cmd, class, fields string) string {
 	wmiCmd := strings.ReplaceAll(cmd, wmiClassTemplate, class)
 	wmiCmd = strings.ReplaceAll(wmiCmd, wmiFieldsTemplate, fields)
 	return wmiCmd
 }
 
+// Парсинг ответа от WMI для вытягивания информации по ОЗУ
 func parseRAMInvInfo(stdout string) []*pb.MemoryCard {
 	var ramInvInfos []*pb.MemoryCard
 
