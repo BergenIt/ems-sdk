@@ -110,9 +110,9 @@
 
 Для корректной работы сбора данных, устройство должно иметь хотя бы одно действительное подключение с протоколом WMI (поле **`protocol`** списка **`credentials`** со значением **`CONNECTOR_PROTOCOL_WMI`**).
 
-Пример заполнения структуры запроса для получения данных по ОЗУ в формате Json по WMI:
+Пример заполнения структуры запроса для получения данных по ОЗУ в формате Protobuf по WMI:
 
-```json
+```protobuf
 {
   "device": {
     "device_id": "test",
@@ -418,20 +418,20 @@
 
 Имея возможность подключения к удаленной машине с ОС Windows мы можем отправлять консольные команды на запуск определенных утилит. В основом это утилита **`WMIC`**.
 
-**`WMIC`** (Windows Management Instrumentation Command-line) — мощная утилита командной строки, которая используется для работы с WMI (Windows Management Instrumentation) в операционных системах Windows. Она предоставляет различные возможности для управления системой и сбора информации о компьютере.
-
 Подробнее по ссылкам:
  - https://learn.microsoft.com/ru-ru/windows/win32/wmisdk/wmi-start-page
  - https://learn.microsoft.com/ru-ru/windows/win32/wmisdk/wmic
 
-Шаблон команды для выполнения - `WMIC PATH @Class GET @Fields /format:list`, где:
+Изучив [документацию](https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/computer-system-hardware-classes) с официального сайта майкрософт становится понятно, что для того, чтобы получить информацию с помощью утилиты WMIC нужно понимать, из какого системного класса мы хотим получить данные.
+
+Также для оптимизации сбора данных было решено получать не весь список полей, а только те, который нам необходимы. 
+
+По итогу можно сформировать следующий шаблон команды для выполнения команд - `WMIC PATH @Class GET @Fields /format:list`, где:
  - **@Class** - Имя класса WMI
  - **@Fields** - Список атрибутов, которые необходимо получить
 
 Используемые WMI классы и атрибуты для сбора инвентарных данных по ОЗУ:
  - **[Win32_PhysicalMemory](https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-physicalmemory)** - **`BankLabel, TypeDetail, MemoryType, SMBIOSMemoryType, FormFactor, Manufacturer, Capacity, PartNumber, SerialNumber, Status, Speed, DeviceLocator`**
-
-После формирования команды 
 
 Пример вывода команды **`WMIC PATH Win32_PhysicalMemory get /format:list`** без фильтра по полям:
 
@@ -498,7 +498,7 @@ func parseRAMInvInfo(stdout string) []*pb.MemoryCard {
         case "PartNumber":
           ramInvInf.PartNumber = value
 
-        // ...
+        // полный switch case можно увидеть в папке project с проектом
       
         default:
           continue

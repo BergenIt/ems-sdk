@@ -23,25 +23,36 @@ func main() {
 }
 
 func run() error {
+	// Создаем инстанс сервиса.
 	m := microservice{}
+
+	// Создаем инстанс сервера.
 	server := grpc.NewServer()
 
+	// Регистрируем сервис.
 	pb.RegisterWindowsManagerServer(server, &m)
+
+	// Регистрируем рефлексию для сервиса, чтобы получать информацию об общедоступных RPC (опционально).
 	reflection.Register(server)
 
+	// Создаем листененра.
 	lis, err := net.Listen("tcp", listenPort)
 	if err != nil {
 		return fmt.Errorf("create listener: %s", err)
 	}
 
 	log.Printf("microservice start serving on port %q", listenPort)
+
+	// Запускаем gRPC сервер.
 	return server.Serve(lis)
 }
 
+// Инстанс сервиса с реализацией RPC.
 type microservice struct {
 	pb.UnimplementedWindowsManagerServer
 }
 
+// RPC по сбору инвентарных данных по ОЗУ с ОС Windows.
 func (r *microservice) CollectMemory(
 	ctx context.Context,
 	req *pb.CollectWindowsMemoryRequest,

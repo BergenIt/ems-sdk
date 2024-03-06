@@ -52,7 +52,6 @@ message DeviceDataIdentity
 
 Ссылки:
  - https://grpc.io/
- - https://grpc.io/docs/languages/go/quickstart/
 
 ### WinRM
 
@@ -77,8 +76,3 @@ message DeviceDataIdentity
 
 [Сбор инвентарных данных по ОЗУ](./golang/memory_inventory/README.md)
 
-> Сделал проект
-
-> Реализовал по нашим инструкциям нужные n-функций модуля расширения
-
-> Сдеплоил его
