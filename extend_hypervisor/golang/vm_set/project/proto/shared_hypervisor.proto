@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package tool_cluster.v4;
+
+message HypervisorContent {
+  // Индентификатор гипервизора.
+  string hypervisor_id = 1;
+  // Тип гипервизора.
+  HypervisorType type = 2;
+  // Идентификатор устройства.
+  string device_id = 3;
+  // Адрес гипервизора.
+  string address = 4;
+  // Логин.
+  string login = 5;
+  // Пароль.
+  string password = 6;
+  // Порт.
+  int32 port = 7;
+  // Заведенные виртуальные машины, где ключ - название виртуальной машины, а значение - device_id в системе.
+  map<string, string> known_vms = 8;
+}
+
+enum HypervisorType {
+  // Невалидное значение.
+  HYPERVISOR_TYPE_UNSPECIFIED = 0;
+  // Тип ESXI.
+  HYPERVISOR_TYPE_ESXI = 1;
+  // Тип QEMU.
+  HYPERVISOR_TYPE_QEMU = 2;
+}

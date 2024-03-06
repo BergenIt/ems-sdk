@@ -36,7 +36,7 @@ func run() error {
 	server := grpc.NewServer()
 
 	// Регистрируем сервис.
-	pb.RegisterHypervisorManagerServer(server, &m)
+	pb.RegisterServiceManagerServer(server, &m)
 
 	// Регистрируем рефлексию для сервиса, чтобы получать информацию об общедоступных RPC (опционально).
 	reflection.Register(server)
@@ -55,11 +55,11 @@ func run() error {
 
 // Инстанс сервиса с реализацией RPC.
 type microservice struct {
-	pb.UnimplementedHypervisorManagerServer
+	pb.UnimplementedServiceManagerServer
 }
 
-// RPC по сбору списка виртуальных машин с гипервизра ESXI.
-func (r *microservice) CollectVirtialMachinesList(context.Context, *pb.CollectVirtialMachinesListRequest) (*pb.CollectVirtialMachinesListResponse, error) {
+// RPC для проверки доступности сервиса при заведении.
+func (r *microservice) DebugAccess(context.Context, *pb.DebugServiceAccessRequest) (*pb.DebugServiceAccessResponse, error) {
 	//реализация rpc
 	//...
 
