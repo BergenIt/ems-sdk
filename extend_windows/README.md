@@ -66,15 +66,8 @@ message DeviceDataIdentity
 * <https://learn.microsoft.com/ru-ru/windows/win32/winrm/installation-and-configuration-for-windows-remote-management>
 * <https://github.com/masterzen/winrm>
 
-## Описание структуры модуля расширения
+## Разработка собственного windows модуля расширения
 
-Где в какой что, по сути тут мы описывает верхнеурово сценарий работы с этим типом модуля расширения
-
-Логически модуль разделен на следующие части:
-
-* GrpcServer отвечает за получение запросов на сбор информации и отправку полученных результатов по протоколу gRPC
-* Memory отвечает за обработку полученных результатов (проверка валидности собранных данных, обработка данных сенсоров и др.)
-
-## Операции модуля расширения
-
-[Сбор инвентарных данных по ОЗУ](./golang/memory_inventory/README.md)
+* [Создание проекта](./golang/create_project/README.md)
+* [Реализация операции 'Сбор инвентарных данных по ОЗУ'](./golang/memory_inventory/README.md)
+* [Развертывание модуля расширения](./golang/deploy/README.md)
