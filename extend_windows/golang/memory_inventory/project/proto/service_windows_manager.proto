@@ -1,0 +1,34 @@
+/**
+ * Контракты для сервиса windows-manager
+ */
+
+syntax = "proto3";
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+import "shared_device_memory.proto";
+
+/**
+ * Сервис WindowsManager реализует логику мониторинга и инвентаризации оборудования и виртуальных машин на базе ОС Windows
+ */
+ service WindowsManager {
+    // Собрать инвентарные данные по ОЗУ
+    rpc CollectMemory(CollectWindowsMemoryRequest) returns (CollectWindowsMemoryResponse);
+}
+
+/**
+ * Контракт запроса для rpc CollectMemory
+ */
+ message CollectWindowsMemoryRequest {
+  // Данные об устройстве
+  DeviceContent device = 1;
+}
+
+/**
+ * Контракт ответа для rpc CollectMemory
+ */
+message CollectWindowsMemoryResponse {
+  // Инвентарные данные по ОЗУ
+  DeviceMemory memory = 1;
+}

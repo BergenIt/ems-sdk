@@ -1,0 +1,11 @@
+version: "3.9"
+
+networks:
+  default:
+    name: 'ems-network'
+
+services:
+  windows-handler:
+    image: docker-windows-handler:latest
+    ports:
+      - 55001:8080
