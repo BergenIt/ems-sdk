@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-
 package tool_cluster.v4;
 
 import "shared_device.proto";
