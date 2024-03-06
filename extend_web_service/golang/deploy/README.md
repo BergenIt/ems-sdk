@@ -1,5 +1,7 @@
 # Развертывание модуля расширения
 
+Данный документ описывает подход к развертыванию модуля расширения с помощью `docker` и `docker-compose`.
+
 ## Сборка в docker
 
 Для сборки проекта необходим [docker](https://docs.docker.com/build/building/packaging/) и [docker-compose](https://docs.docker.com/compose/).
