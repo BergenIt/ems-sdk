@@ -1,0 +1,410 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+
+message ServiceInstance {
+  // Идентификатор сервсиа.
+  string service_instance_id = 1;
+  // Адрес сервиса.
+  string address = 2;
+}
+
+message AddressPort {
+  // адрес.
+  string address = 1;
+  // Порт.
+  int32 port = 2;
+}
+
+message DebugRuleState {
+  // Идентификатор сервсиа.
+  string service_instance_id = 1;
+  // Ответ от сервиса.
+  google.protobuf.StringValue response = 2;
+  // Статус код ответа.
+  google.protobuf.Int32Value status_code = 3;
+  // Состояние сервиса.
+  ServiceState state = 4;
+}
+
+enum ServiceState {
+  // Невалидное значение.
+  SERVICE_STATE_UNSPECIFIED = 0;
+  // Сервис здоров относительно правила.
+  SERVICE_STATE_HEALTH = 1;
+  // Сервис не здоров относительно правила.
+  SERVICE_STATE_UNHEALTH = 2;
+  // Сервис не ответил.
+  SERVICE_STATE_DEAD = 3;
+}
+
+enum ServiceProtocol{
+  // Невалидное значение.
+  SERVICE_PROTOCOL_STATE_UNSPECIFIED = 0;
+  // Протокол TCP.
+  SERVICE_PROTOCOL_TCP = 1;
+  // Протокол UDP.
+  SERVICE_PROTOCOL_UDP = 2;
+  // Протокол WS.
+  SERVICE_PROTOCOL_WS = 3;
+  // Протокол HTTP.
+  SERVICE_PROTOCOL_HTTP = 4;
+  // Протокол GRPC.
+  SERVICE_PROTOCOL_GRPC = 5;
+}
+
+message DebugAccessResult { 
+  // Адрес сервиса.
+  string address = 1;
+  // Состояние доступности сервиса.
+  ServiceAvailableState state = 2;
+}
+
+enum ServiceAvailableState {
+  // Невалидное значение.
+  SERVICE_AVAILABLE_STATE_UNSPECIFIED = 0;
+  // Сервис доступен.
+  SERVICE_AVAILABLE_STATE_AVAILABLE = 1;
+  // Сервис недоступен.
+  SERVICE_AVAILABLE_STATE_UNAVAILABLE = 2;
+}
+
+message CheckAvailableResult {
+  // Идентификатор сервиса.
+  string service_instance_id = 1;
+  // Массив состояний сервиса относительно правил мониторинга.
+  repeated ServiceStateInfo states = 2;
+}
+
+message ServiceStateInfo {
+  // Идентификатор правила мониторинга.
+  string rule_id = 1;
+  // Название правила мониторинга.
+  string rule_name = 2;
+  // Ответ от сервиса.
+  google.protobuf.StringValue response = 3;
+  // Хедеры ответа от сервиса.
+  map<string, string> headers = 4;
+  // Состояние сервиса.
+  ServiceState state = 5;
+  // Статус код ответа.
+  google.protobuf.Int32Value status_code = 6;
+}
+
+message TcpRule {
+  // Идентификатор правила.
+  string id = 1;
+  // Наименование правила.
+  string name = 2;
+
+  // Тело запроса.
+  google.protobuf.StringValue body = 3;
+
+  // Флаг на игнорирование проверки сертификатов.
+  bool tls_check_ignore = 4;
+  // Флаг на использование TLS.
+  bool tls_use = 5;
+  // Флаг на использование MTLS.
+  bool m_tls_use = 6;
+
+  // Ссылка на серверный сертификат.
+  google.protobuf.StringValue server_certificate_link = 7;
+  // Ссылка на клиентский сертификат.
+  google.protobuf.StringValue client_certificate_link = 8;
+
+  // Таймаут на чтение в миллисекундах.
+  uint32 read_timeout = 9;
+  // Таймаут на запись в миллисекундах.
+  uint32 write_timeout = 10;
+  // Размер буффера для ответа в байтах.
+  uint32 receive_size = 11;
+
+  // Шаблон ответа от сервиса.
+  google.protobuf.StringValue response_template = 12;
+  // Правило сравнения ответа с шаблоном.
+  ResponseCompareTemplateType response_compare_template_type = 13;
+
+  // Порт сервиса.
+  int32 port = 14;
+
+  // Пароль от серверного сертификата.
+  google.protobuf.StringValue server_certificate_password = 15;
+  // Пароль от клиентского сертификата.
+  google.protobuf.StringValue client_certificate_password = 16;
+  // Флаг на учет регистра.
+  bool case_sensitivity = 17;
+}
+
+message UdpRule {
+  // Идентификатор правила.
+  string id = 1;
+  // Наименование правила.
+  string name = 2;
+
+  // Тело запроса.
+  google.protobuf.StringValue body = 3;
+
+  // Флаг на игнорирование проверки сертификатов.
+  bool tls_check_ignore = 4;
+  // Флаг на использование TLS.
+  bool tls_use = 5;
+  // Флаг на использование MTLS.
+  bool m_tls_use = 6;
+
+  // Ссылка на серверный сертификат.
+  google.protobuf.StringValue server_certificate_link = 7;
+  // Ссылка на клиентский сертификат.
+  google.protobuf.StringValue client_certificate_link = 8;
+
+  // Таймаут на чтение в миллисекундах.
+  uint32 read_timeout = 9;
+  // Таймаут на запись в миллисекундах.
+  uint32 write_timeout = 10;
+  // Размер буффера для ответа в байтах.
+  uint32 receive_size = 11;
+
+  // Шаблон ответа от сервиса.
+  google.protobuf.StringValue response_template = 12;
+  // Правило сравнения ответа с шаблоном.
+  ResponseCompareTemplateType response_compare_template_type = 13;
+
+  // Порт сервиса.
+  int32 port = 14;
+
+  // Пароль от серверного сертификата.
+  google.protobuf.StringValue server_certificate_password = 15;
+  // Пароль от клиентского сертификата.
+  google.protobuf.StringValue client_certificate_password = 16;
+  // Флаг на учет регистра.
+  bool case_sensitivity = 17;
+}
+
+message GrpcRule {
+  // Идентификатор правила.
+  string id = 1;
+  // Наименование правила.
+  string name = 2;
+
+  // Тело запроса.
+  google.protobuf.StringValue body = 3;
+
+  // Флаг на игнорирование проверки сертификатов.
+  bool tls_check_ignore = 4;
+  // Флаг на использование TLS.
+  bool tls_use = 5;
+  // Флаг на использование MTLS.
+  bool m_tls_use = 6;
+
+  // Ссылка на серверный сертификат.
+  google.protobuf.StringValue server_certificate_link = 7;
+  // Ссылка на клиентский сертификат.
+  google.protobuf.StringValue client_certificate_link = 8;
+
+  // Таймаут на выполнение RPC.
+  uint32 rpc_timeout = 9;
+  // Таймаут на создание клиента.
+  uint32 client_timeout = 10;
+  // Название сервиса.
+  string service_name = 11;
+  
+  // Шаблон хэдеров от сервиса.
+  map<string, google.protobuf.StringValue> header_parameters = 12;
+
+  // Шаблон ответа от сервиса.
+  google.protobuf.StringValue response_template = 13;
+  // Правило сравнения ответа с шаблоном.
+  ResponseCompareTemplateType response_compare_template_type = 14;
+
+  // Порт сервиса.
+  int32 port = 15;
+
+  repeated ResponseHeaders response_headers = 16;
+
+  // Пароль от серверного сертификата.
+  google.protobuf.StringValue server_certificate_password = 17;
+  // Пароль от клиентского сертификата.
+  google.protobuf.StringValue client_certificate_password = 18;
+  // Флаг на учет регистра.
+  bool case_sensitivity = 19;
+}
+
+message WsRule {
+  // Идентификатор правила.
+  string id = 1;
+  // Наименование правила.
+  string name = 2;
+
+  // Тело запроса.
+  google.protobuf.StringValue body = 3;
+
+  // Флаг на игнорирование проверки сертификатов.
+  bool tls_check_ignore = 4;
+  // Флаг на использование TLS.
+  bool tls_use = 5;
+  // Флаг на использование MTLS.
+  bool m_tls_use = 6;
+
+  // Ссылка на серверный сертификат.
+  google.protobuf.StringValue server_certificate_link = 7;
+  // Ссылка на клиентский сертификат.
+  google.protobuf.StringValue client_certificate_link = 8;
+
+  // Таймаут на чтение в миллисекундах.
+  uint32 read_timeout = 9;
+  // Таймаут на запись в миллисекундах.
+  uint32 write_timeout = 10;
+  // Размер буффера для ответа в байтах.
+  uint32 receive_size = 11;
+
+  // Эндпоинт сервиса.
+  string endpoint = 12;
+
+  // Хэдеры для вызова запроса к сервису.
+  map<string, google.protobuf.StringValue> header_parameters = 13;
+  // Квери параметры для запроса к сервису.
+  map<string, google.protobuf.StringValue> query_parameters = 14;
+
+  // Шаблон ответа от сервиса.
+  google.protobuf.StringValue response_template = 15;
+  // Правило сравнения ответа с шаблоном.
+  ResponseCompareTemplateType response_compare_template_type = 16;
+
+  // Порт сервиса.
+  int32 port = 17;
+
+  // Шаблон хэдеров ответа от сервиса.
+  repeated ResponseHeaders response_headers = 18;
+
+  // Пароль от серверного сертификата.
+  google.protobuf.StringValue server_certificate_password = 19;
+  // Пароль от клиентского сертификата.
+  google.protobuf.StringValue client_certificate_password = 20;
+  // Флаг на учет регистра.
+  bool case_sensitivity = 21;
+}
+
+message HttpRule {
+  // Идентификатор правила.
+  string id = 1;
+  // Наименование правила.
+  string name = 2;
+
+  // Тело запроса.
+  google.protobuf.StringValue body = 3;
+
+  // Флаг на игнорирование проверки сертификатов.
+  bool tls_check_ignore = 4;
+  // Флаг на использование TLS.
+  bool tls_use = 5;
+  // Флаг на использование MTLS.
+  bool m_tls_use = 6;
+
+  // Ссылка на серверный сертификат.
+  google.protobuf.StringValue server_certificate_link = 7;
+  // Ссылка на клиентский сертификат.
+  google.protobuf.StringValue client_certificate_link = 8;
+
+  // Эндпоинт сервиса.
+  string endpoint = 9;
+  // Таймаут на выполнение запроса.
+  uint32 timeout = 10;
+
+  // Версия протокола HTTP для проверки.
+  HttpProtocol http_protocol = 11;
+  // Метод HTTP для вызова.
+  HttpMethod http_method = 12;
+
+  // Хэдеры для вызова запроса к сервису.
+  map<string, google.protobuf.StringValue> header_parameters = 13;
+  // Квери параметры для запроса к сервису.
+  map<string, google.protobuf.StringValue> query_parameters = 14;
+
+  // Шаблон ответа от сервиса.
+  google.protobuf.StringValue response_template = 15;
+  // Правило сравнения ответа с шаблоном.
+  ResponseCompareTemplateType response_compare_template_type = 16;
+
+  // Порт сервиса.
+  int32 port = 17;
+
+  // Шаблон хэдеров ответа от сервиса.
+  repeated ResponseHeaders response_headers = 18;
+
+  // Пароль от серверного сертификата.
+  google.protobuf.StringValue server_certificate_password = 19;
+  // Пароль от клиентского сертификата.
+  google.protobuf.StringValue client_certificate_password = 20;
+  // Флаг на учет регистра.
+  bool case_sensitivity = 21;
+}
+
+message ResponseHeaders {
+  // Ключ хэдера.
+  string key = 1;
+  // Значение хэдера.
+  google.protobuf.StringValue value = 2;
+  // Правило сравнения хэдера.
+  ResponseCompareTemplateType response_compare_template_type = 3;
+  // Флаг на учет регистра.
+  bool case_sensitivity = 4;
+}
+
+enum ResponseCompareTemplateType {
+  // Невалидное значение.
+  RESPONSE_COMPARE_TEMPLATE_TYPE_UNSPECIFIED = 0;
+
+  // Начинается с.
+  RESPONSE_COMPARE_TEMPLATE_TYPE_START_WITH = 1;
+  // Заканчивается с.
+  RESPONSE_COMPARE_TEMPLATE_TYPE_END_WITH = 2;
+  // Содержит.
+  RESPONSE_COMPARE_TEMPLATE_TYPE_CONTAINS = 3;
+  // Не содержит.
+  RESPONSE_COMPARE_TEMPLATE_TYPE_NOT_CONTAINS = 4;
+  // Равно.
+  RESPONSE_COMPARE_TEMPLATE_TYPE_EQUALS = 5;
+  // Не равно.
+  RESPONSE_COMPARE_TEMPLATE_TYPE_NOT_EQUALS = 6;
+  // Регулярное выражение.
+  RESPONSE_COMPARE_TEMPLATE_TYPE_REGEX = 7;
+
+  // Игнорировать проверку.
+  RESPONSE_COMPARE_TEMPLATE_TYPE_IGNORE = 1024;
+}
+
+enum HttpProtocol {
+  // Невалидное значение.
+  HTTP_PROTOCOL_PROTOCOL_VERSION_UNSPECIFIED = 0;
+  // Версия 1.1.
+  HTTP_PROTOCOL_PROTOCOL_VERSION_HTTP_1_1 = 1;
+  // Версия 2.
+  HTTP_PROTOCOL_PROTOCOL_VERSION_HTTP_2 = 2;
+  // Версия 3.
+  HTTP_PROTOCOL_PROTOCOL_VERSION_HTTP_3 = 3;
+}
+
+enum HttpMethod {
+  // Невалидное значение.
+  HTTP_METHOD_UNSPECIFIED = 0;
+  // Метод GET.
+  HTTP_METHOD_GET = 1;
+  // Метод HEAD.
+  HTTP_METHOD_HEAD = 2;
+  // Метод POST.
+  HTTP_METHOD_POST = 3;
+  // Метод PUT.
+  HTTP_METHOD_PUT = 4;
+  // Метод DELETE.
+  HTTP_METHOD_DELETE = 5;
+  // Метод CONNECT.
+  HTTP_METHOD_CONNECT = 6;
+  // Метод OPTIONS.
+  HTTP_METHOD_OPTIONS = 7;
+  // Метод TRACE.
+  HTTP_METHOD_TRACE = 8;
+  // Метод PATCH.
+  HTTP_METHOD_PATCH = 9;
+}

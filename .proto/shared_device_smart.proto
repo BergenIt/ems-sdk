@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+
+// Список метаданных о сенсорах устройства.
+message SmartSensors {
+  // Идентификатор устройства, с которого была собрана информация.
+  string device_id = 1;
+  // Список метаданных о сенсорах устройства.
+  repeated SmartSensor sensor_metas = 2;
+}
+
+// Метаданные о сенсоре устройства.
+message SmartSensor {
+  // Название сенсора.
+  string name = 1;
+  // Путь для получения данных о сенсоре.
+  string route = 2;
+  // Единица измерения сенсора.
+  string unit = 3;
+  // Текущее значение сенсора.
+  string value = 4;
+  // Минимальное пороговое значение сенсора.
+  google.protobuf.DoubleValue min_threashold = 5;
+  // Максимальное пороговое значение сенсора.
+  google.protobuf.DoubleValue max_threashold = 6;
+}
+
+// Список метаданных о инвентарной информации оборудования.
+message SmartInventories {
+  // Идентификатор устройства, с которого была собрана информация.
+  string device_id = 1;
+  // Список метаданных о инвентарной информации оборудования.
+  repeated SmartInventory inventory_metas = 2;
+}
+
+// Метаданные о инвентарной информации оборудования.
+message SmartInventory {
+  // Название.
+  string name = 1;
+  // Путь для получения данных.
+  string route = 2;
+  // Текущее значение.
+  string value = 4;
+}

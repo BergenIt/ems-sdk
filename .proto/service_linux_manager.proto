@@ -1,0 +1,221 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+import "shared_device_agent.proto";
+import "shared_device_available.proto";
+import "shared_device_cpu.proto";
+import "shared_device_cpu_utilization.proto";
+import "shared_device_disk.proto";
+import "shared_device_initial.proto";
+import "shared_device_memory.proto";
+import "shared_device_memory_utilization.proto";
+import "shared_device_operation_system.proto";
+import "shared_device_pci_slot.proto";
+import "shared_device_smart.proto";
+import "shared_device_template.proto";
+import "shared_device_uptime.proto";
+
+service LinuxManager {
+  rpc CheckAvailable(CheckLinuxAvailableRequest) returns (CheckLinuxAvailableResponse);
+  rpc CollectDeviceInitialContent(CollectDeviceInitialContentLinuxRequest) returns (CollectDeviceInitialContentLinuxResponse);
+  rpc CollectOperationSystem(CollectLinuxOperationSystemRequest) returns (CollectLinuxOperationSystemResponse);
+  rpc CollectUptime(CollectLinuxUptimeRequest) returns (CollectLinuxUptimeResponse);
+  rpc CollectCpu(CollectLinuxCpuRequest) returns (CollectLinuxCpuResponse);
+  rpc CollectMemory(CollectLinuxMemoryRequest) returns (CollectLinuxMemoryResponse);
+  rpc CollectMemoryUtilization(CollectLinuxMemoryUtilizationRequest) returns (CollectLinuxMemoryUtilizationResponse);
+  rpc CollectCpuUtilization(CollectLinuxCpuUtilizationRequest) returns (CollectLinuxCpuUtilizationResponse);
+  rpc CollectDisk(CollectLinuxDiskRequest) returns (CollectLinuxDiskResponse);
+  rpc CollectPciSlots(CollectLinuxPciSlotRequest) returns (CollectLinuxPciSlotResponse);
+  rpc CollectSmartSensorMeta(CollectLinuxSmartSensorMetaRequest) returns (CollectLinuxSmartSensorMetaResponse);
+  rpc CollectSmartInventoryMeta(CollectLinuxSmartInventoryMetaRequest) returns (CollectLinuxSmartInventoryMetaResponse);
+  rpc CollectAgentSet(CollectLinuxAgentSetRequest) returns (CollectLinuxAgentSetResponse);
+  rpc Reboot(RebootLinuxRequest) returns (RebootLinuxResponse);
+  rpc PowerOff(PowerOffLinuxRequest) returns (PowerOffLinuxResponse);
+  rpc InvokeScript(InvokeScriptLinuxRequest) returns (InvokeScriptLinuxResponse);
+  rpc InstallScriptSoftware(InstallScriptSoftwareLinuxRequest) returns (InstallScriptSoftwareLinuxResponse);
+  rpc InstallAgent(InstallAgentLinuxRequest) returns (InstallAgentLinuxResponse);
+}
+
+message CheckLinuxAvailableRequest {
+  DeviceContent device = 1;
+}
+
+message CheckLinuxAvailableResponse {
+  DeviceAvailable connector_state = 1;
+}
+
+message CollectDeviceInitialContentLinuxRequest {
+  DeviceInitialInput device_input = 1;
+}
+
+message CollectDeviceInitialContentLinuxResponse {
+  DeviceInitialContent content = 2;
+}
+
+message CollectLinuxOperationSystemRequest {
+  DeviceContent device = 1;
+}
+
+message CollectLinuxOperationSystemResponse {
+  DeviceOperationSystem operation_system = 1;
+}
+
+message CollectLinuxUptimeRequest {
+  DeviceContent device = 1;
+}
+
+message CollectLinuxUptimeResponse {
+  DeviceUptime uptime = 1;
+}
+
+message CollectLinuxCpuRequest {
+  DeviceContent device = 1;
+}
+
+message CollectLinuxCpuResponse {
+  DeviceCpu cpu = 1;
+}
+
+message CollectLinuxMemoryUtilizationRequest {
+  DeviceContent device = 1;
+}
+
+message CollectLinuxMemoryUtilizationResponse {
+  DeviceMemoryUtilization memory_utilization = 1;
+}
+
+message CollectLinuxMemoryRequest {
+  DeviceContent device = 1;
+}
+
+message CollectLinuxMemoryResponse {
+  DeviceMemory memory = 1;
+}
+
+message CollectLinuxCpuUtilizationRequest {
+  DeviceContent device = 1;
+}
+
+message CollectLinuxCpuUtilizationResponse {
+  DeviceCpuUtilization cpu_utilization = 1;
+}
+
+message CollectLinuxDiskRequest {
+  DeviceContent device = 1;
+  repeated InventoryTemplate inventories = 2;
+  repeated SensorTemplate sensors = 3;
+}
+
+message CollectLinuxDiskResponse {
+  DeviceDisk disk = 1;
+}
+
+message CollectLinuxPciSlotRequest {
+  DeviceContent device = 1;
+}
+
+message CollectLinuxPciSlotResponse {
+  DevicePciSlots pci_slot = 1;
+}
+
+message CollectLinuxSmartSensorMetaRequest {
+  DeviceContent device = 1;
+}
+
+message CollectLinuxSmartSensorMetaResponse {
+  SmartSensors sensor_metas = 1;
+}
+
+message CollectLinuxSmartInventoryMetaRequest {
+  DeviceContent device = 1;
+}
+
+message CollectLinuxSmartInventoryMetaResponse {
+  SmartInventories inventory_metas = 1;
+}
+
+message CollectLinuxAgentSetRequest { }
+
+message CollectLinuxAgentSetResponse {
+  DeviceAgentSet agent_set = 1;
+}
+
+message PowerOffLinuxRequest {
+  DeviceContent device = 1;
+  LinuxPowerOffMode mode = 2;
+  LinuxInvokeMode invoke_mode = 3;
+}
+
+enum LinuxPowerOffMode {
+  LINUX_POWER_OFF_MODE_UNSPECIFIED = 0;
+  LINUX_POWER_OFF_MODE_STANDARD = 1;
+  LINUX_POWER_OFF_MODE_SOFT = 2;
+}
+
+message PowerOffLinuxResponse {
+  OperationResult result = 1;
+}
+
+message RebootLinuxRequest {
+  DeviceContent device = 1;
+  LinuxInvokeMode invoke_mode = 2;
+}
+
+message RebootLinuxResponse {
+  OperationResult result = 1;
+}
+
+message InvokeScriptLinuxRequest {
+  DeviceContent device = 1;
+  LinuxInvokeMode invoke_mode = 2;
+  LinuxShell shell = 3;
+  string script_url = 4;
+}
+
+message InvokeScriptLinuxResponse {
+  OperationResult result = 1;
+}
+
+message InstallScriptSoftwareLinuxRequest {
+  DeviceContent device = 1;
+  LinuxInvokeMode invoke_mode = 2;
+  LinuxShell shell = 3;
+  string script_url = 4;
+  string software_url = 5;
+}
+
+message InstallScriptSoftwareLinuxResponse {
+  OperationResult result = 1;
+}
+
+message InstallAgentLinuxRequest {
+  DeviceContent device = 1;
+  LinuxInvokeMode invoke_mode = 2;
+  LinuxShell shell = 3;
+  LinuxAgentInstallMode install_mode = 4;
+}
+
+message InstallAgentLinuxResponse {
+  OperationResult result = 1;
+}
+
+enum LinuxAgentInstallMode {
+  LINUX_AGENT_INSTALL_MODE_UNSPECIFIED = 0;
+  LINUX_AGENT_INSTALL_MODE_INIT = 1;
+  LINUX_AGENT_INSTALL_MODE_SYSTEMD = 2;
+}
+
+enum LinuxShell {
+  LINUX_SHELL_UNSPECIFIED = 0;
+  LINUX_SHELL_BASH = 1;
+  LINUX_SHELL_SH = 2;
+}
+
+enum LinuxInvokeMode {
+  LINUX_INVOKE_MODE_UNSPECIFIED = 0;
+  LINUX_INVOKE_MODE_STANDARD = 1;
+  LINUX_INVOKE_MODE_SUDO = 2;
+}

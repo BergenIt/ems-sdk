@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+
+// Статус питания устройства.
+message DevicePowerState {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Статус питания устройства.
+  PowerState state = 2;
+}
+
+// Статус питания устройства.
+enum PowerState {
+  // Невалидное значение.
+  POWER_STATE_UNSPECIFIED = 0;
+  // Статус питания не был определен.
+  POWER_STATE_UNKNOWN = 1;
+  // Устройство включено.
+  POWER_STATE_ON = 2;
+  // Устройство выключено.
+  POWER_STATE_OFF = 3;
+}

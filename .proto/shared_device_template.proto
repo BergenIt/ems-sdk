@@ -1,0 +1,210 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+// Перечень собранных данных инвентарной информации с устройства.
+message DeviceInventoryValues {
+  // Идентификатор устройства.
+  string device_id = 1;
+  // Список значений инвентарной информации для устройства.
+  repeated InventoryValue inventory_values = 2;
+}
+
+// Значение инвентарной информации для устройства.
+message InventoryValue {
+  // Пользовательское имя инвентарной информации.
+  string inventory_name = 1;
+  // Текущее значение инвентарной информации.
+  google.protobuf.StringValue value = 2;
+  // Путь к инвентарной информации.
+  string route  = 3;
+}
+
+// Шаблон инвентарной информации.
+message InventoryTemplate {
+  // Идентификатор шаблона инвентарной информации.
+  string inventory_template_id = 1;
+  // Название инвентарной информации.
+  string name = 2;
+  // Путь к данным инвентарной информации.
+  string route = 3;
+}
+
+// Перечень собранных данных сенсоров с устройства.
+message DeviceSensorValues {
+  // Идентификатор устройства.
+  string device_id = 1;
+  // Идентификатор группы прав доступа.
+  string access_object_id = 2;
+  // Список значений сенсоров для устройства.
+  repeated SensorValue sensor_values = 3;
+}
+
+// Значение сенсора устройства.
+message SensorValue {
+  // Идентификатор сенсора.
+  string sensor_id = 1;
+  // Пользовательское имя сенсора.
+  string sensor_name = 2;
+  // Текущее значение на сенсоре.
+  google.protobuf.DoubleValue current_value = 3;
+  // Пороговое значение, которое было превышено.
+  google.protobuf.DoubleValue threashold_value = 4;
+  // Тип порогового значения.
+  ThreasholdType threashold_type = 5;
+  // Текущее состояние сенсора.
+  SensorState state = 6;
+}
+
+message SensorTemplate {
+  string sensor_id = 1;
+  string name = 2;
+  string route = 3;
+  SensorProtocol protocol = 4;
+  google.protobuf.DoubleValue max_threashold = 5;
+  google.protobuf.DoubleValue min_threashold = 6;
+}
+
+enum SensorProtocol {
+  // Невалидное значение.
+  SENSOR_PROTOCOL_UNSPECIFIED = 0;
+  SENSOR_PROTOCOL_IPMI = 1;
+  SENSOR_PROTOCOL_REDFISH = 2;
+  SENSOR_PROTOCOL_SNMP = 3;
+  SENSOR_PROTOCOL_SMART = 4;
+}
+
+// Тип порогового значения
+enum ThreasholdType {
+  // Невалидное значение.
+  THREASHOLD_TYPE_UNSPECIFIED = 0;
+  // Трешхолд не участвует в типе события. Используется при событиях: сенсор недоступен и сенсор восстановлен.
+  THREASHOLD_TYPE_NONE = 1;
+  // Тип минимальное пороговое значение.
+  THREASHOLD_TYPE_MIN = 2;
+  // Тип максимальное пороговое значение.
+  THREASHOLD_TYPE_MAX = 3;
+}
+
+// Текущее состояние сенсора.
+enum SensorState {
+  // Невалидное значение.
+  SENSOR_STATE_UNSPECIFIED = 0;
+  // Событие нормализации значения на сенсоре.
+  SENSOR_STATE_OK = 1;
+  // Событие приближения значения на сенсоре на 90% к пороговому.
+  SENSOR_STATE_WARNING = 2;
+  // Событие превышения значения на сенсоре порогового.
+  SENSOR_STATE_ERROR = 3;
+  // Событие недоступности сенсора.
+  SENSOR_STATE_UNAVAILABLE = 4;
+}
+
+// Шаблон события
+message EventTemplate {
+  // Идентификатор шаблона события.
+  string event_template_id = 1;
+  // Тело шаблона.
+  string text_template = 2;
+  // Чуствительность к регистру.
+  bool case_sensitive = 3;
+  // Тип сопоставления тела шаблона события.
+  TextTemplateType text_template_type = 4;
+  // Протокол шаблона события.
+  EventProtocol protocol = 5;
+}
+
+// Тип сопоставления тела шаблона события.
+enum TextTemplateType {
+  // Невалидное значение.
+  TEXT_TEMPLATE_TYPE_TEXT_TEMPLATE_UNSPECIFIED = 0;
+  // Тело события должно начинаться с указанного шаблона.
+  TEXT_TEMPLATE_TYPE_TEXT_TEMPLATE_STARTS_WITH = 1;
+  // Тело события должно заканчиваться указанным шаблоном.
+  TEXT_TEMPLATE_TYPE_TEXT_TEMPLATE_END_WITH = 2;
+  // Тело события должно содержать указанный шаблон.
+  TEXT_TEMPLATE_TYPE_TEXT_TEMPLATE_CONTAINS = 3;
+  // Тело события не должно содержать указанный шаблон.
+  TEXT_TEMPLATE_TYPE_TEXT_TEMPLATE_NOT_CONTAINS = 4;
+  // Тело события должно соответствовать регулярному выражению, заданному шаблоном.
+  TEXT_TEMPLATE_TYPE_TEXT_TEMPLATE_REGEX = 5;
+}
+
+// Протокол шаблона события
+enum EventProtocol {
+  // Невалидное значение.
+  EVENT_PROTOCOL_UNSPECIFIED = 0;
+  // События получаемые по IPMI протоколу.
+  EVENT_PROTOCOL_IPMI = 1;
+  // События получаемые по REDFISH протоколу.
+  EVENT_PROTOCOL_REDFISH = 2;
+  // События получаемые по SYSLOG протоколу.
+  EVENT_PROTOCOL_SYSLOG = 3;
+}
+
+// Id последнего собранного события.
+message EventLatestEventId {
+  // Идентификатор события, должны быть сортируемы в рамках 1 протокола (например - можно использовать тики времени).
+  int64 latest_event_id = 1;
+  // Протокол события.
+  EventProtocol protocol = 2;
+}
+
+// Событие собранное с устройства.
+message MonitoringEvent {
+  // Идентификатор события, должны быть сортируемы в рамках 1 протокола (например - можно использовать тики времени).
+  int64 event_id = 1;
+  // Временная метка события, указывающая, когда произошло событие.
+  google.protobuf.Timestamp timestamp = 2;
+  // Протокол события.
+  EventProtocol protocol = 3;
+  // Тело события.
+  string message = 4;
+  // Уровень критичности события.
+  EventLevel level = 5;
+  // Идентификатор шаблона события или null, если не было найдено подходящего события.
+  google.protobuf.StringValue event_template_id = 6;
+}
+
+// Уровень критичности события.
+enum EventLevel {
+  // Невалидное значение.
+  EVENT_LEVEL_UNSPECIFIED = 0;
+  // Уровень неопределен.
+  EVENT_LEVEL_UNKNOWN = 1;
+  // Уровень - ok/health.
+  EVENT_LEVEL_OK = 2;
+  // Уровень - предупреждение.
+  EVENT_LEVEL_WARNING = 3;
+  // Уровень - ошибка.
+  EVENT_LEVEL_ERROR = 4;
+}
+
+message SystemMetricTemplate {
+  string system_metric_template_id = 1;
+  string template = 2;
+  SystemMetric system_metric = 3;
+}
+
+enum SystemMetric {
+  // Невалидное значение.
+  SYSTEM_METRIC_UNSPECIFIED = 0;
+  SYSTEM_METRIC_POWER_STATE = 1;
+  SYSTEM_METRIC_BOOT_GET = 2;
+  SYSTEM_METRIC_MODEL = 3;
+  SYSTEM_METRIC_VENDOR = 4;
+  SYSTEM_METRIC_SERVER_LED = 5;
+  SYSTEM_METRIC_POWER_USAGE = 6;
+  SYSTEM_METRIC_FIRMWARE_BOOT_SOURCE_GET = 7;
+  SYSTEM_METRIC_SERIAL_NUMBER = 8;
+  SYSTEM_METRIC_BIOS_VERSION = 9;
+  SYSTEM_METRIC_BMC_VERSION = 10;
+  SYSTEM_METRIC_OPERATION_SYSTEM = 11;
+  SYSTEM_METRIC_HOSTINFO = 12;
+  SYSTEM_METRIC_PROCESSOR = 13;
+  SYSTEM_METRIC_DEVICE_TEMPERATURE = 14;
+}

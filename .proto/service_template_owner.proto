@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_device_template.proto";
+
+service TemplateOwner {
+  rpc GetDeviceWithTemplateByAddress (DeviceWithTemplateRequest) returns (DeviceWithTemplateResponse);
+}
+
+message DeviceWithTemplateRequest{
+  string address = 1;
+}
+
+message DeviceWithTemplateResponse{
+  string device_id = 1;
+  repeated EventTemplate templates = 2;
+}

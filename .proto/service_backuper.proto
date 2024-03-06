@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+message CreateBackupBySystemRequest { }
+
+message SystemBackupMasterRequest {
+  string initiator = 1;
+  string start_date_time = 2;
+}
+
+message SystemBackupNodeRequest {
+  string address = 1;
+  string username = 2;
+  int32 uid = 3;
+  int32 gid = 4;
+  string mount = 5;
+  string date = 6;
+}
+
+message SystemBackupNodeResponse {
+  string node = 1;
+  string error = 2;
+  uint64 size = 3;
+}
