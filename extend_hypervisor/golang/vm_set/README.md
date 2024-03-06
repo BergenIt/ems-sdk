@@ -30,13 +30,13 @@ message CollectVirtialMachinesListResponse {
 
 ## Пример реализации
 
-Реализация операции будет производиться на ESXI версии 7.???????? запущеной на оборудовании `Gagar>n oracul gen. 1`.
+Реализация операции будет производиться на ESXI версии 7.0 запущеной на оборудовании `Gagar>n oracul gen. 1`.
 
 Дополняем уже имеющийся [шаблон](../create_project/project/main.go) релизацией RPC `CollectVirtialMachinesList`.
 
 В ходе обработки запроса на языке golang для гипервизора `ESXI` мы воспользуемся библиотекой [govmomi](https://github.com/vmware/govmomi) для взаимодействия с VMware vSphere APIs и сбора информации с гипервизора.
 
-> КАК Я ПОНЯЛ ОТКУДА МНЕ ПОЛУЧИТЬ ДАННЫЕ (ссылка на пример, че нибудь такое)
+Данный подход основан на [примере](https://github.com/vmware/govmomi/blob/main/examples/virtualmachines/main.go).
 
 Во входящем запросе мы получаем креды и адрес для подключения ESXI. Используем их и создаем клиента:
 
