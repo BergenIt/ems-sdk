@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+import "shared_device_template.proto";
+
+// Данные для заведения устройства.
+message DeviceInitialInput {
+  // Адрес устройства, может содержать либо IP-адрес, либо полное доменное имя
+  string address = 1;
+  // Проверяемые учетные данные устройства.
+  repeated InitialCredential credentials = 2;
+  // Инвентарная информация для сбора.
+  repeated InventoryTemplate inventory_templates = 3;
+  // Сенсоры для сбора.
+  repeated SensorTemplate sensor_templates = 4;
+  // Шаблоны системных метрик для сбора.
+  repeated SystemMetricTemplate system_metric_templates = 5;
+}
+
+// Учетные данные подключения.
+message InitialCredential {
+  // Протокол подключения.
+  InitialProtocol protocol = 1;
+  // Логин для подключения.
+  string login = 2;
+  // Пароль для подключения.
+  string password = 3;
+  // Порт подключения.
+  int32 port = 4;
+  // Шифрование (только для IPMI).
+  int32 cipher = 5;
+  // Версия протокола (только для SNMP).
+  int32 version = 6;
+  // Community слово (только для SNMP).
+  string community = 7;
+  // Security name (только для SNMP).
+  string security_name = 8;
+  // Контекст подключения (только для SNMP).
+  string context = 9;
+  // Auth protocol (только для SNMP).
+  string auth_protocol = 10;
+  // Auth key (только для SNMP).
+  string auth_key = 11;
+  // Private protocol (только для SNMP).
+  string private_protocol = 12;
+  // Private key (только для SNMP).
+  string private_key = 13;
+  // Уровень безопасности (только для SNMP).
+  string security_level = 14;
+}
+
+// Протоколы подключения.
+enum InitialProtocol {
+  // Невалидное значение.
+  INITIAL_PROTOCOL_UNSPECIFIED = 0;
+  // Ipmi протокол для проверки подключения.
+  INITIAL_PROTOCOL_IPMI = 1;
+  // Redfish протокол для проверки подключения.
+  INITIAL_PROTOCOL_REDFISH = 2;
+  // Snmp протокол для проверки подключения.
+  INITIAL_PROTOCOL_SNMP = 3;
+  // Ssh протокол для проверки подключения.
+  INITIAL_PROTOCOL_SSH = 4;
+  // Wmi протокол для проверки подключения.
+  INITIAL_PROTOCOL_WMI = 5;
+  // Esxi SOAP протокол для проверки подключения.
+  INITIAL_PROTOCOL_ESXI = 6;
+}
+
+// Результат получения данных оборудования при заведении.
+message DeviceInitialContent {
+  // Результат проверки корректности данных подключения (credential) к устройству.
+  bool check_result = 1;
+  // Вывод полученный при сборе данных.
+  string output = 2;
+  // Список моделей собранных с устройства.
+  repeated string models = 3;
+  // Список вендоров собранных с устройства.
+  repeated string vendors = 4;
+  // Список серийных номеров собранных с устройства.
+  repeated string serial_numbers = 5;
+  // Список операционных систем, собранных с устройства.
+  repeated InitialOperationSystem operation_systems = 6;
+  // Список сетевых интефрейсов собранных с устройства.
+  repeated InitialNetworkInterface network_interfaces = 7;
+  // Список информации о сенсорах собранных с устройства.
+  repeated SensorValue sensors = 8;
+  // Список инвентарной информации собранной с устройства.
+  repeated InventoryValue inventory_infos = 9;
+}
+
+// Данные операционной системы, собранной с устройства
+message InitialOperationSystem {
+  // Наименование операционной системы.
+  string operation_system = 1;
+  // Версия операционной системы.
+  string operation_system_version = 2;
+  // Архитектура операционной системы.
+  string operation_system_architecture = 3;
+  // Хостнейм операционной системы.
+  string hostname = 4;
+}
+
+// Данные сетевого интерфейса, собранного с устройства
+message InitialNetworkInterface {
+  // MAC-адрес сетевого интерфейса.
+  google.protobuf.StringValue mac = 1;
+  // Список IP-адресов сетевого интерфейса.
+  repeated string ip_addresses = 2;
+  // Описание сетевого интерфейса, полученное с хоста.
+  string description = 3;
+  // Имя сетевого интерфейса.
+  string interface_name = 4;
+  // Список хостнеймов, связанных с сетевым интерфейсом.
+  repeated string hostnames = 5;
+}
