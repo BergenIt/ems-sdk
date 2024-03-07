@@ -28,9 +28,9 @@ func newRedfishClient(username, password, address string, port int32) *RedfishCl
 func preparePortAndProtocol(in int32) (int32, string) {
 	port := checkPort(in)
 
-	protocol := HTTPProtocol
-	if port == HTTPsPort {
-		protocol = HTTPsProtocol
+	protocol := HTTP_PROTOCOL
+	if port == HTTPS_PORT {
+		protocol = HTTPS_PROTOCOL
 	}
 
 	return port, protocol
@@ -38,7 +38,7 @@ func preparePortAndProtocol(in int32) (int32, string) {
 
 func checkPort(port int32) int32 {
 	if port <= 0 {
-		return HTTPsPort
+		return HTTPS_PORT
 	}
 
 	return port
