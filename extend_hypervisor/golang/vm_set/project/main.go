@@ -18,6 +18,7 @@ import (
 	"github.com/vmware/govmomi/vim25/soap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const (
@@ -50,7 +51,7 @@ func run() error {
 	reflection.Register(server)
 
 	// Создаем листененра.
-	lis, err := net.Listen("tcp", listenPort)
+	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		return fmt.Errorf("create listener: %s", err)
 	}
@@ -67,12 +68,13 @@ type microservice struct {
 }
 
 // RPC по сбору списка виртуальных машин с гипервизра ESXI.
-func (r *microservice) CollectVirtialMachinesList(ctx context.Context, req *pb.CollectVirtialMachinesListRequest) (*pb.CollectVirtialMachinesListResponse, error) {
+func (r *microservice) CollectVirtualMachinesList(ctx context.Context, req *pb.CollectVirtualMachinesListRequest) (*pb.CollectVirtualMachinesListResponse, error) {
+	log.Printf("got reqiest with vendor")
 	// Проверка на то, что тип гипервизора ESXI.
 	if req.Hypervisor.GetType() != pb.HypervisorType_HYPERVISOR_TYPE_ESXI {
 		return nil, errors.New("only esxi hypervisor supported")
 	}
-
+	fmt.Printf("%+v\n", req.Hypervisor)
 	address := req.Hypervisor.GetAddress()
 
 	if strings.TrimSpace(address) == "" {
@@ -108,10 +110,13 @@ func (r *microservice) CollectVirtialMachinesList(ctx context.Context, req *pb.C
 	}
 
 	// Создание выходной структуры.
-	resp := pb.CollectVirtialMachinesListResponse{
+	resp := pb.CollectVirtualMachinesListResponse{
 		VirtualMachines: &pb.VirtualMachines{
-			DeviceId:        req.Hypervisor.GetDeviceId(),
-			HypervisorId:    req.Hypervisor.GetHypervisorId(),
+			Identity: &pb.HypervisorIdentity{
+				HypervisorId: req.GetHypervisor().GetIdentity().GetHypervisorId(),
+				HypervisorOwnerId: req.GetHypervisor().GetIdentity().GetHypervisorOwnerId(),
+				AccessObjectId: req.GetHypervisor().GetIdentity().GetAccessObjectId(),
+			},
 			VirtualMachines: make([]*pb.VirtualMachine, 0, len(virtualMachines)),
 		},
 	}
@@ -132,7 +137,7 @@ func (r *microservice) CollectVirtialMachinesList(ctx context.Context, req *pb.C
 
 				machine.Networks = append(machine.Networks, &pb.VirtualMachineNetwork{
 					Ips: getIPv4(ni.IpAddress, regexp),
-					Mac: ni.MacAddress,
+					Mac: wrapperspb.String(ni.MacAddress),
 				})
 			}
 		}

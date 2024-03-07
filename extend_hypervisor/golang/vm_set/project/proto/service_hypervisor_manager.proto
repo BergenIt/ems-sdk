@@ -14,21 +14,21 @@ import "shared_hypervisor.proto";
  */
 service HypervisorManager  {
   // Получение списка виртуальных машин гипервизора
-  rpc CollectVirtialMachinesList(CollectVirtialMachinesListRequest) returns (CollectVirtialMachinesListResponse);
+  rpc CollectVirtualMachinesList(CollectVirtualMachinesListRequest) returns (CollectVirtualMachinesListResponse);
 }
 
 /**
- * Контракт запроса для rpc CollectVirtialMachinesList
+ * Контракт запроса для rpc CollectVirtualMachinesList
  */
-message CollectVirtialMachinesListRequest {
+message CollectVirtualMachinesListRequest {
   // Информация о гипервизоре
   HypervisorContent hypervisor = 1;
 }
 
 /**
- * Контракт ответа для rpc CollectVirtialMachinesList
+ * Контракт ответа для rpc CollectVirtualMachinesList
  */
-message CollectVirtialMachinesListResponse {
+message CollectVirtualMachinesListResponse {
   // Спискок виртуальных машин
   VirtualMachines virtual_machines = 1;
 }
