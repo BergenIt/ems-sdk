@@ -149,7 +149,7 @@ func memDeviceTypeInternal(memType uint16, smbiosMemType uint32) pb.MemoryDevice
 	case 26:
 		return pb.MemoryDeviceType_MEMORY_DEVICE_TYPE_DDR4
 	default:
-		return pb.MemoryDeviceType_MEMORY_DEVICE_TYPE_UNSPECIFIED
+		return pb.MemoryDeviceType_MEMORY_DEVICE_TYPE_DDR
 	}
 }
 
@@ -176,7 +176,7 @@ func memTypeInternal(typeDetail uint16) pb.MemoryType {
 	case 4096:
 		return pb.MemoryType_MEMORY_TYPE_NVRAM
 	default:
-		return pb.MemoryType_MEMORY_TYPE_UNSPECIFIED
+		return pb.MemoryType_MEMORY_TYPE_FPRAM
 	}
 }
 
@@ -227,7 +227,7 @@ func memBaseModuleTypeInternal(formFactor uint16) pb.BaseModuleType {
 	case 23:
 		return pb.BaseModuleType_BASE_MODULE_TYPE_LGA
 	default:
-		return pb.BaseModuleType_BASE_MODULE_TYPE_UNSPECIFIED
+		return pb.BaseModuleType_BASE_MODULE_TYPE_SIP
 	}
 }
 
