@@ -1,0 +1,6 @@
+services:
+  linux-manager:
+    image: linuxmanager:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
