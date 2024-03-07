@@ -74,7 +74,7 @@ func (r *microservice) CollectVirtualMachinesList(ctx context.Context, req *pb.C
 	if req.Hypervisor.GetType() != pb.HypervisorType_HYPERVISOR_TYPE_ESXI {
 		return nil, errors.New("only esxi hypervisor supported")
 	}
-	fmt.Printf("%+v\n", req.Hypervisor)
+
 	address := req.Hypervisor.GetAddress()
 
 	if strings.TrimSpace(address) == "" {
@@ -105,7 +105,7 @@ func (r *microservice) CollectVirtualMachinesList(ctx context.Context, req *pb.C
 	}
 	defer v.Destroy(ctx)
 
-	if err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"guest", "config", "summary"}, virtualMachines); err != nil {
+	if err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"guest", "config", "summary"}, &virtualMachines); err != nil {
 		return nil, fmt.Errorf("retrieve: %s", err)
 	}
 
@@ -113,9 +113,9 @@ func (r *microservice) CollectVirtualMachinesList(ctx context.Context, req *pb.C
 	resp := pb.CollectVirtualMachinesListResponse{
 		VirtualMachines: &pb.VirtualMachines{
 			Identity: &pb.HypervisorIdentity{
-				HypervisorId: req.GetHypervisor().GetIdentity().GetHypervisorId(),
+				HypervisorId:      req.GetHypervisor().GetIdentity().GetHypervisorId(),
 				HypervisorOwnerId: req.GetHypervisor().GetIdentity().GetHypervisorOwnerId(),
-				AccessObjectId: req.GetHypervisor().GetIdentity().GetAccessObjectId(),
+				AccessObjectId:    req.GetHypervisor().GetIdentity().GetAccessObjectId(),
 			},
 			VirtualMachines: make([]*pb.VirtualMachine, 0, len(virtualMachines)),
 		},
