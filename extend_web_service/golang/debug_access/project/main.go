@@ -70,6 +70,8 @@ func (r *microservice) DebugAccess(ctx context.Context, req *pb.DebugServiceAcce
 		address = f.Uri
 	}
 
+	log.Printf("got request with address %s", address)
+
 	var (
 		err          error
 		availability bool

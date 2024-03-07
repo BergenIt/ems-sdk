@@ -2,13 +2,14 @@ syntax = "proto3";
 
 package tool_cluster.v4;
 
+import "shared_hypervisor.proto";
+import "google/protobuf/wrappers.proto";
+
 message VirtualMachines {
-  // Идентификатор устройства.
-  string device_id = 1;
-  // Идентификатор гипервизора.
-  string hypervisor_id = 2;
+  // Индентификатор гипервизора.
+  HypervisorIdentity identity = 1;
   // Массив виртуальных машин.
-  repeated VirtualMachine virtual_machines = 3;
+  repeated VirtualMachine virtual_machines = 2;
 }
 
 message VirtualMachine {
@@ -22,5 +23,5 @@ message VirtualMachineNetwork {
   // IP-адреса.
   repeated string ips = 1;
   // MAC-адрес.
-  string mac = 2;
+  google.protobuf.StringValue mac = 2;
 }

@@ -15,9 +15,7 @@ RUN make build
 
 FROM scratch AS release
 LABEL ems.hypervisor.virtual-machine-set=default
-LABEL ems.service.secure=default
 LABEL ems.service.port=8081
-LABEL ems.grpc-service.healthcheck=81
 WORKDIR /app
 COPY --from=build /src/bin ./bin
 ENTRYPOINT ["./bin"]

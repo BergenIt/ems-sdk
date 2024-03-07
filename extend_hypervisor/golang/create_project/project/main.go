@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	listenPort = ":8080"
+	listenPort  = ":8080"
+	ipv4Pattern = `\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`
 )
 
 func main() {
@@ -42,7 +43,7 @@ func run() error {
 	reflection.Register(server)
 
 	// Создаем листененра.
-	lis, err := net.Listen("tcp", listenPort)
+	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		return fmt.Errorf("create listener: %s", err)
 	}
@@ -59,9 +60,6 @@ type microservice struct {
 }
 
 // RPC по сбору списка виртуальных машин с гипервизра ESXI.
-func (r *microservice) CollectVirtialMachinesList(context.Context, *pb.CollectVirtialMachinesListRequest) (*pb.CollectVirtialMachinesListResponse, error) {
-	//реализация rpc
-	//...
-
+func (r *microservice) CollectVirtualMachinesList(ctx context.Context, req *pb.CollectVirtualMachinesListRequest) (*pb.CollectVirtualMachinesListResponse, error) {
 	return nil, errors.New("not implemented")
 }

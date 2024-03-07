@@ -73,6 +73,8 @@ type microservice struct {
 
 // RPC для установления настроек LDAP-авторизации на BMC.
 func (r *microservice) PutSettings(ctx context.Context, req *pb.PutSsoSettingsRequest) (*pb.PutSsoSettingsResponse, error) {
+	log.Printf("got request with state %v", req.TargetState.String())
+
 	// Поиск редфиш кредов
 	creds, address, err := findCreds(req.Device.Connectors, pb.ConnectorProtocol_CONNECTOR_PROTOCOL_REDFISH)
 	if err != nil {

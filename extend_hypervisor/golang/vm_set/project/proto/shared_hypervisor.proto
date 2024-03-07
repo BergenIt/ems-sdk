@@ -1,24 +1,23 @@
 syntax = "proto3";
 
+
 package tool_cluster.v4;
 
 message HypervisorContent {
   // Индентификатор гипервизора.
-  string hypervisor_id = 1;
+  HypervisorIdentity identity = 1;
   // Тип гипервизора.
   HypervisorType type = 2;
-  // Идентификатор устройства.
-  string device_id = 3;
   // Адрес гипервизора.
-  string address = 4;
+  string address = 3;
   // Логин.
-  string login = 5;
+  string login = 4;
   // Пароль.
-  string password = 6;
+  string password = 5;
   // Порт.
-  int32 port = 7;
+  int32 port = 6;
   // Заведенные виртуальные машины, где ключ - название виртуальной машины, а значение - device_id в системе.
-  map<string, string> known_vms = 8;
+  map<string, string> known_vms = 7;
 }
 
 enum HypervisorType {
@@ -28,4 +27,23 @@ enum HypervisorType {
   HYPERVISOR_TYPE_ESXI = 1;
   // Тип QEMU.
   HYPERVISOR_TYPE_QEMU = 2;
+}
+
+enum HypervisorAvailableState {
+  // Невалидное значение.
+  HYPERVISOR_AVAILABLE_STATE_UNSPECIFIED = 0;
+  // Сетевой интерфейс доступен.
+  HYPERVISOR_AVAILABLE_STATE_AVAILABLE = 1;
+  // Сетевой интерфейс недоступен.
+  HYPERVISOR_AVAILABLE_STATE_UNAVAILABLE = 2;
+}
+
+// Описание источника сбора данных.
+message HypervisorIdentity {
+  // Идентификатор хостового устройства гипервизора.
+  string hypervisor_owner_id = 1;
+  // Идентификатор объекта прав доступа.
+  string access_object_id = 2;
+  // Идентификатор гипервизора, с которого были собраны данные.
+  string hypervisor_id = 3;
 }
