@@ -128,5 +128,4 @@ func extractSSHConnInfo(connectors []*pb.DeviceConnector) (sshConnInfo, error) {
 		}
 	}
 	return sshConnInfo{}, fmt.Errorf("ssh credentials were not found")
-
 }
