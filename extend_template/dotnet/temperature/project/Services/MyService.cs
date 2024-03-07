@@ -1,4 +1,4 @@
-﻿using ToolCluster.V4;
+using ToolCluster.V4;
 using Grpc.Core;
 using SnmpExample.Snmp;
 
@@ -17,7 +17,6 @@ namespace SnmpExample.Services
                     .Select(credentials => new SnmpCredential(
                         connector.Address,
                         credentials.Login,
-                        credentials.Password,
                         credentials.Port,
                         credentials.Version,
                         credentials.SecurityName,
