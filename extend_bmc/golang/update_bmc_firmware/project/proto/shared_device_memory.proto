@@ -1,0 +1,224 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+
+// Инвентарные данные оборудования по оперативной памяти устройства.
+message DeviceMemory {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Плашки оперативной памяти устройства.
+  repeated MemoryCard memories = 2;
+}
+
+// Плашка оперативной памяти устройства.
+message MemoryCard {
+  // Тип памяти.
+  MemoryType memory_type = 1;
+  // Тип устройства памяти.
+  MemoryDeviceType memory_device_type = 2;
+  // Тип базового модуля памяти.
+  BaseModuleType base_module_type = 3;
+  // Производитель или идентификатор поставщика (VendorID).
+  string vendor = 4;
+  // Емкость памяти в мегабайтах (CapacityMiB).
+  int32 size = 5;
+  // Номер детали (PartNumber).
+  string part_number = 6;
+  // Серийный номер.
+  string serial_number = 7;
+  // Ревизия прошивки.
+  string firmware_revision = 8;
+  // Слот расположения памяти.
+  int32 slot = 9;
+  // Состояние памяти.
+  MemoryState state = 10;
+  // Разъем, к которому подключена память (MemoryLocation.Socket).
+  int32 socket = 11;
+  // Скорость работы в мегагерцах (OperatingSpeedMhz).
+  int32 speed_mhz = 12;
+  // Расположение устройства (DeviceLocator).
+  string location = 13;
+}
+  
+// Тип памяти.
+enum MemoryType {
+  // Невалидное значение.
+  MEMORY_TYPE_UNSPECIFIED = 0;
+  // Dynamic Random Access Memory (DRAM) представляет собой тип оперативной памяти, который используется для временного хранения данных, к которым процессор имеет быстрый доступ.
+  MEMORY_TYPE_DRAM = 1;
+  // Non-Volatile Dual In-line Memory Module (NVDIMM_N) - это модуль памяти, который объединяет в себе характеристики оперативной и постоянной памяти.
+  MEMORY_TYPE_NVDIMM_N = 2;
+  // Non-Volatile Dual In-line Memory Module (NVDIMM_F) - второй тип NVDIMM, предоставляющий функциональность хранения данных при выключенном устройстве.
+  MEMORY_TYPE_NVDIMM_F = 3;
+  // Non-Volatile Dual In-line Memory Module (NVDIMM_P) - третий тип NVDIMM, который сочетает в себе характеристики постоянной памяти и дополнительной энергонезависимой памяти.
+  MEMORY_TYPE_NVDIMM_P = 4;
+  // Intel Optane DC Persistent Memory - технология памяти, разработанная Intel, которая сочетает в себе характеристики оперативной и постоянной памяти.
+  MEMORY_TYPE_INTEL_OPTANE = 5;
+  // Fast-paged RAM - тип оперативной памяти с быстрым доступом.
+  MEMORY_TYPE_FPRAM = 6;
+  // Static Random Access Memory (SRAM) - статическая оперативная память, которая сохраняет свое состояние до отключения питания.
+  MEMORY_TYPE_SRAM = 7;
+  // Synchronous DRAM (S-DRAM) - вид DRAM, работающий с синхронизацией с системным тактовым сигналом.
+  MEMORY_TYPE_S_DRAM = 8;
+  // Pseudo-static RAM (PSRAM) - тип оперативной памяти, комбинирующий свойства SRAM и DRAM.
+  MEMORY_TYPE_PSRAM = 9;
+  // Rambus DRAM (RDRAM) - высокоскоростной тип DRAM, разработанный Rambus Inc.
+  MEMORY_TYPE_RAMBUS = 10;
+  // Complementary Metal-Oxide-Semiconductor (CMOS) - технология производства полупроводников, используемая для создания интегральных микросхем.
+  MEMORY_TYPE_CMOS = 11;
+  // Extended Data Output RAM (EDO RAM) - улучшенный тип DRAM, предоставляющий более быстрый доступ к данным.
+  MEMORY_TYPE_EDO_RAM = 12;
+  // Window DRAM - DRAM с использованием окон для адресации памяти.
+  MEMORY_TYPE_WIN_DRAM = 13;
+  // Cache DRAM - DRAM, используемая как кэш для быстрого доступа к данным.
+  MEMORY_TYPE_CACHE_DRAM = 14;
+  // Non-Volatile RAM (NVRAM) - тип оперативной памяти, сохраняющей данные при отключении питания.
+  MEMORY_TYPE_NVRAM = 15;
+}
+  
+// Тип устройства памяти.
+enum MemoryDeviceType {
+  // Невалидное значение.
+  MEMORY_DEVICE_TYPE_UNSPECIFIED = 0;
+  // Double Data Rate (DDR) - тип DRAM, использующий двойное количество данных на такт.
+  MEMORY_DEVICE_TYPE_DDR = 1;
+  // Low Power DDR4 SDRAM (LPDDR4 SDRAM) - энергоэффективный тип DDR4 SDRAM.
+  MEMORY_DEVICE_TYPE_LPDDR4_SDRAM = 2;
+  // DDR Synchronous Dynamic Random Access Memory (DDR SDRAM) - синхронный динамический RAM.
+  MEMORY_DEVICE_TYPE_DDR_SDRAM = 3;
+  // Второе поколение Double Data Rate (DDR2) SDRAM.
+  MEMORY_DEVICE_TYPE_DDR2 = 4;
+  // Третье поколение Double Data Rate (DDR3) SDRAM.
+  MEMORY_DEVICE_TYPE_DDR3_SDRAM = 5;
+  // Read-Only Memory (ROM) - память только для чтения.
+  MEMORY_DEVICE_TYPE_ROM = 6;
+  // Четвертое поколение Double Data Rate (DDR4) SDRAM.
+  MEMORY_DEVICE_TYPE_DDR3 = 7;
+  // Low Power DDR3 SDRAM (LPDDR3 SDRAM) - энергоэффективный тип DDR3 SDRAM.
+  MEMORY_DEVICE_TYPE_LPDDR3_SDRAM = 8;
+  // Synchronous Dynamic Random Access Memory (SDRAM) - синхронная динамическая оперативная память.
+  MEMORY_DEVICE_TYPE_SDRAM = 9;
+  // Четвертое поколение Double Data Rate (DDR4) SDRAM.
+  MEMORY_DEVICE_TYPE_DDR4 = 10;
+  // Второе поколение Double Data Rate (DDR2) SDRAM.
+  MEMORY_DEVICE_TYPE_DDR2_SDRAM = 11;
+  // Extended Data Output (EDO) RAM.
+  MEMORY_DEVICE_TYPE_EDO = 12;
+  // Пятое поколение Double Data Rate (DDR5) SDRAM.
+  MEMORY_DEVICE_TYPE_DDR5 = 13;
+  // DDR2 SDRAM Fully Buffered DIMM.
+  MEMORY_DEVICE_TYPE_DDR2_SDRAM_FB_DIMM = 14;
+  // Fast-page mode.
+  MEMORY_DEVICE_TYPE_FAST_PAGE_MODE = 15;
+  // Четвертое поколение Double Data Rate (DDR4) SDRAM.
+  MEMORY_DEVICE_TYPE_DDR4_SDRAM = 16;
+  // DDR2 SDRAM Fully Buffered DIMM Probe.
+  MEMORY_DEVICE_TYPE_DDR2_SDRAM_FB_DIMM_PROBE = 17;
+  // Pipelined Nibble.
+  MEMORY_DEVICE_TYPE_PIPELINED_NIBBLE = 18;
+  // DDR4 E SDRAM.
+  MEMORY_DEVICE_TYPE_DDR4_E_SDRAM = 19;
+  // DDR SGRAM.
+  MEMORY_DEVICE_TYPE_DDR_SGRAM = 20;
+  // Логическая.
+  MEMORY_DEVICE_TYPE_LOGICAL = 21;
+  // Cached RAM.
+  MEMORY_DEVICE_TYPE_CDRAM = 22;
+  // Extended Data RAM.
+  MEMORY_DEVICE_TYPE_EDRAM = 23;
+  // Video RAM.
+  MEMORY_DEVICE_TYPE_VRAM = 24;
+  // RAM.
+  MEMORY_DEVICE_TYPE_RAM = 25;
+  // Electrically Erasable Programmable Read-Only Memory (EEPROM) - электрически стираемая программируемая ПЗУ.
+  MEMORY_DEVICE_TYPE_EEPROM = 26;
+  // Flash EEPROM.
+  MEMORY_DEVICE_TYPE_FEPROM = 27;
+  // Erasable Programmable Read-Only Memory (EPROM) - программируемая ПЗУ.
+  MEMORY_DEVICE_TYPE_EPROM = 28;
+}
+
+// Тип базового модуля памяти.
+enum BaseModuleType {
+  // Невалидное значение.
+  BASE_MODULE_TYPE_UNSPECIFIED = 0;
+  // Registered DIMM (RDIMM) - Тип DIMM-модуля, который использует регистры для буферизации адресов и команд памяти.
+  BASE_MODULE_TYPE_RDIMM = 1;
+  // Unbuffered DIMM (UDIMM) - DIMM-модуль без использования регистров для буферизации адресов и команд.
+  BASE_MODULE_TYPE_UDIMM = 2;
+  // Small Outline DIMM (SO-DIMM) - Компактный формат DIMM, обычно используемый в ноутбуках и других мобильных устройствах.
+  BASE_MODULE_TYPE_SO_DIMM = 3;
+  // Load-Reduced DIMM (LRDIMM) - Тип DIMM-модуля, который использует буфер для уменьшения нагрузки на память.
+  BASE_MODULE_TYPE_LRDIMM = 4;
+  // Mini Registered DIMM - Мини-версия Registered DIMM.
+  BASE_MODULE_TYPE_MINI_RDIMM = 5;
+  // Mini Unbuffered DIMM - Мини-версия Unbuffered DIMM.
+  BASE_MODULE_TYPE_MINI_UDIMM = 6;
+  // Small Outline Registered DIMM (72-bit) - Компактный формат Registered DIMM с 72-битной шириной шины данных.
+  BASE_MODULE_TYPE_SO_RDIMM_72B = 7;
+  // Small Outline Unbuffered DIMM (72-bit) - Компактный формат Unbuffered DIMM с 72-битной шириной шины данных.
+  BASE_MODULE_TYPE_SO_UDIMM_72B = 8;
+  // Small Outline DIMM (16-bit) - Компактный формат DIMM с 16-битной шириной шины данных.
+  BASE_MODULE_TYPE_SO_DIMM_16B = 9;
+  // Small Outline DIMM (32-bit) - Компактный формат DIMM с 32-битной шириной шины данных.
+  BASE_MODULE_TYPE_SO_DIMM_32B = 10;
+  // Single Inline Package (SIP) - Устройство в одном корпусе.
+  BASE_MODULE_TYPE_SIP = 11;
+  // Dual Inline Package (DIP) - Устройство в двухстрочном корпусе.
+  BASE_MODULE_TYPE_DIP = 12;
+  // Zigzag In-line Package (ZIP) - Устройство с корпусом Zigzag In-line Package.
+  BASE_MODULE_TYPE_ZIP = 13;
+  // Small Outline J-lead (SOJ) - Компактный формат с корпусом Small Outline J-lead.
+  BASE_MODULE_TYPE_SOJ = 14;
+  // Проприетарный тип.
+  BASE_MODULE_TYPE_PROPRIETARY = 15;
+  // Single Inline Memory Module (SIMM) - Модуль памяти в одной линии.
+  BASE_MODULE_TYPE_SIMM = 16;
+  // Dual Inline Memory Module (DIMM) - Модуль памяти в двухстрочном форм-факторе.
+  BASE_MODULE_TYPE_DIMM = 17;
+  // Thin Small Outline Package (TSOP) - Тонкий компактный корпус с выводами.
+  BASE_MODULE_TYPE_TSOP = 18;
+  // Pin Grid Array (PGA) - Массив выводов в форме сетки.
+  BASE_MODULE_TYPE_PGA = 19;
+  // Rambus Inline Memory Module (RIMM) - Модуль памяти для технологии Rambus.
+  BASE_MODULE_TYPE_RIMM = 20;
+  // Single Rambus Inline Memory Module (SRIMM) - Одиночный модуль памяти для технологии Rambus.
+  BASE_MODULE_TYPE_SRIMM = 21;
+  // Surface Mount Device (SMD) - Устройство для монтажа на поверхности.
+  BASE_MODULE_TYPE_SMD = 22;
+  // Shrink Small Outline Package (SSMP) - Компактный корпус с уменьшенными размерами.
+  BASE_MODULE_TYPE_SSMP = 23;
+  // Quad Flat Package (QFP) - Четырехсторонний корпус.
+  BASE_MODULE_TYPE_QFP = 24;
+  // Thin Quad Flat Package (TQFP) - Тонкий четырехсторонний корпус
+  BASE_MODULE_TYPE_TQFP = 25;
+  // Small Outline Integrated Circuit (SOIC) - Компактный корпус для интегральных схем.
+  BASE_MODULE_TYPE_SOIC = 26;
+  // Leadless Chip Carrier (LCC) - Корпус для монтажа чипов без выводов.
+  BASE_MODULE_TYPE_LCC = 27;
+  // Plastic Leaded Chip Carrier (PLCC) - Корпус для монтажа чипов с пластиковыми выводами.
+  BASE_MODULE_TYPE_PLCC = 28;
+  // Ball Grid Array (BGA) - Массив шаров для монтажа на поверхности.
+  BASE_MODULE_TYPE_BGA = 29;
+  // Fine-Pitch Ball Grid Array (FPBGA) - Массив шаров с мелким шагом для монтажа на поверхности.
+  BASE_MODULE_TYPE_FPBGA = 30;
+  // Land Grid Array (LGA) - Массив выводов для монтажа на поверхности.
+  BASE_MODULE_TYPE_LGA = 31;
+}
+
+// Состояние памяти.
+enum MemoryState {
+  // Невалидное значение.
+  MEMORY_STATE_UNSPECIFIED = 0;
+  // Состояние памяти неизвестно. Невозможно точно определить текущее состояние.
+  MEMORY_STATE_UNKNOWN = 1;
+  // Память в нормальном состоянии. Нет проблем или ошибок.
+  MEMORY_STATE_OK = 2;
+  // Предупреждение относительно состояния памяти. Возможны проблемы, но они не критические.
+  MEMORY_STATE_WARNING = 3;
+  // Критическое состояние памяти. Присутствуют серьезные проблемы или ошибки, которые требуют внимания и решения.
+  MEMORY_STATE_CRITICAL = 4;
+}

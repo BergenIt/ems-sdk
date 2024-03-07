@@ -26,7 +26,8 @@ RUN make build
 
 # Использование многоэтапной сборки для уменьшения размера образа
 FROM scratch AS release
-LABEL ems.windows.memory=default
+# Указание лейбла операции
+LABEL ems.bmc.bmc-firmware-update=default
 WORKDIR /app
 # Копирование бинарного файла приложения, полученного на предыдущем этапе сборки
 COPY --from=build /src/bin ./bin

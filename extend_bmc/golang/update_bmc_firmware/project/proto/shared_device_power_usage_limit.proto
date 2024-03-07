@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+import "shared_device.proto";
+
+// Данные оборудования по текущему максимальному энергопотреблению.
+message DevicePowerUsageLimit {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Текущее максимальное энергопотребление в Ватах.
+  google.protobuf.DoubleValue limit = 2;
+}

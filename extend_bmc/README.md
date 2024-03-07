@@ -47,7 +47,7 @@ BMC manager - стандартный модуль расширения, пред
 
 * [Создание проекта](./dotnet/create_project/README.md)
 * [Реализация операции 'Cбор статуса LED'](./dotnet/led_state/README.md)
-* [Реализация операции 'Обновление прошивок BMC'](./dotnet/update_bmc_firmware/README.md)
+* [Реализация операции 'Обновление прошивок BMC'](./golang/update_bmc_firmware/README.md)
 * [Развертывание модуля расширения](./dotnet/deploy/README.md)
 
 ## Используемые технологии
