@@ -30,6 +30,13 @@ Linux manager - стандартный модуль расширения, пре
    * Перезагрузка оборудования;
    * Soft перезагрузка оборудования;
    * Установка агентов мониторинга.
+
+## Разработка собственного windows модуля расширения
+
+* [Создание проекта](./dotnet/create_project/README.md)
+* [Получение нагрузки на CPU](./dotnet/cpu_utilization/README.md)
+* [Развертывание модуля расширения](./dotnet/deploy/README.md)
+
 ## Используемые технологии
 
 ### gRPC
@@ -76,14 +83,3 @@ NATS - это система обмена сообщениями с открыт
 https://en.wikipedia.org/wiki/NATS_Messaging
 https://docs.nats.io/?_gl=1*k0qgdy*_ga*MjAyNzM1ODQ5OS4xNzA5MjgxOTU3*_ga_6242VH03CH*MTcwOTYzNDM5Mi4yLjAuMTcwOTYzNDM5Mi4wLjAuMA..
 
-## Описание структуры модуля расширения
-
-Логически модуль можно разделитьна следующие части:
- -  GrpcServer - отвечает за получение запросов на сбор информации и отправку полученных результатов по протоколу gRPC
- -  CallSsh - вызов клиентского оборудования по протоколу ssh и выполнение на нем shell команд
- -	ProcessResponse - обработка результатов выполнения команд.
- - 	GetCpuUtilisation - управляющий метода, который вызывает CallSsh и ProcessResponse
-
-## Операции модуля расширения
-
-[Получение нагрузки на CPU](./dotnet/cpu_utilization/README.md)
