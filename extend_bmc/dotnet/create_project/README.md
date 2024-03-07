@@ -16,8 +16,8 @@
 
 Подключение модуля расширения к системе осуществляется с помощью следующих ключевых технологий:
 
-- Протокол [gRPC](https://grpc.io/docs/what-is-grpc/introduction/)
-- [docker-compose](https://docs.docker.com/compose/)
+* Протокол [gRPC](https://grpc.io/docs/what-is-grpc/introduction/)
+* [docker-compose](https://docs.docker.com/compose/)
 
 Для работы сервиса необходимы протофайлы. Полный набор протофайлов можно найти в корне проекта `sdk`, в директории `.proto`.
 
@@ -27,8 +27,8 @@
 
 ```xml
   <ItemGroup>
-		<Protobuf ProtoRoot="./" Include="Protos/*.proto" AdditionalImportDirs="Protos/" OutputDir="$(IntermediateOutputPath)/%(RecursiveDir)" />
-	</ItemGroup>
+  <Protobuf ProtoRoot="./" Include="Protos/*.proto" AdditionalImportDirs="Protos/" OutputDir="$(IntermediateOutputPath)/%(RecursiveDir)" />
+ </ItemGroup>
 ```
 
 Реализуем простейший grpc сервис для подключенного протофайла:
