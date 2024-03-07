@@ -5,9 +5,9 @@ networks:
     name: 'ems-network'
 
 services:
-  windows-handler:
+  bmc-handler-firmware:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 55001:8080
+      - 55005:8080

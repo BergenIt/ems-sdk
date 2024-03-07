@@ -1,0 +1,15 @@
+networks:
+ default:
+  # Имя сети, необходимо чтобы контейнеры были в одной сети
+  name: 'ems-network'
+
+services:
+  # Название вашего сервиса
+  bmc-handler-led:
+    # Процесс сборки через Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+    # Порты для обращения к сервису внешний:внутренний
+      - 55555:8080
