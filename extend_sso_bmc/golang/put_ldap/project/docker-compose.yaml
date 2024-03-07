@@ -22,7 +22,7 @@ services:
     environment:
       ServicePort: 8080
     volumes:
-      - ./roots.pem:./roots.pem
+      - ./roots.pem:/app/roots.pem
     deploy:
       resources:
         limits:

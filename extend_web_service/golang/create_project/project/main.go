@@ -42,7 +42,7 @@ func run() error {
 	reflection.Register(server)
 
 	// Создаем листененра.
-	lis, err := net.Listen("tcp", listenPort)
+	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		return fmt.Errorf("create listener: %s", err)
 	}
