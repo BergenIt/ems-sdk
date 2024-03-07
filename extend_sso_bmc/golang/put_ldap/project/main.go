@@ -2,35 +2,32 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"net"
-	"net/http"
 	"os"
 	pb "sso_center/gen/cluster-contract"
-	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
 const (
-	listenPort                 = ":8080"
-	HTTPPort                   = 80
-	HTTPsPort                  = 443
-	HTTPProtocol               = "http://"
-	HTTPsProtocol              = "https://"
-	accountServicePageEndpoint = "/redfish/v1/AccountService/"
-	managersPageEndpoint       = "/redfish/v1/Managers/"
-	CAEndpoint                 = `/redfish/v1/Managers/iDRAC.Embedded.1/Oem/Dell/DelliDRACCardService/Actions/DelliDRACCardService.ImportSSLCertificate`
-	BASE_DN                    = "dc=bergen,dc=ems"
-	SSO_HOST                   = "some_sso_host"
-	SSO_PORT                   = "1234"
+	LISTEN_PORT = ":8080"
+
+	HTTP_PORT            = 80
+	HTTPS_PORT           = 443
+	HTTP_PROTOCOL        = "http://"
+	HTTPS_PROTOCOL       = "https://"
+	ACCOUNT_SERVICE_PAGE = "/redfish/v1/AccountService/"
+	MANAGERS_PAGE        = "/redfish/v1/Managers/"
+	SET_CA_PAGE          = `/redfish/v1/Managers/iDRAC.Embedded.1/Oem/Dell/DelliDRACCardService/Actions/DelliDRACCardService.ImportSSLCertificate`
+	BASE_DN              = "dc=bergen,dc=ems"
+	SSO_HOST             = "some_sso_host"
+	SSO_PORT             = "1234"
+	CA_LOCAL_PATH        = "./roots.pem"
 )
 
 func main() {
@@ -42,7 +39,7 @@ func main() {
 func run() error {
 	port := os.Getenv("ServicePort")
 	if port == "" {
-		port = listenPort
+		port = LISTEN_PORT
 	}
 
 	// Создаем инстанс сервиса.
@@ -58,7 +55,7 @@ func run() error {
 	reflection.Register(server)
 
 	// Создаем листененра.
-	lis, err := net.Listen("tcp", listenPort)
+	lis, err := net.Listen("tcp", LISTEN_PORT)
 	if err != nil {
 		return fmt.Errorf("create listener: %s", err)
 	}
@@ -76,23 +73,27 @@ type microservice struct {
 
 // RPC для установления настроек LDAP-авторизации на BMC.
 func (r *microservice) PutSettings(ctx context.Context, req *pb.PutSsoSettingsRequest) (*pb.PutSsoSettingsResponse, error) {
+	// Поиск редфиш кредов
 	creds, address, err := findCreds(req.Device.Connectors, pb.ConnectorProtocol_CONNECTOR_PROTOCOL_REDFISH)
 	if err != nil {
 		return nil, fmt.Errorf("find redfish creds: %s", err)
 	}
 
+	// Создание редфиш клиента
 	redfishClient := newRedfishClient(creds.Login, creds.Password, address, creds.Port)
 
+	// Установка настроек в зависимости от статуса
 	if err := putSettings(redfishClient, req.TargetState); err != nil {
 		return nil, fmt.Errorf("put ldap settings: %s", err)
 	}
 
+	// Если статус - активировать, то загружаем дополнительные параметры и сертификат
 	if req.TargetState == pb.SsoState_SSO_STATE_ACTIVE {
 		if err := setLDAPAttrsDell(redfishClient, req.SsoDn, req.SsoPassword); err != nil {
 			return nil, fmt.Errorf("set ldap attrs: %s", err)
 		}
 
-		if err := loadLDAPCA(); err != nil {
+		if err := loadLDAPCA(redfishClient); err != nil {
 			return nil, fmt.Errorf("load CA: %s", err)
 		}
 	}
@@ -120,7 +121,7 @@ func findCreds(in []*pb.DeviceConnector, protocol pb.ConnectorProtocol) (*pb.Cre
 func putSettings(client *RedfishClient, state pb.SsoState) error {
 	body := createLDAPManageBody(state)
 
-	if err := client.PatchData(accountServicePageEndpoint, body); err != nil {
+	if err := client.PatchData(ACCOUNT_SERVICE_PAGE, body); err != nil {
 		return err
 	}
 
@@ -128,12 +129,12 @@ func putSettings(client *RedfishClient, state pb.SsoState) error {
 }
 
 func loadLDAPCA(client *RedfishClient) error {
-	ca, err := DownloadAcmeCAFromStorage(d.configEms.S3Host, d.ca)
+	ca, err := loadCA()
 	if err != nil {
-		return fmt.Errorf("download CA error: %s", err)
+		return fmt.Errorf("load CA: %s", err)
 	}
 
-	if err := client.PostData(CAEndpoint, createLoadCABody(ca)); err != nil {
+	if err := client.PostData(SET_CA_PAGE, createLoadCABody(ca)); err != nil {
 		return fmt.Errorf("post CA error: %s", err)
 	}
 
@@ -148,7 +149,7 @@ type ManagersDell struct {
 
 // Установка настроек лдапа в бмс Dell (работает только при включении лдапа)
 func setLDAPAttrsDell(client *RedfishClient, ssoDn, ssoPassword string) error {
-	b, err := client.GetPage(managersPageEndpoint)
+	b, err := client.GetPage(MANAGERS_PAGE)
 	if err != nil {
 		return fmt.Errorf("get managers page error: %s", err)
 	}
@@ -172,31 +173,11 @@ func setLDAPAttrsDell(client *RedfishClient, ssoDn, ssoPassword string) error {
 	return nil
 }
 
-func DownloadAcmeCAFromStorage(addr string, ca *x509.CertPool) (string, error) {
-	client := http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs:            ca,
-				InsecureSkipVerify: true,
-			},
-		},
-		Timeout: 60 * time.Second,
-	}
-
-	resp, err := client.Get(fmt.Sprintf("https://%s/roots.pem", addr))
-	if err != nil {
-		return "", fmt.Errorf("download ca error: %s", err)
-	}
-	defer resp.Body.Close()
-
-	b, err := io.ReadAll(resp.Body)
+func loadCA() (string, error) {
+	ca, err := os.ReadFile(CA_LOCAL_PATH)
 	if err != nil {
 		return "", fmt.Errorf("read body error: %s", err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("error downloading ca: %s", string(b))
-	}
-
-	return string(b), nil
+	return string(ca), nil
 }
