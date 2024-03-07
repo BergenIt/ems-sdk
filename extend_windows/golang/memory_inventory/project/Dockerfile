@@ -1,5 +1,7 @@
 FROM golang:1.22-bullseye AS build
 
+LABEL ems.windows.memory=default
+
 RUN apt-get update && \
     apt install -y protobuf-compiler && \
     apt clean
