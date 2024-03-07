@@ -46,7 +46,7 @@ ENTRYPOINT ["dotnet", "BmcHandler.dll"]
 Выполним сборку docker образа:
 
 ```bash
-docker build --tag bmc-handler ./
+docker build --tag bmc-handler-led ./
 ```
 
 ## Развертывание
@@ -63,12 +63,14 @@ networks:
 
 services:
   # Название вашего сервиса
-  bmc-handler:
-   # Название созданного вами образа
-    image: bmc-handler:latest
+  bmc-handler-led:
+    # Процесс сборки через Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-   # Порты для обращения к сервису внешний:внутренний
-      - 44444:8080
+    # Порты для обращения к сервису внешний:внутренний
+      - 55555:8080
 ```
 
 Для запуска проекта в директории с файлом docker-compose.yaml необходимо выполнить команду:
@@ -80,14 +82,14 @@ docker compose up -d
 Убедитесь в том, что контейнер запущен:
 
 ```bash
-docker ps -a | grep 'bmc-handler'
+docker ps -a | grep 'bmc-handler-led'
 ```
 
 Пример вывода:
 
 ```bash
 CONTAINER ID   IMAGE            COMMAND                  CREATED              STATUS              PORTS                    NAMES
-122ffc95ec59   bmc-handler:latest   "dotnet BmcHandler.…"   About a minute ago   Up About a minute   0.0.0.0:42763->8080/tcp   1-bmc-handler-1
+122ffc95ec59   bmc-handler-led:latest   "dotnet BmcHandler.…"   About a minute ago   Up About a minute   0.0.0.0:42763->8080/tcp   project-bmc-handler-led-1
 ```
 
 ## Проверка в EMS
@@ -98,11 +100,9 @@ CONTAINER ID   IMAGE            COMMAND                  CREATED              ST
 
 Для проверки получения статуса LED необходимо:
 
-1) Авторизоваться в EMS
-2) Добавить или настроить существующий шаблон для сбора температуры
-    - Шаблон мониторинга -> Системные метрики -> Датчик температур -> SNMP
-3) Завести оборудование или настроить заведенное введя данные для подключения по SNMP
-4) Подождать немного (пока произведется фоновый опрос оборудования)
-5) Полученная температура должна отобразиться на вкладке Общая информация
+- Авторизоваться в EMS
+- Завести оборудование с сетевым интерфейсом по Redfish
+
+//TODO добавить инфу
 
 Подробнее можно прочитать в руководстве пользователя

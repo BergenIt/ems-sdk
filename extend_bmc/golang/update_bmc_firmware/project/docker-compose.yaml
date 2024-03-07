@@ -5,7 +5,7 @@ networks:
     name: 'ems-network'
 
 services:
-  bmc-handler:
+  bmc-handler-firmware:
     build:
       context: .
       dockerfile: Dockerfile

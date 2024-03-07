@@ -124,7 +124,7 @@ services:
 Если приложения корректно запущено, то при выполнении команды `docker ps | grep project-windows-handler-1` мы увидим вот такой результат:
 
 ```bash
-CONTAINER ID   IMAGE                           COMMAND   CREATED          STATUS         PORTS                                       NAMES
+CONTAINER ID   IMAGE                           COMMAND   CREATED          STATUS         PORTS                                         NAMES
 69d9a7d31c20   docker-windows-handler:latest   "./bin"   37 seconds ago   Up 3 seconds   0.0.0.0:55001->8080/tcp, :::55001->8080/tcp   project-windows-handler-1
 ```
 

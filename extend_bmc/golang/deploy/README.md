@@ -60,13 +60,13 @@ ENTRYPOINT ["./bin"]
 
 После формирования Dockerfile можно сформировать сам образ, для этого в терминале необходимо выполнить команду и дождаться завершения процесса сборки:
 
-- `docker build --tag docker-bmc-handler .`
+- `docker build --tag docker-bmc-handler-firmware .`
 
 После формирования образа в терминале можно ввести команду `docker images` и увидеть, что образ успешно сформирован.
 
 ```table
-REPOSITORY                TAG       IMAGE ID       CREATED          SIZE
-docker-bmc-handler    latest    33f51e228eb4   17 seconds ago   17.4MB
+REPOSITORY                     TAG       IMAGE ID       CREATED          SIZE
+docker-bmc-handler-firmware    latest    33f51e228eb4   17 seconds ago   17.4MB
 ```
 
 ## Развертывание
@@ -110,7 +110,7 @@ networks:
     name: 'ems-network'
 
 services:
-  bmc-handler:
+  bmc-handler-firmware:
     build:
       context: .
       dockerfile: Dockerfile
@@ -125,31 +125,27 @@ services:
 
 Для запуска модуля расширения в эксплуатацию необходимо поместить папку `project` на ВМ, где запущен EMS и выполнить команду `docker-compose up --build -d` из корня проекта.
 
-Если приложения корректно запущено, то при выполнении команды `docker ps | grep project-bmc-handler-1` мы увидим вот такой результат:
+Если приложения корректно запущено, то при выполнении команды `docker ps | grep project-bmc-handler-firmware-1` мы увидим вот такой результат:
 
 ```bash
-CONTAINER ID   IMAGE                           COMMAND   CREATED          STATUS         PORTS                                       NAMES
-69d9a7d31c20   docker-bmc-handler:latest   "./bin"   37 seconds ago   Up 3 seconds   0.0.0.0:55001->8080/tcp, :::55001->8080/tcp   project-bmc-handler-1
+CONTAINER ID   IMAGE                                COMMAND   CREATED          STATUS         PORTS                                         NAMES
+69d9a7d31c20   docker-bmc-handler-firmware:latest   "./bin"   37 seconds ago   Up 3 seconds   0.0.0.0:55005->8080/tcp, :::55005->8080/tcp   project-bmc-handler-firmware-1
 ```
 
 Проверить работу сервиса можно через Postman, подробнее об этом описано здесь:
 
 - <https://learning.postman.com/docs/sending-requests/grpc/first-grpc-request/>
 
-
-
 Для проверки в UI EMS необходимо:
 
-- Зайти на страницу минио стенда <http://адрес_стенда:9000/minio/login> (логин: minio, пароль: minio_key)
-- Создать bucket(папку) `firmware`, если его не было
-- Переименовать файл прошивки на имя `update_firmware.hpm` и положить в bucket `firmware`
+- Переименовать файл прошивки на `update_firmware.hpm` и загрузить в EMS
 - Авторизоваться в EMS
 - Завести оборудование с сетевым интерфейсом по Redfish
 - Зайти в меню "Управление"
 - Найти раздел "Управление прошивками"
-
-- Найти заведенное устройство
-- Открыть карточку устройства
-- Перейти на вкладку **`Оперативная память`** (примечание: данные собираются раз в 15 минут, поэтому возможно придётся подождать)
+- Выбрать заведененно устройство
+- Выбрать загруженный файл прошивки
+- В качестве протокола выбрать Redfish
+- Нажать кнопку "Запустить сейчас" и дождаться завершения процесаа (около 5 минут) 
 
 Подробнее можно прочитать в руководстве пользователя
