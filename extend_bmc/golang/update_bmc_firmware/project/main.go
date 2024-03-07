@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/url"
+	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -23,7 +25,6 @@ var (
 const (
 	listenPort = ":8080"
 
-	sftpHost = "10.1.18.17"
 	sftpPort = "2222"
 )
 
@@ -84,7 +85,7 @@ func (r *microservice) BmcFirmwareUpdate(
 	for _, connector := range req.Device.Connectors {
 		redfishCreds, _ := getRedfishCreds(connector.Credentials)
 		if redfishCreds != nil {
-			err := proccessUpdate(redfishCreds, connector.Address)
+			err := proccessUpdate(req.FirmwareUrl, redfishCreds, connector.Address)
 			if err != nil {
 				resp.Result.State = pb.OperationState_OPERATION_STATE_FAILED
 				resp.Result.Output = err.Error()
@@ -117,8 +118,8 @@ func getRedfishCreds(in []*pb.Credential) (*pb.Credential, error) {
 	return nil, fmt.Errorf("redfish creds not found")
 }
 
-func proccessUpdate(redfishCreds *pb.Credential, ip string) error {
-	sftpPath, err := sftpBuilder(sftpHost, sftpPort)
+func proccessUpdate(firmwareUrl string, redfishCreds *pb.Credential, ip string) error {
+	sftpPath, err := sftpBuilder(firmwareUrl, sftpPort)
 	if err != nil {
 		return err
 	}
@@ -149,13 +150,25 @@ func proccessUpdate(redfishCreds *pb.Credential, ip string) error {
 	return redfishService.SimpleUpdate(sftpPath, cfg, host)
 }
 
-func sftpBuilder(sftpHostIp, sftpPortValue string) (string, error) {
+func sftpBuilder(firmwareUrl, sftpPortValue string) (string, error) {
+	if firmwareUrl == "" || !strings.Contains(firmwareUrl, "http") {
+		return "", ErrNotValidURL
+	}
+
 	if sftpPortValue == "" {
 		return "", ErrEmptySftpPort
 	}
 
+	u, err := url.Parse(firmwareUrl)
+	if err != nil {
+		return firmwareUrl, fmt.Errorf("sftpBuilder failed: %w", err)
+	}
+
+	host := strings.Split(u.Host, ":")[0]
+	path := strings.TrimPrefix(u.Path, "/")
+
 	return fmt.Sprintf("sftp://%s:%s@%s:%s/%s",
-		"minio", "minio_key", sftpHostIp, sftpPort,
-		"firmware/update_firmware.hpm"), nil
+		"minio", "minio_key", host, sftpPort,
+		path), nil
 
 }
