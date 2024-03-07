@@ -99,9 +99,11 @@ func parseRAMInvInfo(stdout string) []*pb.MemoryCard {
 		}
 
 		ramInvInf.MemoryDeviceType = memDeviceTypeInternal(memoryDeviceType, smBIOSMemoryType)
+		ramInvInf.State = MemoryState.MEMORY_STATE_UNKNOWN
 		if ramInvInf != (&pb.MemoryCard{}) {
 			ramInvInfos = append(ramInvInfos, ramInvInf)
 		}
+
 	}
 
 	return ramInvInfos
