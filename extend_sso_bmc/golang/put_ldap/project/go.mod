@@ -1,4 +1,4 @@
-module hypervisor
+module sso_center
 
 go 1.22.0
 

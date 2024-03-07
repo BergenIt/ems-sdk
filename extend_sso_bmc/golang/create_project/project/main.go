@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	pb "hypervisor/gen/cluster-contract"
 	"log"
 	"net"
 	"os"
+	pb "sso_center/gen/cluster-contract"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -36,7 +36,7 @@ func run() error {
 	server := grpc.NewServer()
 
 	// Регистрируем сервис.
-	pb.RegisterServiceManagerServer(server, &m)
+	pb.RegisterSsoCenterServer(server, &m)
 
 	// Регистрируем рефлексию для сервиса, чтобы получать информацию об общедоступных RPC (опционально).
 	reflection.Register(server)
@@ -55,11 +55,11 @@ func run() error {
 
 // Инстанс сервиса с реализацией RPC.
 type microservice struct {
-	pb.UnimplementedServiceManagerServer
+	pb.UnimplementedSsoCenterServer
 }
 
-// RPC для проверки доступности сервиса при заведении.
-func (r *microservice) DebugAccess(context.Context, *pb.DebugServiceAccessRequest) (*pb.DebugServiceAccessResponse, error) {
+// RPC для установления настроек LDAP-авторизации на BMC.
+func (r *microservice) PutSettings(context.Context, *pb.PutSsoSettingsRequest) (*pb.PutSsoSettingsResponse, error) {
 	//реализация rpc
 	//...
 

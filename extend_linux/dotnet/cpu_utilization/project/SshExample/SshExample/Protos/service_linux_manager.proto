@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+import "shared_device_cpu_utilization.proto";
+
+service LinuxManager {
+  rpc CollectCpuUtilization(CollectLinuxCpuUtilizationRequest) returns (CollectLinuxCpuUtilizationResponse);
+}
+
+message CollectLinuxCpuUtilizationRequest {
+  DeviceContent device = 1;
+}
+
+message CollectLinuxCpuUtilizationResponse {
+  DeviceCpuUtilization cpu_utilization = 1;
+}
+
+enum LinuxAgentInstallMode {
+  LINUX_AGENT_INSTALL_MODE_UNSPECIFIED = 0;
+  LINUX_AGENT_INSTALL_MODE_INIT = 1;
+  LINUX_AGENT_INSTALL_MODE_SYSTEMD = 2;
+}
+
+enum LinuxShell {
+  LINUX_SHELL_UNSPECIFIED = 0;
+  LINUX_SHELL_BASH = 1;
+  LINUX_SHELL_SH = 2;
+}
+
+enum LinuxInvokeMode {
+  LINUX_INVOKE_MODE_UNSPECIFIED = 0;
+  LINUX_INVOKE_MODE_STANDARD = 1;
+  LINUX_INVOKE_MODE_SUDO = 2;
+}

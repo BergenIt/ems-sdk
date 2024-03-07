@@ -5,7 +5,7 @@ networks:
     name: 'ems-network'
 
 services:
-  service-manager:
+  sso-center:
     build:
       context: .
       dockerfile: Dockerfile
@@ -18,7 +18,7 @@ services:
       core:
         hard: 0
         soft: 0
-    hostname: service-manager
+    hostname: sso-center
     environment:
       ServicePort: 8080
     deploy:
