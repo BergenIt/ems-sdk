@@ -16,7 +16,7 @@
 - <https://docs.docker.com/language/dotnet/>
 - <https://learn.microsoft.com/ru-ru/visualstudio/containers/container-build?view=vs-2022>
 
-Для возможности подключения модуля расширения в Dockerfile необходимо указать лейбл. Для операции получение температуры подходят следущие лейблы:
+Для возможности подключения модуля расширения к системе в `Dockerfile` необходимо указать лейбл. Для операции получение температуры подходят следущие лейблы:
 
 - **`ems.template.temperature.model`**
     - Для привязки модуля расширения к операции для конкретных моделей устройств.
@@ -34,7 +34,7 @@
 ```Dockerfile
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-LABEL ems.template.temperature.some-label=default
+LABEL ems.template.temperature.model.some-label=default
 USER app
 WORKDIR /app
 EXPOSE 8080
@@ -86,7 +86,7 @@ services:
       - 42763:8080
 ```
 
-Для запуска проекта в директории с файлом docker-compose.yaml необходимо выполнить команду:
+Для запуска проекта в директории с файлом `docker-compose.yaml` необходимо выполнить команду:
 
 ```bash
 docker compose up -d
