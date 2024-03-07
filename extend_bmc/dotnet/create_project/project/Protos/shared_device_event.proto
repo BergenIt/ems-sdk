@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "shared_device.proto";
+import "shared_device_template.proto";
+
+// Массив событий мониторинга для данного устройства.
+message DeviceEvents {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Массив событий мониторинга для данного устройства.
+  repeated MonitoringEvent events = 2;
+}

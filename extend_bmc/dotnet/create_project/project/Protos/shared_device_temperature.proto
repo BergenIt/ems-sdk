@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+import "shared_device.proto";
+
+// Перечень собранной температуры с устройств
+message DeviceTemperature {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Текущее значение температуры сервера в градусах по Цельсию.
+  google.protobuf.DoubleValue temperature = 2;
+}

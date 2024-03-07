@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+
+// Массив метаданных о сенсорах устройства.
+message RedfishSensors {
+  // Идентификатор устройства, с которого была собрана данная информация.
+  string device_id = 1;
+  // Массив метаданных о сенсорах устройства.
+  repeated RedfishSensor sensor_metas = 2;
+}
+
+// Метаданные о сенсорах устройства.
+message RedfishSensor {
+  // Название сенсора.
+  string name = 1;
+  // Путь для получения данных сенсора.
+  string route = 2;
+  // Единица измерения, используемая для данных сенсора.
+  string unit = 3;
+  oneof ref_value {
+    // Текущее значение сенсора в виде числа с плавающей запятой двойной точности.
+    google.protobuf.DoubleValue value = 4;
+    // Ссылка на получение следующего значения сенсора.
+    string ref = 5;
+  }
+  // Минимальное пороговое значение для сенсора.
+  google.protobuf.DoubleValue min_threashold = 6;
+  // Максимальное пороговое значение для сенсора.
+  google.protobuf.DoubleValue max_threashold = 7;
+}
+
+// Массив метаданных об redfish-инвентарной информации оборудования.
+message RedfishInventories {
+  // Идентификатор устройства, с которого была собрана данная информация.
+  string device_id = 1;
+  // Массив метаданных об redfish-инвентарной информации оборудования.
+  repeated RedfishInventory inventory_metas = 2;
+}
+
+// Метаданные об redfish-инвентарной информации оборудования.
+message RedfishInventory {
+  // Название собираемой информации.
+  string name = 1;
+  // Путь для сбора информации.
+  string route = 2;
+  oneof ref_value {
+    // Текущее значение информации об инвентаре, представленное в виде строки.
+    google.protobuf.StringValue value = 3;
+    // Ссылка на получение следующего значения информации об инвентаре.
+    string ref = 4;
+  }
+}

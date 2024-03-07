@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "shared_device.proto";
+import "shared_device_template.proto";
+
+// Перечень собранных дисков с устройства.
+message DeviceDisk {
+  // Описание источника сбора данных.
+  DeviceDataIdentity device_identity = 1;
+  // Перечень собранных дисков с устройства.
+  repeated DiskEntry disks = 2;
+  // Перечень данных по прочим записям (loopn).
+  repeated LoopDiskEntry loop_disks = 3;
+}
+
+// Диск устройства.
+message DiskEntry {
+  // Данные по дочерним дискам.
+  repeated DiskEntry nested_disk_entiries = 1; 
+  // Имя диска.
+  string name = 2;
+  // Файловая система.
+  string file_system = 3;
+  // Точка монтирования.
+  string mountpoint = 4;
+  // Модель диска.
+  string model = 5;
+  // Вендор диска.
+  string vendor = 6;
+  // Серийный номер.
+  string serial = 7;
+  // Размер диска в киллобайтах.
+  google.protobuf.UInt64Value size = 8;
+  // Владелец.
+  string owner = 9;
+  // Группа.
+  string group = 10;
+  // Зона.
+  string zoned = 11;
+  // Используемые системы - scsi, pci, block и т.д.
+  repeated string subsystems = 12; 
+  // Ревизия.
+  string firmware_version = 13; 
+  // Тип - disk, part и т.д.
+  string type = 14;
+  // Возможность хотплагина (usb, pcmcia и т.д.) или удаления.
+  google.protobuf.BoolValue hotplug = 15;
+  // Лейбл диска.
+  string label = 16;
+  // Возможность read-ahead (упреждающее чтение, кеш).
+  google.protobuf.BoolValue ra = 17; 
+  // Рид-онли режим.
+  google.protobuf.BoolValue ro = 18; 
+  // Возможность удаления.
+  google.protobuf.BoolValue rm = 19; 
+  // Тип транспорта (spi, sata и т.д.).
+  string transpont = 20;
+  // Права доступа.
+  string mode = 21;
+  // Статус диска.
+  DiskState state = 22; 
+  // Номер ревизии диска.
+  string revision = 23; 
+  // Физическое расположение диска.
+  string physical_location = 24;
+  // Количество свободного пространства.
+  google.protobuf.UInt64Value free_space = 25; 
+  // Количество занятого пространства.
+  google.protobuf.UInt64Value total_using = 26;
+
+  // Smart контент диска или отсутсвие его поддержки.
+  oneof content {
+    // Smart контент диска.
+    DiskSmartContent smart_content = 27;
+    // Smart контент диска неприменим.
+    google.protobuf.Empty not_applicable = 28;
+  }
+}
+
+// LoopN диск устройства.
+message LoopDiskEntry {
+  // Имя диска.
+  string name = 1;
+  // Файловая система.
+  string file_system = 2;
+  // Точка монтирования.
+  string mountpoint = 3;
+  // Размер диска в киллобайтах.
+  google.protobuf.UInt64Value size = 4;
+  // Владелец.
+  string owner = 5;
+  // Группа.
+  string group = 6;
+  // Зона.
+  string zoned = 7;
+  // Права доступа.
+  string mode = 8;
+}
+
+// Smart контент диска.
+message DiskSmartContent {
+  // Smart сенсоры диска.
+  repeated SensorValue sensor_values = 1;
+  // Smart инвентарка диска.
+  repeated InventoryValue inventory_values = 2;
+}
+
+// Статус диска.
+enum DiskState {
+  // Невалидное значение.
+  DISK_STATE_UNSPECIFIED = 0;
+  // Состояние диска неизвестно. Невозможно точно определить текущее состояние.
+  DISK_STATE_UNKNOWN = 1;
+  // Диск находится в нормальном состоянии. Нет проблем или ошибок.
+  DISK_STATE_OK = 2;
+  // Предупреждение относительно состояния диска. Возможны проблемы, но они не являются критическими.
+  DISK_STATE_WARNING = 3;
+  // Критическое состояние диска. Присутствуют серьезные проблемы или ошибки, требующие немедленного внимания и решения.
+  DISK_STATE_CRITICAL = 4;
+}

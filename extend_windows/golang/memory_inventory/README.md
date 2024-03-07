@@ -139,6 +139,30 @@
   * **Тип параметра:** `repeated MemoryCard`
   * **Описание:**  Плашки оперативной памяти устройства.
 
+Тип `DeviceDataIdentity`:
+
+* `device_id`:
+  * **Тип параметра:** `string`
+  * **Описание:** Идентификатор устройства.
+* `source`:
+  * **Тип параметра:** `ServiceSource`
+  * **Описание:** Идентификатор rpc, с которого были собраны данные.
+
+Перечисление `ServiceSource`:
+
+* `SERVICE_SOURCE_UNSPECIFIED`:
+  * **Описание:** Невалидное значение.
+* `SERVICE_SOURCE_BMC_MANAGER`:
+  * **Описание:** Реализация управления и сбора с BMC.
+* `SERVICE_SOURCE_LINUX_MANAGER`:
+  * **Описание:** Реализация управления и сбора с linux-хостов.
+* `SERVICE_SOURCE_WINDOWS_MANAGER`:
+  * **Описание:** Реализация управления и сбора с windows-хостов.
+* `SERVICE_SOURCE_HYPERVISOR_MANAGER`:
+  * **Описание:** Реализация управления и сбора с гипервизоров.
+* `SERVICE_SOURCE_TEMPLATE_MANAGER`:
+  * **Описание:** Реализация шаблонного мониторинга.
+
 Тип `MemoryCard`:
 
 * `memory_type`:

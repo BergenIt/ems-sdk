@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+
+package tool_cluster.v4;
+
+import "google/protobuf/wrappers.proto";
+
+// Список метаданных о сенсорах устройства.
+message IpmiSensors {
+  // Идентификатор устройства, с которого была собрана информация.
+  string device_id = 1;
+  // Список метаданных о сенсорах устройства.
+  repeated IpmiSensor sensor_metas = 2;
+}
+
+// Метаданные сенсора устройства.
+message IpmiSensor {
+  // Название сенсора.
+  string name = 1;
+  // Путь для получения данных о сенсоре.
+  string route = 2;
+  // Единица измерения сенсора.
+  string unit = 3;
+  // Текущее значение сенсора.
+  string value = 4;
+  // Минимальное пороговое значение сенсора.
+  google.protobuf.DoubleValue min_threashold = 5;
+  // Максимальное пороговое значение сенсора.
+  google.protobuf.DoubleValue max_threashold = 6;
+}
+
+// Список метаданных о инвентарной информации оборудования.
+message IpmiInventories {
+  // Идентификатор устройства, с которого была собрана информация.
+  string device_id = 1;
+  // Список метаданных о инвентарной информации оборудования.
+  repeated IpmiInventory inventory_metas = 2;
+}
+
+// Метаданные инвентарной информации оборудования.
+message IpmiInventory {
+  // Название.
+  string name = 1;
+  // Путь для получения данных.
+  string route = 2;
+  // Текущее значение.
+  string value = 4;
+}
