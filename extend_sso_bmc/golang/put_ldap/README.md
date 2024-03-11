@@ -198,6 +198,7 @@ func loadCA() (string, error) {
     return string(ca), nil
 }
 ```
+
 В завершении отправляем полученный результат как ответ по RPC.
 
 Пример готового проекта расположен в папке [project](./project)
