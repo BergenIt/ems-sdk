@@ -295,35 +295,35 @@
 
 ```go
 func SendWinRMCommand(
-	ctx context.Context,
-	ip, login, pass string,
-	port int,
-	cmd string,
+ ctx context.Context,
+ ip, login, pass string,
+ port int,
+ cmd string,
 ) (string, error) {
-	client, err := newWinRMClient(ip, login, pass, port)
-	if err != nil {
-		return "", fmt.Errorf("create WMI client error: %s", err)
-	}
+ client, err := newWinRMClient(ip, login, pass, port)
+ if err != nil {
+  return "", fmt.Errorf("create WMI client error: %s", err)
+ }
 
-	var stdout, stderr bytes.Buffer
-	_, err = client.RunWithContext(ctx, "chcp 866 | "+cmd, &stdout, &stderr)
-	if err != nil {
-		return "", fmt.Errorf("cmd [%s] WinRM error: %s", cmd, err)
-	}
+ var stdout, stderr bytes.Buffer
+ _, err = client.RunWithContext(ctx, "chcp 866 | "+cmd, &stdout, &stderr)
+ if err != nil {
+  return "", fmt.Errorf("cmd [%s] WinRM error: %s", cmd, err)
+ }
 
-	stderrStr := stderr.String()
-	stdoutStr := stdout.String()
-	if stderrStr != "" {
-		return "", fmt.Errorf("cmd [%s] error: %s", cmd, stderrStr)
-	}
+ stderrStr := stderr.String()
+ stdoutStr := stdout.String()
+ if stderrStr != "" {
+  return "", fmt.Errorf("cmd [%s] error: %s", cmd, stderrStr)
+ }
 
-	reader := transform.NewReader(bytes.NewReader([]byte(stdoutStr)), charmap.CodePage866.NewDecoder())
-	d, err := io.ReadAll(reader)
-	if err != nil {
-		return "", fmt.Errorf("encoding stdout [%s] error [%s]", stdoutStr, err)
-	}
+ reader := transform.NewReader(bytes.NewReader([]byte(stdoutStr)), charmap.CodePage866.NewDecoder())
+ d, err := io.ReadAll(reader)
+ if err != nil {
+  return "", fmt.Errorf("encoding stdout [%s] error [%s]", stdoutStr, err)
+ }
 
-	return string(d), nil
+ return string(d), nil
 }
 ```
 

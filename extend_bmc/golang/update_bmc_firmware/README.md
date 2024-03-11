@@ -59,47 +59,47 @@
 Тип `Credential`:
 
 * `protocol`:
-	* **Тип параметра:** `ConnectorProtocol`
-	* **Описание:** Протокол подключения.
+  * **Тип параметра:** `ConnectorProtocol`
+  * **Описание:** Протокол подключения.
 * `login`:
   * **Тип параметра:** `string`
   * **Описание:** Логин для подключения.
 * `password`:
-	* **Тип параметра:** `string`
-	* **Описание:** Пароль для подключения.
+  * **Тип параметра:** `string`
+  * **Описание:** Пароль для подключения.
 * `port`:
-	* **Тип параметра:** `int32`
-	* **Описание:** Порт подключения.
+  * **Тип параметра:** `int32`
+  * **Описание:** Порт подключения.
 * `cipher`:
-	* **Тип параметра:** `int32`
-	* **Описание:** Шифрование (только для IPMI).
+  * **Тип параметра:** `int32`
+  * **Описание:** Шифрование (только для IPMI).
 * `version`:
-	* **Тип параметра:** `int32`
-	* **Описание:** Версия протокола (только для SNMP).
+  * **Тип параметра:** `int32`
+  * **Описание:** Версия протокола (только для SNMP).
 * `community`:
-	* **Тип параметра:** `string`
-	* **Описание:** Community слово (только для SNMP).
+  * **Тип параметра:** `string`
+  * **Описание:** Community слово (только для SNMP).
 * `security_name`:
-	* **Тип параметра:** `string`
-	* **Описание:** Security name (только для SNMP).
+  * **Тип параметра:** `string`
+  * **Описание:** Security name (только для SNMP).
 * `context`:
-	* **Тип параметра:** `string`
-	* **Описание:** Контекст подключения (только для SNMP).
+  * **Тип параметра:** `string`
+  * **Описание:** Контекст подключения (только для SNMP).
 * `auth_protocol`:
-	* **Тип параметра:** `string`
-	* **Описание:** Auth protocol (только для SNMP).
+  * **Тип параметра:** `string`
+  * **Описание:** Auth protocol (только для SNMP).
 * `auth_key`:
-	* **Тип параметра:** `string`
-	* **Описание:** Auth key (только для SNMP).
+  * **Тип параметра:** `string`
+  * **Описание:** Auth key (только для SNMP).
 * `private_protocol`:
-	* **Тип параметра:** `string`
-	* **Описание:** Private protocol (только для SNMP).
+  * **Тип параметра:** `string`
+  * **Описание:** Private protocol (только для SNMP).
 * `private_key`:
-	* **Тип параметра:** `string`
-	* **Описание:** Private key (только для SNMP).
+  * **Тип параметра:** `string`
+  * **Описание:** Private key (только для SNMP).
 * `security_level`:
-	* **Тип параметра:** `string`
-	* **Описание:** Уровень безопасности.
+  * **Тип параметра:** `string`
+  * **Описание:** Уровень безопасности.
 
 Перечисление `ConnectorProtocol`:
 
@@ -207,6 +207,7 @@ URI домашней страницы службы Redfish (другое наз�
 Также для того, чтобы целевое устройство могло получить файл прошивки, он должен быть расположен на SFTP сервере (в поставке EMS специально развернут SFTP сервер).
 
 Конфигурация для выполнения операции выглядит следующим образом:
+
 ```yaml
   - vendor: Huawei
     model: 2288H V5
@@ -219,34 +220,34 @@ URI домашней страницы службы Redfish (другое наз�
 
 ```go
 func (r *redfishService) huaweiUpdateFirmware(
-	filePath string,
-	host Host,
-	cfg RedfishCFG,
-	redfish *rfish.RedfishAdapter,
+ filePath string,
+ host Host,
+ cfg RedfishCFG,
+ redfish *rfish.RedfishAdapter,
 ) error {
-	if !strings.HasPrefix(filePath, SFTP) {
-		return ErrHuaweiWrongFilePath
-	}
+ if !strings.HasPrefix(filePath, SFTP) {
+  return ErrHuaweiWrongFilePath
+ }
 
-	h, id, err := redfish.CreateSession(host.Headers, host.User, host.Password)
-	if err != nil {
-		return fmt.Errorf("CreateSession failed: %w", err)
-	}
+ h, id, err := redfish.CreateSession(host.Headers, host.User, host.Password)
+ if err != nil {
+  return fmt.Errorf("CreateSession failed: %w", err)
+ }
 
-	_, ok := h[AuthHeader]
-	if !ok {
-		return ErrEmptyAuthToken
-	}
+ _, ok := h[AuthHeader]
+ if !ok {
+  return ErrEmptyAuthToken
+ }
 
-	if err := r.updateFirmware(h, filePath, "@odata.id", "TaskState", cfg, redfish); err != nil {
-		return fmt.Errorf("updateFirmware failed: %w", err)
-	}
+ if err := r.updateFirmware(h, filePath, "@odata.id", "TaskState", cfg, redfish); err != nil {
+  return fmt.Errorf("updateFirmware failed: %w", err)
+ }
 
-	if err := redfish.DeleteSession(h, id); err != nil {
-		return fmt.Errorf("DeleteSession failed: X-Auth-Token: %s: Id: %q", h[AuthHeader], id)
-	}
+ if err := redfish.DeleteSession(h, id); err != nil {
+  return fmt.Errorf("DeleteSession failed: X-Auth-Token: %s: Id: %q", h[AuthHeader], id)
+ }
 
-	return nil
+ return nil
 }
 ```
 
@@ -254,40 +255,40 @@ func (r *redfishService) huaweiUpdateFirmware(
 
 ```go
 func (ra *RedfishAdapter) CreateSession(headers map[string]string, username, password string) (map[string]string, string, error) {
-	p := fmt.Sprintf("{\"UserName\": \"%s\", \"Password\": \"%s\"}", username, password)
-	payload := make(map[string]any)
-	if err := json.Unmarshal([]byte(p), &payload); err != nil {
-		return nil, "", err
-	}
-	sessionURL := "/redfish/v1/SessionService/Sessions"
-	resp, err := ra.client.PostWithHeaders(sessionURL, payload, headers)
-	if err != nil {
-		return nil, "", err
-	}
-	defer resp.Body.Close()
-	var result = make(map[string]any)
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, "", err
-	}
+ p := fmt.Sprintf("{\"UserName\": \"%s\", \"Password\": \"%s\"}", username, password)
+ payload := make(map[string]any)
+ if err := json.Unmarshal([]byte(p), &payload); err != nil {
+  return nil, "", err
+ }
+ sessionURL := "/redfish/v1/SessionService/Sessions"
+ resp, err := ra.client.PostWithHeaders(sessionURL, payload, headers)
+ if err != nil {
+  return nil, "", err
+ }
+ defer resp.Body.Close()
+ var result = make(map[string]any)
+ if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+  return nil, "", err
+ }
 
-	var id string
-	x, ok := result["Id"]
-	if ok {
-		id = x.(string)
-	}
+ var id string
+ x, ok := result["Id"]
+ if ok {
+  id = x.(string)
+ }
 
-	if resp.StatusCode != http.StatusCreated {
-		return nil, "", ErrCreateSession
-	}
+ if resp.StatusCode != http.StatusCreated {
+  return nil, "", ErrCreateSession
+ }
 
-	authToken := resp.Header.Get(AuthHeader)
-	if authToken == "" {
-		return nil, "", ErrGetAuthToken
-	}
+ authToken := resp.Header.Get(AuthHeader)
+ if authToken == "" {
+  return nil, "", ErrGetAuthToken
+ }
 
-	headers[AuthHeader] = authToken
+ headers[AuthHeader] = authToken
 
-	return headers, id, nil
+ return headers, id, nil
 }
 ```
 
@@ -295,17 +296,17 @@ func (ra *RedfishAdapter) CreateSession(headers map[string]string, username, pas
 
 ```go
 func (ra *RedfishAdapter) PostWithHeaders(headers map[string]string, updateURL, body string) (*http.Response, error) {
-	payload := make(map[string]any)
-	if err := json.Unmarshal([]byte(body), &payload); err != nil {
-		return nil, fmt.Errorf("unmarshal payload: %w", err)
-	}
+ payload := make(map[string]any)
+ if err := json.Unmarshal([]byte(body), &payload); err != nil {
+  return nil, fmt.Errorf("unmarshal payload: %w", err)
+ }
 
-	resp, err := ra.client.PostWithHeaders(updateURL, payload, headers)
-	if err != nil {
-		return nil, fmt.Errorf("error when try request to update: %w", err)
-	}
+ resp, err := ra.client.PostWithHeaders(updateURL, payload, headers)
+ if err != nil {
+  return nil, fmt.Errorf("error when try request to update: %w", err)
+ }
 
-	return resp, nil
+ return resp, nil
 }
 ```
 
@@ -313,57 +314,57 @@ func (ra *RedfishAdapter) PostWithHeaders(headers map[string]string, updateURL, 
 
 ```go
 func (r *redfishService) monitoringUpdFirmware(taskMonitor, state string, redfish *rfish.RedfishAdapter) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-	defer cancel()
-	var getTaskErr error
-	for {
-		select {
-		default:
-			// каждый раз делаем запрос по пути мониторинга для получения свежей информации
-			resp, err := redfish.GetTaskMonitor(taskMonitor)
-			if err != nil {
-				if getTaskErr == nil {
-					getTaskErr = &RedfishRequestErr{Origin: err}
-				}
-				continue
-			}
+ ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+ defer cancel()
+ var getTaskErr error
+ for {
+  select {
+  default:
+   // каждый раз делаем запрос по пути мониторинга для получения свежей информации
+   resp, err := redfish.GetTaskMonitor(taskMonitor)
+   if err != nil {
+    if getTaskErr == nil {
+     getTaskErr = &RedfishRequestErr{Origin: err}
+    }
+    continue
+   }
 
-			switch resp.StatusCode {
-			case http.StatusNoContent, http.StatusOK:
-				if resp.ContentLength <= 0 {
-					return nil
-				}
-			case http.StatusAccepted:
-				continue
-			}
+   switch resp.StatusCode {
+   case http.StatusNoContent, http.StatusOK:
+    if resp.ContentLength <= 0 {
+     return nil
+    }
+   case http.StatusAccepted:
+    continue
+   }
 
-			var result map[string]any
-			if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-				return fmt.Errorf("unmarshal response from task service: %w", err)
-			}
-			resp.Body.Close()
+   var result map[string]any
+   if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+    return fmt.Errorf("unmarshal response from task service: %w", err)
+   }
+   resp.Body.Close()
 
-			states, ok := result[state].(string)
-			if !ok {
-				return fmt.Errorf(
-					"failed assert states: states value: [%s] status: [%v] content lenght: [%v]",
-					states,
-					resp.StatusCode,
-					resp.ContentLength,
-				)
-			}
-			states = strings.ToLower(states)
-			switch states {
-			case "completed", "ok":
-				return nil
-			case "exception", "error", "critical":
-				return fmt.Errorf("failed task for updating source: [%s]", result)
-			}
+   states, ok := result[state].(string)
+   if !ok {
+    return fmt.Errorf(
+     "failed assert states: states value: [%s] status: [%v] content lenght: [%v]",
+     states,
+     resp.StatusCode,
+     resp.ContentLength,
+    )
+   }
+   states = strings.ToLower(states)
+   switch states {
+   case "completed", "ok":
+    return nil
+   case "exception", "error", "critical":
+    return fmt.Errorf("failed task for updating source: [%s]", result)
+   }
 
-		case <-ctx.Done():
-			return fmt.Errorf("%w: %s", ctx.Err(), getTaskErr.Error())
-		}
-	}
+  case <-ctx.Done():
+   return fmt.Errorf("%w: %s", ctx.Err(), getTaskErr.Error())
+  }
+ }
 }
 ```
 

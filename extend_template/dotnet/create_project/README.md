@@ -82,6 +82,7 @@ app.Run();
 ```
 
 ### Реализация отправки Snmp запросов
+
 Большинство операций данного сервиса используют Snmp протокол для общения.
 
 Для отправки Snmp запросов будем использовать библиотеку `Lextm.SharpSnmpLib` - [github](https://github.com/lextudio/sharpsnmplib?tab=readme-ov-file)
