@@ -167,8 +167,17 @@ func sftpBuilder(firmwareUrl, sftpPortValue string) (string, error) {
 	host := strings.Split(u.Host, ":")[0]
 	path := strings.TrimPrefix(u.Path, "/")
 
+	var ipHost string
+
+	ips, _ := net.LookupIP(host)
+	for _, ip := range ips {
+		if ipv4 := ip.To4(); ipv4 != nil {
+			ipHost = ipv4.String()
+		}
+	}
+
 	return fmt.Sprintf("sftp://%s:%s@%s:%s/%s",
-		"minio", "minio_key", host, sftpPort,
+		"minio", "minio_key", ipHost, sftpPort,
 		path), nil
 
 }
