@@ -119,6 +119,8 @@ func getRedfishCreds(in []*pb.Credential) (*pb.Credential, error) {
 }
 
 func proccessUpdate(firmwareUrl string, redfishCreds *pb.Credential, ip string) error {
+	fmt.Printf("Start update bmc process with Firmware URL: %s, Address: %s", firmwareUrl, ip)
+
 	sftpPath, err := sftpBuilder(firmwareUrl, sftpPort)
 	if err != nil {
 		return err
