@@ -47,166 +47,172 @@ message MemoryCard {
 enum MemoryType {
   // Невалидное значение.
   MEMORY_TYPE_UNSPECIFIED = 0;
+  // Неизвестно.
+  MEMORY_TYPE_UNKNOWN = 1;
   // Dynamic Random Access Memory (DRAM) представляет собой тип оперативной памяти, который используется для временного хранения данных, к которым процессор имеет быстрый доступ.
-  MEMORY_TYPE_DRAM = 1;
+  MEMORY_TYPE_DRAM = 2;
   // Non-Volatile Dual In-line Memory Module (NVDIMM_N) - это модуль памяти, который объединяет в себе характеристики оперативной и постоянной памяти.
-  MEMORY_TYPE_NVDIMM_N = 2;
+  MEMORY_TYPE_NVDIMM_N = 3;
   // Non-Volatile Dual In-line Memory Module (NVDIMM_F) - второй тип NVDIMM, предоставляющий функциональность хранения данных при выключенном устройстве.
-  MEMORY_TYPE_NVDIMM_F = 3;
+  MEMORY_TYPE_NVDIMM_F = 4;
   // Non-Volatile Dual In-line Memory Module (NVDIMM_P) - третий тип NVDIMM, который сочетает в себе характеристики постоянной памяти и дополнительной энергонезависимой памяти.
-  MEMORY_TYPE_NVDIMM_P = 4;
+  MEMORY_TYPE_NVDIMM_P = 5;
   // Intel Optane DC Persistent Memory - технология памяти, разработанная Intel, которая сочетает в себе характеристики оперативной и постоянной памяти.
-  MEMORY_TYPE_INTEL_OPTANE = 5;
+  MEMORY_TYPE_INTEL_OPTANE = 6;
   // Fast-paged RAM - тип оперативной памяти с быстрым доступом.
-  MEMORY_TYPE_FPRAM = 6;
+  MEMORY_TYPE_FPRAM = 7;
   // Static Random Access Memory (SRAM) - статическая оперативная память, которая сохраняет свое состояние до отключения питания.
-  MEMORY_TYPE_SRAM = 7;
+  MEMORY_TYPE_SRAM = 8;
   // Synchronous DRAM (S-DRAM) - вид DRAM, работающий с синхронизацией с системным тактовым сигналом.
-  MEMORY_TYPE_S_DRAM = 8;
+  MEMORY_TYPE_S_DRAM = 9;
   // Pseudo-static RAM (PSRAM) - тип оперативной памяти, комбинирующий свойства SRAM и DRAM.
-  MEMORY_TYPE_PSRAM = 9;
+  MEMORY_TYPE_PSRAM = 10;
   // Rambus DRAM (RDRAM) - высокоскоростной тип DRAM, разработанный Rambus Inc.
-  MEMORY_TYPE_RAMBUS = 10;
+  MEMORY_TYPE_RAMBUS = 11;
   // Complementary Metal-Oxide-Semiconductor (CMOS) - технология производства полупроводников, используемая для создания интегральных микросхем.
-  MEMORY_TYPE_CMOS = 11;
+  MEMORY_TYPE_CMOS = 12;
   // Extended Data Output RAM (EDO RAM) - улучшенный тип DRAM, предоставляющий более быстрый доступ к данным.
-  MEMORY_TYPE_EDO_RAM = 12;
+  MEMORY_TYPE_EDO_RAM = 13;
   // Window DRAM - DRAM с использованием окон для адресации памяти.
-  MEMORY_TYPE_WIN_DRAM = 13;
+  MEMORY_TYPE_WIN_DRAM = 14;
   // Cache DRAM - DRAM, используемая как кэш для быстрого доступа к данным.
-  MEMORY_TYPE_CACHE_DRAM = 14;
+  MEMORY_TYPE_CACHE_DRAM = 15;
   // Non-Volatile RAM (NVRAM) - тип оперативной памяти, сохраняющей данные при отключении питания.
-  MEMORY_TYPE_NVRAM = 15;
+  MEMORY_TYPE_NVRAM = 16;
 }
   
 // Тип устройства памяти.
 enum MemoryDeviceType {
   // Невалидное значение.
   MEMORY_DEVICE_TYPE_UNSPECIFIED = 0;
+  // Неизвестно.
+  MEMORY_DEVICE_TYPE_UNKNOWN = 1;
   // Double Data Rate (DDR) - тип DRAM, использующий двойное количество данных на такт.
-  MEMORY_DEVICE_TYPE_DDR = 1;
+  MEMORY_DEVICE_TYPE_DDR = 2;
   // Low Power DDR4 SDRAM (LPDDR4 SDRAM) - энергоэффективный тип DDR4 SDRAM.
-  MEMORY_DEVICE_TYPE_LPDDR4_SDRAM = 2;
+  MEMORY_DEVICE_TYPE_LPDDR4_SDRAM = 3;
   // DDR Synchronous Dynamic Random Access Memory (DDR SDRAM) - синхронный динамический RAM.
-  MEMORY_DEVICE_TYPE_DDR_SDRAM = 3;
+  MEMORY_DEVICE_TYPE_DDR_SDRAM = 4;
   // Второе поколение Double Data Rate (DDR2) SDRAM.
-  MEMORY_DEVICE_TYPE_DDR2 = 4;
+  MEMORY_DEVICE_TYPE_DDR2 = 5;
   // Третье поколение Double Data Rate (DDR3) SDRAM.
-  MEMORY_DEVICE_TYPE_DDR3_SDRAM = 5;
+  MEMORY_DEVICE_TYPE_DDR3_SDRAM = 6;
   // Read-Only Memory (ROM) - память только для чтения.
-  MEMORY_DEVICE_TYPE_ROM = 6;
+  MEMORY_DEVICE_TYPE_ROM = 7;
   // Четвертое поколение Double Data Rate (DDR4) SDRAM.
-  MEMORY_DEVICE_TYPE_DDR3 = 7;
+  MEMORY_DEVICE_TYPE_DDR3 = 8;
   // Low Power DDR3 SDRAM (LPDDR3 SDRAM) - энергоэффективный тип DDR3 SDRAM.
-  MEMORY_DEVICE_TYPE_LPDDR3_SDRAM = 8;
+  MEMORY_DEVICE_TYPE_LPDDR3_SDRAM = 9;
   // Synchronous Dynamic Random Access Memory (SDRAM) - синхронная динамическая оперативная память.
-  MEMORY_DEVICE_TYPE_SDRAM = 9;
+  MEMORY_DEVICE_TYPE_SDRAM = 10;
   // Четвертое поколение Double Data Rate (DDR4) SDRAM.
-  MEMORY_DEVICE_TYPE_DDR4 = 10;
+  MEMORY_DEVICE_TYPE_DDR4 = 11;
   // Второе поколение Double Data Rate (DDR2) SDRAM.
-  MEMORY_DEVICE_TYPE_DDR2_SDRAM = 11;
+  MEMORY_DEVICE_TYPE_DDR2_SDRAM = 12;
   // Extended Data Output (EDO) RAM.
-  MEMORY_DEVICE_TYPE_EDO = 12;
+  MEMORY_DEVICE_TYPE_EDO = 13;
   // Пятое поколение Double Data Rate (DDR5) SDRAM.
-  MEMORY_DEVICE_TYPE_DDR5 = 13;
+  MEMORY_DEVICE_TYPE_DDR5 = 14;
   // DDR2 SDRAM Fully Buffered DIMM.
-  MEMORY_DEVICE_TYPE_DDR2_SDRAM_FB_DIMM = 14;
+  MEMORY_DEVICE_TYPE_DDR2_SDRAM_FB_DIMM = 15;
   // Fast-page mode.
-  MEMORY_DEVICE_TYPE_FAST_PAGE_MODE = 15;
+  MEMORY_DEVICE_TYPE_FAST_PAGE_MODE = 16;
   // Четвертое поколение Double Data Rate (DDR4) SDRAM.
-  MEMORY_DEVICE_TYPE_DDR4_SDRAM = 16;
+  MEMORY_DEVICE_TYPE_DDR4_SDRAM = 17;
   // DDR2 SDRAM Fully Buffered DIMM Probe.
-  MEMORY_DEVICE_TYPE_DDR2_SDRAM_FB_DIMM_PROBE = 17;
+  MEMORY_DEVICE_TYPE_DDR2_SDRAM_FB_DIMM_PROBE = 18;
   // Pipelined Nibble.
-  MEMORY_DEVICE_TYPE_PIPELINED_NIBBLE = 18;
+  MEMORY_DEVICE_TYPE_PIPELINED_NIBBLE = 19;
   // DDR4 E SDRAM.
-  MEMORY_DEVICE_TYPE_DDR4_E_SDRAM = 19;
+  MEMORY_DEVICE_TYPE_DDR4_E_SDRAM = 20;
   // DDR SGRAM.
-  MEMORY_DEVICE_TYPE_DDR_SGRAM = 20;
+  MEMORY_DEVICE_TYPE_DDR_SGRAM = 21;
   // Логическая.
-  MEMORY_DEVICE_TYPE_LOGICAL = 21;
+  MEMORY_DEVICE_TYPE_LOGICAL = 22;
   // Cached RAM.
-  MEMORY_DEVICE_TYPE_CDRAM = 22;
+  MEMORY_DEVICE_TYPE_CDRAM = 23;
   // Extended Data RAM.
-  MEMORY_DEVICE_TYPE_EDRAM = 23;
+  MEMORY_DEVICE_TYPE_EDRAM = 24;
   // Video RAM.
-  MEMORY_DEVICE_TYPE_VRAM = 24;
+  MEMORY_DEVICE_TYPE_VRAM = 25;
   // RAM.
-  MEMORY_DEVICE_TYPE_RAM = 25;
+  MEMORY_DEVICE_TYPE_RAM = 26;
   // Electrically Erasable Programmable Read-Only Memory (EEPROM) - электрически стираемая программируемая ПЗУ.
-  MEMORY_DEVICE_TYPE_EEPROM = 26;
+  MEMORY_DEVICE_TYPE_EEPROM = 27;
   // Flash EEPROM.
-  MEMORY_DEVICE_TYPE_FEPROM = 27;
+  MEMORY_DEVICE_TYPE_FEPROM = 28;
   // Erasable Programmable Read-Only Memory (EPROM) - программируемая ПЗУ.
-  MEMORY_DEVICE_TYPE_EPROM = 28;
+  MEMORY_DEVICE_TYPE_EPROM = 29;
 }
 
 // Тип базового модуля памяти.
 enum BaseModuleType {
   // Невалидное значение.
   BASE_MODULE_TYPE_UNSPECIFIED = 0;
+  // Неизвестно.
+  BASE_MODULE_TYPE_UNKNOWN = 1;
   // Registered DIMM (RDIMM) - Тип DIMM-модуля, который использует регистры для буферизации адресов и команд памяти.
-  BASE_MODULE_TYPE_RDIMM = 1;
+  BASE_MODULE_TYPE_RDIMM = 2;
   // Unbuffered DIMM (UDIMM) - DIMM-модуль без использования регистров для буферизации адресов и команд.
-  BASE_MODULE_TYPE_UDIMM = 2;
+  BASE_MODULE_TYPE_UDIMM = 3;
   // Small Outline DIMM (SO-DIMM) - Компактный формат DIMM, обычно используемый в ноутбуках и других мобильных устройствах.
-  BASE_MODULE_TYPE_SO_DIMM = 3;
+  BASE_MODULE_TYPE_SO_DIMM = 4;
   // Load-Reduced DIMM (LRDIMM) - Тип DIMM-модуля, который использует буфер для уменьшения нагрузки на память.
-  BASE_MODULE_TYPE_LRDIMM = 4;
+  BASE_MODULE_TYPE_LRDIMM = 5;
   // Mini Registered DIMM - Мини-версия Registered DIMM.
-  BASE_MODULE_TYPE_MINI_RDIMM = 5;
+  BASE_MODULE_TYPE_MINI_RDIMM = 6;
   // Mini Unbuffered DIMM - Мини-версия Unbuffered DIMM.
-  BASE_MODULE_TYPE_MINI_UDIMM = 6;
+  BASE_MODULE_TYPE_MINI_UDIMM = 7;
   // Small Outline Registered DIMM (72-bit) - Компактный формат Registered DIMM с 72-битной шириной шины данных.
-  BASE_MODULE_TYPE_SO_RDIMM_72B = 7;
+  BASE_MODULE_TYPE_SO_RDIMM_72B = 8;
   // Small Outline Unbuffered DIMM (72-bit) - Компактный формат Unbuffered DIMM с 72-битной шириной шины данных.
-  BASE_MODULE_TYPE_SO_UDIMM_72B = 8;
+  BASE_MODULE_TYPE_SO_UDIMM_72B = 9;
   // Small Outline DIMM (16-bit) - Компактный формат DIMM с 16-битной шириной шины данных.
-  BASE_MODULE_TYPE_SO_DIMM_16B = 9;
+  BASE_MODULE_TYPE_SO_DIMM_16B = 10;
   // Small Outline DIMM (32-bit) - Компактный формат DIMM с 32-битной шириной шины данных.
-  BASE_MODULE_TYPE_SO_DIMM_32B = 10;
+  BASE_MODULE_TYPE_SO_DIMM_32B = 11;
   // Single Inline Package (SIP) - Устройство в одном корпусе.
-  BASE_MODULE_TYPE_SIP = 11;
+  BASE_MODULE_TYPE_SIP = 12;
   // Dual Inline Package (DIP) - Устройство в двухстрочном корпусе.
-  BASE_MODULE_TYPE_DIP = 12;
+  BASE_MODULE_TYPE_DIP = 13;
   // Zigzag In-line Package (ZIP) - Устройство с корпусом Zigzag In-line Package.
-  BASE_MODULE_TYPE_ZIP = 13;
+  BASE_MODULE_TYPE_ZIP = 14;
   // Small Outline J-lead (SOJ) - Компактный формат с корпусом Small Outline J-lead.
-  BASE_MODULE_TYPE_SOJ = 14;
+  BASE_MODULE_TYPE_SOJ = 15;
   // Проприетарный тип.
-  BASE_MODULE_TYPE_PROPRIETARY = 15;
+  BASE_MODULE_TYPE_PROPRIETARY = 16;
   // Single Inline Memory Module (SIMM) - Модуль памяти в одной линии.
-  BASE_MODULE_TYPE_SIMM = 16;
+  BASE_MODULE_TYPE_SIMM = 17;
   // Dual Inline Memory Module (DIMM) - Модуль памяти в двухстрочном форм-факторе.
-  BASE_MODULE_TYPE_DIMM = 17;
+  BASE_MODULE_TYPE_DIMM = 18;
   // Thin Small Outline Package (TSOP) - Тонкий компактный корпус с выводами.
-  BASE_MODULE_TYPE_TSOP = 18;
+  BASE_MODULE_TYPE_TSOP = 19;
   // Pin Grid Array (PGA) - Массив выводов в форме сетки.
-  BASE_MODULE_TYPE_PGA = 19;
+  BASE_MODULE_TYPE_PGA = 20;
   // Rambus Inline Memory Module (RIMM) - Модуль памяти для технологии Rambus.
-  BASE_MODULE_TYPE_RIMM = 20;
+  BASE_MODULE_TYPE_RIMM = 21;
   // Single Rambus Inline Memory Module (SRIMM) - Одиночный модуль памяти для технологии Rambus.
-  BASE_MODULE_TYPE_SRIMM = 21;
+  BASE_MODULE_TYPE_SRIMM = 22;
   // Surface Mount Device (SMD) - Устройство для монтажа на поверхности.
-  BASE_MODULE_TYPE_SMD = 22;
+  BASE_MODULE_TYPE_SMD = 23;
   // Shrink Small Outline Package (SSMP) - Компактный корпус с уменьшенными размерами.
-  BASE_MODULE_TYPE_SSMP = 23;
+  BASE_MODULE_TYPE_SSMP = 24;
   // Quad Flat Package (QFP) - Четырехсторонний корпус.
-  BASE_MODULE_TYPE_QFP = 24;
+  BASE_MODULE_TYPE_QFP = 25;
   // Thin Quad Flat Package (TQFP) - Тонкий четырехсторонний корпус
-  BASE_MODULE_TYPE_TQFP = 25;
+  BASE_MODULE_TYPE_TQFP = 26;
   // Small Outline Integrated Circuit (SOIC) - Компактный корпус для интегральных схем.
-  BASE_MODULE_TYPE_SOIC = 26;
+  BASE_MODULE_TYPE_SOIC = 27;
   // Leadless Chip Carrier (LCC) - Корпус для монтажа чипов без выводов.
-  BASE_MODULE_TYPE_LCC = 27;
+  BASE_MODULE_TYPE_LCC = 28;
   // Plastic Leaded Chip Carrier (PLCC) - Корпус для монтажа чипов с пластиковыми выводами.
-  BASE_MODULE_TYPE_PLCC = 28;
+  BASE_MODULE_TYPE_PLCC = 29;
   // Ball Grid Array (BGA) - Массив шаров для монтажа на поверхности.
-  BASE_MODULE_TYPE_BGA = 29;
+  BASE_MODULE_TYPE_BGA = 30;
   // Fine-Pitch Ball Grid Array (FPBGA) - Массив шаров с мелким шагом для монтажа на поверхности.
-  BASE_MODULE_TYPE_FPBGA = 30;
+  BASE_MODULE_TYPE_FPBGA = 31;
   // Land Grid Array (LGA) - Массив выводов для монтажа на поверхности.
-  BASE_MODULE_TYPE_LGA = 31;
+  BASE_MODULE_TYPE_LGA = 32;
 }
 
 // Состояние памяти.
