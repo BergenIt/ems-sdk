@@ -12,13 +12,6 @@ message ServiceInstance {
   string address = 2;
 }
 
-message AddressPort {
-  // адрес.
-  string address = 1;
-  // Порт.
-  int32 port = 2;
-}
-
 message DebugRuleState {
   // Идентификатор сервсиа.
   string service_instance_id = 1;
