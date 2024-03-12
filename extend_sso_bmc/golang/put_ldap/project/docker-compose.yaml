@@ -5,7 +5,7 @@ networks:
     name: 'ems-network'
 
 services:
-  sso-center:
+  sso-center-put-ldap-handler:
     build:
       context: .
       dockerfile: Dockerfile
@@ -18,7 +18,7 @@ services:
       core:
         hard: 0
         soft: 0
-    hostname: sso-center
+    hostname: sso-center-put-ldap-handler
     environment:
       ServicePort: 8080
     volumes:
