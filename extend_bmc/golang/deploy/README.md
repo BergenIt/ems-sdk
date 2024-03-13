@@ -136,7 +136,9 @@ CONTAINER ID   IMAGE                                COMMAND   CREATED          S
 
 - <https://learning.postman.com/docs/sending-requests/grpc/first-grpc-request/>
 
-Для проверки в UI EMS необходимо:
+Для чистоты проверки в UI EMS необходимо остановить Docker-контейнер стандартного модуля расширения по BMC, а именно контейнер `ems-bmc-manager-1`.
+
+Алгоритм проверки в UI EMS:
 
 - Подготовить файл прошивки и загрузить в EMS
 - Авторизоваться в EMS
