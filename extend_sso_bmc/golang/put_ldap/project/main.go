@@ -109,10 +109,10 @@ func findCreds(in []*pb.DeviceConnector, protocol pb.ConnectorProtocol) (*pb.Cre
 			if creds.Protocol == protocol {
 				fmt.Println(connector.GetAddress())
 				if creds.Login == "" || creds.Password == "" {
-					return nil, connector.Address, fmt.Errorf("login or password can not be empty")
+					return nil, "", fmt.Errorf("login or password can not be empty")
 				}
 
-				return creds, "", nil
+				return creds, connector.Address, nil
 			}
 		}
 	}
