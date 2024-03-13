@@ -132,7 +132,9 @@ CONTAINER ID   IMAGE                           COMMAND   CREATED          STATUS
 
 - <https://learning.postman.com/docs/sending-requests/grpc/first-grpc-request/>
 
-Для проверки в UI EMS необходимо:
+Для чистоты проверки в UI EMS необходимо остановить Docker-контейнер стандартного модуля расширения Windows, а именно контейнер `ems-windows-manager-1`.
+
+Алгоритм проверки в UI EMS:
 
 - Авторизоваться в EMS
 - Завести оборудование с сетевым интерфейсом по WMI
