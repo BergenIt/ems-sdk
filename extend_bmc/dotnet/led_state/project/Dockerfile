@@ -1,4 +1,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+LABEL ems.bmc.led-state=default
 USER app
 WORKDIR /app
 EXPOSE 8080
