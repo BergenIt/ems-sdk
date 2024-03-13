@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,10 +13,13 @@ namespace BmcHandler.Services
     public class BmcHandlerService : BmcManager.BmcManagerBase
     {
         private const string OffTag = "Off";
+        private const string OnTag = "Lit";
+        private const string BlinkTag = "Blinking";
 
         // RPC по сбору статуса LED.
         public override async Task<CollectBmcLedStateResponse> CollectLedState(CollectBmcLedStateRequest request, ServerCallContext context)
         {
+            Console.WriteLine("Starting process to collect LedState");
             if (request.Device is null)
             {
                 return new();
@@ -43,13 +46,15 @@ namespace BmcHandler.Services
                     continue;
                 }
 
+                Console.WriteLine("Starting get LedState from Address - {0}", connector.Address);
                 resp.Led.State = await GetRedfishLedState(credential, connector.Address);
+                Console.WriteLine("Ending get LedState from Address - {0}", connector.Address);
                 if (resp.Led.State is not LedState.Unspecified && resp.Led.State is not LedState.Unknown)
                 {
                     break;
                 }
             }
-
+            Console.WriteLine("Ending process with LedState - {0}", resp.Led);
             return resp;
         }
 
@@ -74,9 +79,9 @@ namespace BmcHandler.Services
         {
             return strLedState switch
             {
-                "Blinking" => LedState.Blink,
-                "Lit" => LedState.On,
-                "Off" => LedState.Off,
+                BlinkTag => LedState.Blink,
+                OnTag => LedState.On,
+                OffTag => LedState.Off,
                 _ => LedState.Unknown,
             };
         }
