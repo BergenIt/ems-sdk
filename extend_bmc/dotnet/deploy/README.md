@@ -20,22 +20,22 @@
 
 ```Dockerfile
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+LABEL ems.bmc.led-state=default
 USER app
 WORKDIR /app
 EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
+
 WORKDIR /src
 COPY ["BmcHandler.csproj", "."]
 RUN dotnet restore "./BmcHandler.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "./BmcHandler.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./BmcHandler.csproj" -c Release -o /app/build
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./BmcHandler.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./BmcHandler.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
@@ -50,6 +50,33 @@ docker build --tag bmc-handler-led ./
 ```
 
 ## Развертывание
+
+В процессе работы система EMS ищет docker сервис с лейблом "ems.bmc.led-state.model" и значением,
+которое совпадает с названием модели устройства или docker сервис с лейблом "ems.bmc.led-state.vendor" значение которого совпадает с названием производителем устройства.
+
+Eсли не находит, то ищет сервис с лейблом "ems.bmc.led-state", если не находит, то ищет сервис с лейблом "ems.bmc".
+
+Список лейблов с описанием:
+
+Один на выбор:
+
+- LABEL ems.bmc.led-state.model
+  - Для привязки модуля расширения к операции для конкретной модели устройства.
+  - Для этого объявите этот лейбл с названием модели устройства в качестве значения лейбла.
+- LABEL ems.bmc.led-state.vendor
+  - Для привязки модуля расширения к операции для производителя устройства.
+  - Для этого объявите этот лейбл с названием производителя устройства в качестве значения лейбла.
+- LABEL ems.bmc.led-state
+  - Для привязки модуля расширения к операции для всех устройств.
+  - Для этого объявите этот лейбл с любым значением.
+
+Дополнительные:
+
+- LABEL ems.service.secure=default - активация защищенного соединения, в случае использования tls на gRPC сервере.
+- LABEL ems.service.port=8081 - порт, который прослушивает сервер.
+- LABEL ems.grpc-service.healthcheck=81 - порт для проверки доступности сервера.
+
+Лейблы необходимо указывать в Dockerfile проекта.
 
 Для развертывания контейнера в EMS используется Docker-compose, который позволяет настроить межсервисное общение.
 
