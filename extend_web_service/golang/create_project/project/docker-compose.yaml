@@ -20,7 +20,7 @@ services:
         soft: 0
     hostname: service-debug-service-access-handler
     environment:
-      ServicePort: 8080
+      ServicePort: :8080
     deploy:
       resources:
         limits:
