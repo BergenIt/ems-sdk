@@ -55,7 +55,7 @@ func run() error {
 	reflection.Register(server)
 
 	// Создаем листененра.
-	lis, err := net.Listen("tcp", LISTEN_PORT)
+	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		return fmt.Errorf("create listener: %s", err)
 	}
@@ -107,6 +107,7 @@ func findCreds(in []*pb.DeviceConnector, protocol pb.ConnectorProtocol) (*pb.Cre
 	for _, connector := range in {
 		for _, creds := range connector.Credentials {
 			if creds.Protocol == protocol {
+				fmt.Println(connector.GetAddress())
 				if creds.Login == "" || creds.Password == "" {
 					return nil, connector.Address, fmt.Errorf("login or password can not be empty")
 				}

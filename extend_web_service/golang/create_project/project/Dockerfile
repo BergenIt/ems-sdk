@@ -14,7 +14,7 @@ COPY . .
 RUN make build
 
 FROM scratch AS release
-LABEL ems.service.service-health=default
+LABEL ems.service.debug-service-access=default
 WORKDIR /app
 COPY --from=build /src/bin ./bin
 ENTRYPOINT ["./bin"]

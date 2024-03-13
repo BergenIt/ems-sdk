@@ -5,7 +5,7 @@ networks:
     name: 'ems-network'
 
 services:
-  service-service-health-handler:
+  service-debug-service-access-handler:
     build:
       context: .
       dockerfile: Dockerfile
@@ -18,9 +18,9 @@ services:
       core:
         hard: 0
         soft: 0
-    hostname: service-service-health-handler
+    hostname: service-debug-service-access-handler
     environment:
-      ServicePort: 8080
+      ServicePort: :8080
     deploy:
       resources:
         limits:

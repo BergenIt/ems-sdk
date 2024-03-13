@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	pb "service/gen/cluster-contract"
 	"log"
 	"net"
 	"os"
+	pb "service/gen/cluster-contract"
 	"time"
 
 	"google.golang.org/grpc"
@@ -61,23 +61,14 @@ type microservice struct {
 
 // RPC по сбору списка виртуальных машин с гипервизра ESXI.
 func (r *microservice) DebugAccess(ctx context.Context, req *pb.DebugServiceAccessRequest) (*pb.DebugServiceAccessResponse, error) {
-	// Составление адреса в зависимости от входных данных.
-	address := ""
-	switch f := req.Address.(type) {
-	case *pb.DebugServiceAccessRequest_AddressPort:
-		address = fmt.Sprintf("%s:%d", f.AddressPort.Address, f.AddressPort.Port)
-	case *pb.DebugServiceAccessRequest_Uri:
-		address = f.Uri
-	}
-
-	log.Printf("got request with address %s", address)
+	log.Printf("got request with address %s", req.GetUri())
 
 	var (
 		err          error
 		availability bool
 		out          *pb.DebugServiceAccessResponse = &pb.DebugServiceAccessResponse{
 			Result: &pb.DebugAccessResult{
-				Address: address,
+				Address: req.GetUri(),
 			},
 		}
 	)
@@ -88,12 +79,12 @@ func (r *microservice) DebugAccess(ctx context.Context, req *pb.DebugServiceAcce
 		pb.ServiceProtocol_SERVICE_PROTOCOL_WS,
 		pb.ServiceProtocol_SERVICE_PROTOCOL_TCP,
 		pb.ServiceProtocol_SERVICE_PROTOCOL_HTTP:
-		availability, err = pingTcp(address)
+		availability, err = pingTcp(req.GetUri())
 
 		out.Result.State = determineAvailability(availability, err)
 
 	case pb.ServiceProtocol_SERVICE_PROTOCOL_UDP:
-		availability, err = pingUdp(address)
+		availability, err = pingUdp(req.GetUri())
 
 		out.Result.State = determineAvailability(availability, err)
 

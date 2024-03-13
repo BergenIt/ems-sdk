@@ -28,10 +28,7 @@ COPY . .
 RUN make build
 
 FROM scratch AS release
-LABEL ems.service.service-health=default
-LABEL ems.service.secure=default
-LABEL ems.service.port=8081
-LABEL ems.grpc-service.healthcheck=81
+LABEL ems.service.debug-service-access=default
 WORKDIR /app
 COPY --from=build /src/bin ./bin
 ENTRYPOINT ["./bin"]
@@ -48,16 +45,16 @@ ENTRYPOINT ["./bin"]
 
 ## Развертывание
 
-В процессе работы система EMS ищет docker сервис с лейблом "ems.service.service-health.type" и значением, которое совпадает с названием типа сервиса. Eсли не находит, то ищет сервис с лейблом "ems.service.service-health", если не находит, то ищет сервис с лейблом "ems.service".
+В процессе работы система EMS ищет docker сервис с лейблом "ems.service.debug-service-access.type" и значением, которое совпадает с названием типа сервиса. Eсли не находит, то ищет сервис с лейблом "ems.service.debug-service-access", если не находит, то ищет сервис с лейблом "ems.service".
 
 Список лейблов с описанием:
 
 Один на выбор:
 
-- LABEL ems.service.service-health.operation-system
+- LABEL ems.service.debug-service-access.operation-system
   - Для привязки модуля расширения к операции для конкретных операционных систем устройств.
   - Для этого объявите этот лейбл с названием и версией операционной системы устройства, разделенных пробелом, в качестве значения лейбла.
-- LABEL ems.service.service-health
+- LABEL ems.service.debug-service-access
   - Для привязки модуля расширения к операции для всех устройств.
   - Для этого объявите этот лейбл с любым значением.
 
@@ -81,7 +78,7 @@ networks:
     name: 'ems-network'
 
 services:
-  service-manager:
+  service-debug-service-access-handler:
     build:
       context: .
       dockerfile: Dockerfile
@@ -94,9 +91,9 @@ services:
       core:
         hard: 0
         soft: 0
-    hostname: service-manager
+    hostname: service-debug-service-access-handler
     environment:
-      ServicePort: 8081
+      ServicePort: 8080
     deploy:
       resources:
         limits:
@@ -114,11 +111,11 @@ services:
 
 Для запуска модуля расширения в эксплуатацию необходимо поместить папку `project` на ВМ, где запущен EMS и выполнить команду `docker-compose up --build -d` из корня проекта.
 
-Если приложения корректно запущено, то при выполнении команды `docker ps | grep project-service-manager-1` мы увидим вот такой результат:
+Если приложения корректно запущено, то при выполнении команды `docker ps | grep project-service-debug-service-access-handler-1` мы увидим вот такой результат:
 
 ```bash
 CONTAINER ID   IMAGE                     COMMAND   CREATED         STATUS         PORTS     NAMES
-059ed982d404   project-service-manager   "./bin"   3 seconds ago   Up 2 seconds             project-service-manager-1
+059ed982d404   project-service-debug-service-access-handler   "./bin"   3 seconds ago   Up 2 seconds             project-service-debug-service-access-handler-1
 ```
 
 Проверить работу сервиса можно через Postman, подробнее об этом описано [здесь](https://learning.postman.com/docs/sending-requests/grpc/first-grpc-request/).

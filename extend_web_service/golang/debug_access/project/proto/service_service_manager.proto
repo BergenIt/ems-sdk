@@ -12,14 +12,10 @@ service ServiceManager {
  * Контракт запроса для rpc DebugAccess
  */
 message DebugServiceAccessRequest {
-  oneof address {
-    // URI сервиса.
-    string uri = 2;
-    // Адрес и порт сервиса.
-    AddressPort address_port = 3;
-  }
+  // URI сервиса
+  string uri = 1;
   // Протокол сервиса
-  ServiceProtocol protocol = 4;
+  ServiceProtocol protocol = 2;
 }
 
 /**

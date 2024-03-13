@@ -29,9 +29,7 @@ RUN make build
 
 FROM scratch AS release
 LABEL ems.hypervisor.virtual-machine-set=default
-LABEL ems.service.secure=default
 LABEL ems.service.port=8081
-LABEL ems.grpc-service.healthcheck=81
 WORKDIR /app
 COPY --from=build /src/bin ./bin
 ENTRYPOINT ["./bin"]
@@ -83,7 +81,7 @@ networks:
     name: 'ems-network'
 
 services:
-  hypervisor-manager:
+  hypervisor-vm-set-handler:
     build:
       context: .
       dockerfile: Dockerfile
@@ -96,7 +94,7 @@ services:
       core:
         hard: 0
         soft: 0
-    hostname: hypervisor-manager
+    hostname: hypervisor-vm-set-handler
     environment:
       ServicePort: 8081
     deploy:
@@ -116,11 +114,11 @@ services:
 
 Для запуска модуля расширения в эксплуатацию необходимо поместить папку `project` на ВМ, где запущен EMS и выполнить команду `docker-compose up --build -d` из корня проекта.
 
-Если приложения корректно запущено, то при выполнении команды `docker ps | grep project-hypervisor-manager-1` мы увидим вот такой результат:
+Если приложения корректно запущено, то при выполнении команды `docker ps | grep project-hypervisor-vm-set-handler-1` мы увидим вот такой результат:
 
 ```bash
 CONTAINER ID   IMAGE                     COMMAND   CREATED         STATUS         PORTS     NAMES
-059ed982d404   project-hypervisor-manager   "./bin"   3 seconds ago   Up 2 seconds             project-hypervisor-manager-1
+059ed982d404   project-hypervisor-vm-set-handler   "./bin"   3 seconds ago   Up 2 seconds             project-hypervisor-vm-set-handler-1
 ```
 
 Проверить работу сервиса можно через Postman, подробнее об этом описано [здесь](https://learning.postman.com/docs/sending-requests/grpc/first-grpc-request/).

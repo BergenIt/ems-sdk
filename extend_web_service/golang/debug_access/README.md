@@ -13,14 +13,10 @@ service ServiceManager {
 
 // Контракт запроса для rpc DebugAccess
 message DebugServiceAccessRequest {
-  oneof address {
-    // URI сервиса.
-    string uri = 2;
-    // Адрес и порт сервиса.
-    AddressPort address_port = 3;
-  }
+  // URI сервиса
+  string uri = 1;
   // Протокол сервиса
-  ServiceProtocol protocol = 4;
+  ServiceProtocol protocol = 2;
 }
 
 // Контракт ответа для rpc DebugAccess
@@ -48,19 +44,7 @@ message DebugServiceAccessResponse {
 
 На вход нам приходит `oneof` адреса, который может быть либо доменным именем, либо ip-адресом с портом.
 
-Составляем адрес в зависимости от `oneof` поля Address:
-
-```golang
-address := ""
-switch f := req.Address.(type) {
-case *pb.DebugServiceAccessRequest_AddressPort:
-    address = fmt.Sprintf("%s:%d", f.AddressPort.Address, f.AddressPort.Port)
-case *pb.DebugServiceAccessRequest_Uri:
-    address = f.Uri
-}
-```
-
-Далее производим проверку в зависимости от протокола:
+Производим проверку в зависимости от протокола:
 
 ```golang
 switch req.Protocol {
