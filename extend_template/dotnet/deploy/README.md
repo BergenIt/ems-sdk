@@ -49,7 +49,7 @@
 ```Dockerfile
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-LABEL ems.template.temperature.model.some-model=default
+LABEL ems.template.temperature.model="RouterOS CHR"
 USER app
 WORKDIR /app
 EXPOSE 8080
