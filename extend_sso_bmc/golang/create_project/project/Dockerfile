@@ -14,10 +14,7 @@ COPY . .
 RUN make build
 
 FROM scratch AS release
-LABEL ems.sso.put-setting=default
-LABEL ems.service.secure=default
-LABEL ems.service.port=8081
-LABEL ems.grpc-service.healthcheck=81
+LABEL ems.sso.put-settings=default
 WORKDIR /app
 COPY --from=build /src/bin ./bin
 ENTRYPOINT ["./bin"]

@@ -14,7 +14,7 @@ COPY . .
 RUN make build
 
 FROM scratch AS release
-LABEL ems.sso.put-setting=default
+LABEL ems.sso.put-settings=default
 WORKDIR /app
 COPY --from=build /src/bin ./bin
 ENTRYPOINT ["./bin"]
