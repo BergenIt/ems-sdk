@@ -5,7 +5,7 @@ namespace Infrastructure.Service;
 
 public class SshCommandCaller
 {
-    private static readonly string[] _commands = { "top -b -n1 -1 -p0 -w 400", "top -b -n1 -w 400" };
+    private static readonly string[] _commands = { "top -b -n2 -1 -p0 -w 400", "top -b -n1 -w 400" };
     private static string TopCpuPrefix = "%cpu";
 
     public record HandleResult(int Success, string Stdout, string Stderr);
@@ -18,33 +18,48 @@ public class SshCommandCaller
     {
         DeviceConnector connection = request.Device.Connectors.First();
         Credential creds = connection.Credentials.First();
-
-        using (SshClient client = new SshClient(connection.Address, creds.Port, creds.Login, creds.Password))
+        if (creds.Protocol == ConnectorProtocol.Ssh)
         {
-            client.Connect();
-            SshCommand cmdRes = client.RunCommand(command);
-            if (cmdRes.ExitStatus == 0)
+            using (SshClient client = new SshClient(connection.Address, creds.Port, creds.Login, creds.Password))
             {
+                client.Connect();
+                SshCommand cmdRes = client.RunCommand(command);
+                if (cmdRes.ExitStatus == 0)
+                {
+                    client.Disconnect();
+                    return new HandleResult(cmdRes.ExitStatus,
+                    cmdRes.Result, cmdRes.Error);
+                }
                 client.Disconnect();
                 return new HandleResult(cmdRes.ExitStatus,
-                cmdRes.Result, cmdRes.Error);
+                    cmdRes.Result, cmdRes.Error);
             }
-            client.Disconnect();
-            return new HandleResult(cmdRes.ExitStatus,
-                cmdRes.Result, cmdRes.Error);
         }
+        return new(1, "", "");
     }
     public static CollectLinuxCpuUtilizationResponse ProcessResponse(HandleResult[] results, CollectLinuxCpuUtilizationRequest request)
     {
         string response = "";
-        foreach (HandleResult res in results)
+        if (results.Length > 0)
         {
-            if (res.Success == 0)
+            foreach (HandleResult res in results)
             {
-                response += res.Stdout;
+                if (res.Success == 0)
+                {
+                    string buffer = res.Stdout;
+                    string[] arr = buffer.Split("Tasks:");
+                    if (arr != null && arr.Length > 0)
+                    {
+                        response += arr[arr.Length - 1];
+                    }
+                    else
+                    {
+                        response += res.Stdout;
+                    }
+
+                }
             }
         }
-
         CollectLinuxCpuUtilizationResponse statDeviceCpu = new()
         {
             CpuUtilization = new()
@@ -116,8 +131,11 @@ public class SshCommandCaller
                         default: break;
                     }
                 }
-               
+
             }
+            cpu.TotalUsing = 100 - cpu.IdleTime;
+            cpu.IdleTime = 55;
+            Console.WriteLine(cpu.TotalUsing);
             if (processorId == -1)
             {
                 statDeviceCpu.CpuUtilization.SummaryUtilization = cpu;
@@ -127,6 +145,9 @@ public class SshCommandCaller
                 statDeviceCpu.CpuUtilization.UnitUtilistaions.Add(processorId, cpu);
             }
         }
+        
+        Console.WriteLine(request.Device.DeviceId);
+        Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         return statDeviceCpu;
     }
 
