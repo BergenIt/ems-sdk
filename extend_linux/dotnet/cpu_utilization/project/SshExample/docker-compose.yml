@@ -1,6 +1,13 @@
+networks:
+ default:
+  # Имя сети, необходимо чтобы контейнеры были в одной сети
+  name: 'ems-network'
+
 services:
-  linux-manager:
-    image: linuxmanager:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
+  # Название вашего сервиса
+  linuxmanager:
+   # Название созданного вами образа
+    image: linuxmanager2:latest
+    ports:
+   # Порты для обращения к сервису внешний:внутренний
+      - 42763:8080
