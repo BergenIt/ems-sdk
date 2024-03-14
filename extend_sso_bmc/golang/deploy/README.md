@@ -96,7 +96,7 @@ services:
         soft: 0
     hostname: sso-center-put-ldap-handler
     environment:
-      ServicePort: 8081
+      ServicePort: :8081
     deploy:
       resources:
         limits:

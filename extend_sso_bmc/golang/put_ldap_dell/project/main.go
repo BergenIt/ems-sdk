@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -100,7 +99,12 @@ func (r *microservice) PutSettings(ctx context.Context, req *pb.PutSsoSettingsRe
 		}
 	}
 
-	return nil, errors.New("not implemented")
+	return &pb.PutSsoSettingsResponse{
+		Result: &pb.OperationResult{
+			DeviceId: req.Device.DeviceId,
+			State:    pb.OperationState_OPERATION_STATE_SUCCESS,
+		},
+	}, nil
 }
 
 func findCreds(in []*pb.DeviceConnector, protocol pb.ConnectorProtocol) (*pb.Credential, string, error) {
