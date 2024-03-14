@@ -10,6 +10,9 @@ namespace SshExample.Services
         public override Task<CollectLinuxCpuUtilizationResponse> CollectCpuUtilization(CollectLinuxCpuUtilizationRequest request, ServerCallContext context)
         {
             Console.WriteLine("cpu request");
+            Console.WriteLine("------");
+            Console.WriteLine(request.Device.DeviceId);
+            Console.WriteLine("++++++");
             return Task.FromResult(SshCommandCaller.GetCpuUtilisation(request));
         }
     }
