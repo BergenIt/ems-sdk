@@ -14,6 +14,7 @@ COPY . .
 RUN make build
 
 FROM debian AS release
+LABEL ems.network.create-config=default
 WORKDIR /app
 COPY --from=build /src/bin ./bin
 ENTRYPOINT ["./bin"]

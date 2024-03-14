@@ -43,7 +43,7 @@ func run() error {
 	// Регистрируем рефлексию для сервиса, чтобы получать информацию об общедоступных RPC (опционально).
 	reflection.Register(server)
 
-	lis, err := net.Listen("tcp", listenPort)
+	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		return fmt.Errorf("create listener: %w", err)
 	}
@@ -68,23 +68,22 @@ type sshConnInfo struct {
 const createConfigCmd = "export"
 
 func (m *microservice) CreateConfig(ctx context.Context, req *pb.CreateNetworkConfigRequest) (*pb.CreateNetworkConfigResponse, error) {
+	fmt.Println("got request")
+
 	info, err := extractSSHConnInfo(req.Device.Connectors)
 	if err != nil {
 		return nil, err
 	}
 
 	cfg := &ssh.ClientConfig{
-		User: info.login,
-		HostKeyCallback: ssh.HostKeyCallback(
-			func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-				return nil
-			}),
+		User:            info.login,
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		Auth: []ssh.AuthMethod{
 			ssh.Password(info.pass),
 		},
 	}
 
-	conn, err := ssh.Dial("tcp", info.addr, cfg)
+	conn, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", info.addr, info.port), cfg)
 	if err != nil {
 		return nil, err
 	}

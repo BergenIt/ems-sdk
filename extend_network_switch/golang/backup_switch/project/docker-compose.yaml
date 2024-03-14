@@ -5,7 +5,7 @@ networks:
     name: 'ems-network'
 
 services:
-  network-manager:
+  network-manager-create-backup-handler:
     build:
       context: .
       dockerfile: Dockerfile
@@ -18,9 +18,9 @@ services:
       core:
         hard: 0
         soft: 0
-    hostname: network-manager
+    hostname: network-manager-create-backup-handler
     environment:
-      ServicePort: 8081
+      ServicePort: :8080
     deploy:
       resources:
         limits:
