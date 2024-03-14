@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -156,9 +158,9 @@ func loadLDAPCA(client *RedfishClient, xauth string) error {
 		"X-Auth-Token": xauth,
 	}
 
-	ca, err := os.ReadFile(CA_LOCAL_PATH)
+	ca, err := loadCa()
 	if err != nil {
-		return fmt.Errorf("read body error: %s", err)
+		return fmt.Errorf("load CA: %s", err)
 	}
 
 	if err := client.PostDataWithHeaders(LDAPSetCAPageEndpoint, createLDAPSetCABody(string(ca)), headers); err != nil {
@@ -203,4 +205,28 @@ func setLDAPSettings(client *RedfishClient, xauth string) error {
 	}
 
 	return nil
+}
+
+func loadCa() (string, error) {
+	req, _ := http.NewRequest(http.MethodGet, "https://traefik:7071/roots.pem", nil)
+	c := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
+
+	response, err := c.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("http GET: %s", err)
+	}
+	defer response.Body.Close()
+
+	ca, err := io.ReadAll(response.Body)
+	if err != nil {
+		return "", fmt.Errorf("read response body: %s", err)
+	}
+
+	return string(ca), nil
 }

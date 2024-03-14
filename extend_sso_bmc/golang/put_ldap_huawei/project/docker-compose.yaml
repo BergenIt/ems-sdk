@@ -6,6 +6,8 @@ networks:
 
 services:
   sso-center-put-ldap-handler-huawei:
+    extra_hosts:
+      - traefik:10.1.18.17
     build:
       context: .
       dockerfile: Dockerfile
@@ -21,8 +23,6 @@ services:
     hostname: sso-center-put-ldap-handler-huawei
     environment:
       ServicePort: :8080
-    volumes:
-      -  ${PWD}/roots.pem:/app/roots.pem
     deploy:
       resources:
         limits:

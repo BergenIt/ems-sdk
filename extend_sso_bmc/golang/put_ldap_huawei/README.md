@@ -34,13 +34,6 @@ message PutSsoSettingsResponse {
 
 Дополняем уже имеющийся [шаблон](../create_project/project/main.go) релизацией RPC `PutSettings`.
 
-Для активации работы LDAP по защищенному соединению необходимо получить CA. Для этого необходимо зайти на ВМ sdk и выполнить команду `docker exec -it ems-traefik-1 sh -c "wget -O - --no-check-certificate https://acme:443/roots.pem 2> /dev/null" > roots.pem`. Данный сертификат необходимо загрузить в проект через волюм в docker-compose.yaml слудующим образом:
-
-```yaml
-volumes:
-    - roots.pem:roots.pem
-```
-
 Для начала нам необходимо спарсить данные для подключения к BMC по протоколу REDFISH из входящих данных:
 
 ```golang
@@ -190,9 +183,9 @@ func loadLDAPCA(client *RedfishClient, xauth string) error {
         "X-Auth-Token": xauth,
     }
 
-    ca, err := os.ReadFile(CA_LOCAL_PATH)
+    ca, err := loadCa()
     if err != nil {
-        return fmt.Errorf("read body error: %s", err)
+        return fmt.Errorf("load CA: %s", err)
     }
 
     if err := client.PostDataWithHeaders(LDAPSetCAPageEndpoint, createLDAPSetCABody(string(ca)), headers); err != nil {
@@ -200,6 +193,30 @@ func loadLDAPCA(client *RedfishClient, xauth string) error {
     }
 
     return nil
+}
+
+func loadCa() (string, error) {
+    req, _ := http.NewRequest(http.MethodGet, "https://traefik:7071/roots.pem", nil)
+    c := &http.Client{
+        Transport: &http.Transport{
+            TLSClientConfig: &tls.Config{
+                InsecureSkipVerify: true,
+            },
+        },
+    }
+
+    response, err := c.Do(req)
+    if err != nil {
+        return "", fmt.Errorf("http GET: %s", err)
+    }
+    defer response.Body.Close()
+
+    ca, err := io.ReadAll(response.Body)
+    if err != nil {
+        return "", fmt.Errorf("read response body: %s", err)
+    }
+
+    return string(ca), nil
 }
 ```
 

@@ -34,13 +34,6 @@ message PutSsoSettingsResponse {
 
 Дополняем уже имеющийся [шаблон](../create_project/project/main.go) релизацией RPC `PutSettings`.
 
-Для активации работы LDAP по защищенному соединению необходимо получить CA. Для этого необходимо зайти на ВМ sdk и выполнить команду `docker exec -it ems-traefik-1 sh -c "wget -O - --no-check-certificate https://acme:443/roots.pem 2> /dev/null" > roots.pem`. Данный сертификат необходимо загрузить в проект через волюм в docker-compose.yaml слудующим образом:
-
-```yaml
-volumes:
-    - roots.pem:roots.pem
-```
-
 Для начала нам необходимо спарсить данные для подключения к BMC по протоколу REDFISH из входящих данных:
 
 ```golang

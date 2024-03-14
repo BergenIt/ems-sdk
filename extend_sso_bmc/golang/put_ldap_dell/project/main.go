@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	pb "sso_center/gen/cluster-contract"
 
@@ -136,7 +139,7 @@ func putSettings(client *RedfishClient, state pb.SsoState) error {
 }
 
 func loadLDAPCA(client *RedfishClient) error {
-	ca, err := loadCA()
+	ca, err := loadCa()
 	if err != nil {
 		return fmt.Errorf("load CA: %s", err)
 	}
@@ -180,10 +183,25 @@ func setLDAPAttrsDell(client *RedfishClient, ssoDn, ssoPassword string) error {
 	return nil
 }
 
-func loadCA() (string, error) {
-	ca, err := os.ReadFile(CA_LOCAL_PATH)
+func loadCa() (string, error) {
+	req, _ := http.NewRequest(http.MethodGet, "https://traefik:7071/roots.pem", nil)
+	c := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
+
+	response, err := c.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("read body error: %s", err)
+		return "", fmt.Errorf("http GET: %s", err)
+	}
+	defer response.Body.Close()
+
+	ca, err := io.ReadAll(response.Body)
+	if err != nil {
+		return "", fmt.Errorf("read response body: %s", err)
 	}
 
 	return string(ca), nil

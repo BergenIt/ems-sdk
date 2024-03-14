@@ -71,6 +71,13 @@ ENTRYPOINT ["./bin"]
 
 Далее необходимо создать `docker-compose.yaml` файл конфигурации для развертывания сервиса через `docker-compose`.
 
+Важно прописать extra_hosts следующим образом:
+
+```yaml
+extra_hosts:
+  - traefik:<IP master-cluster>
+```
+
 Важно определить в конфигурации работу в сети `ems-network`, пример рабочего файла конфигурации выглядит следующим образом:
 
 ```yaml
@@ -81,7 +88,9 @@ networks:
     name: 'ems-network'
 
 services:
-  sso-center-put-ldap-handler:
+  sso-center-put-ldap-handler-huawei:
+    extra_hosts:
+      - traefik:10.1.18.17
     build:
       context: .
       dockerfile: Dockerfile
@@ -94,9 +103,9 @@ services:
       core:
         hard: 0
         soft: 0
-    hostname: sso-center-put-ldap-handler
+    hostname: sso-center-put-ldap-handler-huawei
     environment:
-      ServicePort: :8081
+      ServicePort: :8080
     deploy:
       resources:
         limits:
