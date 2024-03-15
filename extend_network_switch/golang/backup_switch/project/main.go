@@ -65,7 +65,7 @@ type sshConnInfo struct {
 	port  int32
 }
 
-const createConfigCmd = "export"
+const createConfigCmd = "net show configuration command"
 
 func (m *microservice) CreateConfig(ctx context.Context, req *pb.CreateNetworkConfigRequest) (*pb.CreateNetworkConfigResponse, error) {
 	fmt.Println("got request")
