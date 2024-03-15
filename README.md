@@ -1,6 +1,6 @@
 # EMS SDK
 
-> В разработке
+* [Установить OpenEMS](https://sourceforge.net/projects/ems/)
 
 ## Описание решения
 
