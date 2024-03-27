@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package tool_cluster.v4;
+
+// Сервис выдачи таргетов модулей расширения
+service TargetDistributor {
+  // Получить таргет
+  rpc GetTarget(GetTargetRequest) returns (GetTargetResponse);
+}
+
+message GetTargetRequest {
+  // Адрес устройства для отпределения таргета
+  string device_address = 1;
+}
+
+message GetTargetResponse {
+  // Адрес таргета
+  string target_address = 1;
+}
